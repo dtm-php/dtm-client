@@ -98,4 +98,9 @@ class HttpApi implements ApiInterface
         }
         return null;
     }
+
+    public function transRequestBranch()
+    {
+
+    }
 }
