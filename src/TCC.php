@@ -19,9 +19,9 @@ class TCC
 
     protected array $branch = [];
 
-    public function __construct(ApiFactory $apiFactory)
+    public function __construct(ApiInterface $api)
     {
-        $this->api = $apiFactory->create();
+        $this->api = $api;
     }
 
     public function generateGid(string $dtmService): string

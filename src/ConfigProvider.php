@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace DtmClient;
 
+use DtmClient\Api\ApiInterface;
 use DtmClient\Api\HttpApi;
 use DtmClient\Api\HttpApiFactory;
 
@@ -21,6 +22,7 @@ class ConfigProvider
         return [
             'dependencies' => [
                 HttpApi::class => HttpApiFactory::class,
+                ApiInterface::class => ApiFactory::class,
             ],
             'commands' => [
             ],
