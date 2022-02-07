@@ -19,9 +19,12 @@ class TCC
 
     protected array $branch = [];
 
-    public function __construct(ApiFactory $apiFactory)
+    protected BranchIdGenerateInterface $branchIdGenerate;
+
+    public function __construct(ApiFactory $apiFactory, BranchIdGenerateInterface $branchIdGenerate)
     {
         $this->api = $apiFactory->create();
+        $this->branchIdGenerate = $branchIdGenerate;
     }
 
     public function generateGid(string $dtmService): string
@@ -31,10 +34,17 @@ class TCC
 
     public function tccGlobalTransaction(string $dtmServer, string $gid, callable $callback)
     {
+        $callback();
+
     }
 
     public function callBranch(array $body, string $tryUrl, string $confirmUrl, string $cancelUrl)
     {
-
+        $res = $this->api->registerBranch([
+            'data' => $body,
+            'branch_id' => $this->branchIdGenerate->generateSubBranchId(),
+            'confirm' => $confirmUrl,
+            'cancel' => $cancelUrl
+        ]);
     }
 }

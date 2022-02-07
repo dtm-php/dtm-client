@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace DtmClient\Api;
 
 use DtmClient\Constants\Operation;
-use DtmClient\Exception\GenerateGidException;
+use DtmClient\Exception\GenerateException;
 use DtmClient\Exception\RequestException;
 use GuzzleHttp\Exception\GuzzleException;
 use Hyperf\Contract\ConfigInterface;
@@ -33,7 +33,7 @@ class HttpApi implements ApiInterface
         $response = $this->client->get($url)->getBody()->getContents();
         $responseContent = json_decode($response, true);
         if ($responseContent['dtm_result'] !== 'SUCCESS' || empty($responseContent['gid'])) {
-            throw new GenerateGidException($responseContent['message'] ?? '');
+            throw new GenerateException($responseContent['message'] ?? '');
         }
         return $responseContent['gid'];
     }
