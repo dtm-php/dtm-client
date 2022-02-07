@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace DtmClient;
 
 use DtmClient\Api\ApiInterface;
+use DtmClient\Constants\TransType;
 
 class Sage
 {
@@ -30,7 +31,7 @@ class Sage
         TransContext::init($gid, 'sage', '');
     }
 
-    public function add(string $action, string $compensate, $payload): static
+    public function add(string $action, string $compensate, array|object $payload): static
     {
         TransContext::appendSteps([
             'action' => $action,
@@ -54,7 +55,12 @@ class Sage
     public function submit()
     {
         $this->addConcurrentContext();
-        return $this->api->submit($this->orders);
+        return $this->api->submit([
+            'gid' => TransContext::getGid(),
+            'trans_type' => TransType::SAGE,
+            'payloads' => TransContext::getPayloads(),
+            'steps' => TransContext::getSteps(),
+        ]);
     }
 
     public function addConcurrentContext()
@@ -66,5 +72,5 @@ class Sage
             ]));
         }
     }
-    
+
 }

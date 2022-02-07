@@ -12,9 +12,9 @@ class TransType
 {
     public const TCC = 'tcc';
 
-    public const MESSAGE = 'message';
+    public const SAGE = 'sage';
 
     public const XA = 'xa';
 
-    public const SAGA = 'saga';
+    public const MSG = 'msg';
 }
