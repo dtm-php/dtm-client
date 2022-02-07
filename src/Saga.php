@@ -28,7 +28,7 @@ class Saga extends AbstractTransaction
 
     public function init(string $gid)
     {
-        TransContext::init($gid, 'sage', '');
+        TransContext::init($gid, TransType::SAGA, '');
     }
 
     public function add(string $action, string $compensate, array|object $payload): static
