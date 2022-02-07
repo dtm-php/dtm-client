@@ -9,11 +9,11 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-namespace DtmPhp\DtmClient\Api;
+namespace Dtm\DtmClient\Api;
 
-use DtmPhp\DtmClient\Constants\Operation;
-use DtmPhp\DtmClient\Exception\GenerateGidException;
-use DtmPhp\DtmClient\Exception\RequestException;
+use Dtm\DtmClient\Constants\Operation;
+use Dtm\DtmClient\Exception\GenerateGidException;
+use Dtm\DtmClient\Exception\RequestException;
 use GuzzleHttp\Client;
 use Hyperf\Guzzle\ClientFactory;
 

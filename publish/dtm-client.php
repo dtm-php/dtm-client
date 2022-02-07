@@ -10,5 +10,5 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 return [
-    'protocol' => \DtmPhp\DtmClient\Constants\Protocol::HTTP,
+    'protocol' => \Dtm\DtmClient\Constants\Protocol::HTTP,
 ];

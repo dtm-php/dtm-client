@@ -1,6 +1,6 @@
 <?php
 
-namespace DtmPhp\DtmClient\Exception;
+namespace Dtm\DtmClient\Exception;
 
 class GenerateGidException extends \Exception
 {

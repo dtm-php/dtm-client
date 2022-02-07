@@ -9,12 +9,12 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-namespace DtmPhp\DtmClient;
+namespace Dtm\DtmClient;
 
-use DtmPhp\DtmClient\Api\ApiInterface;
-use DtmPhp\DtmClient\Api\HttpApi;
-use DtmPhp\DtmClient\Constants\Protocol;
-use DtmPhp\DtmClient\Exception\UnsupportedException;
+use Dtm\DtmClient\Api\ApiInterface;
+use Dtm\DtmClient\Api\HttpApi;
+use Dtm\DtmClient\Constants\Protocol;
+use Dtm\DtmClient\Exception\UnsupportedException;
 use Psr\Container\ContainerInterface;
 
 class ApiFactory

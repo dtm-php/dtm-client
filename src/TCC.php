@@ -9,9 +9,9 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-namespace DtmPhp\DtmClient;
+namespace Dtm\DtmClient;
 
-use DtmPhp\DtmClient\Api\ApiInterface;
+use Dtm\DtmClient\Api\ApiInterface;
 use Psr\Container\ContainerInterface;
 
 class TCC

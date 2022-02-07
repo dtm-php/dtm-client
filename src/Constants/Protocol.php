@@ -1,6 +1,6 @@
 <?php
 
-namespace DtmPhp\DtmClient\Constants;
+namespace Dtm\DtmClient\Constants;
 
 class Protocol
 {
