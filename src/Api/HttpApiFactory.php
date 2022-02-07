@@ -18,7 +18,7 @@ class HttpApiFactory
     {
         $config = $container->get(ConfigInterface::class);
         $server = $config->get('dtm-client.server');
-        $port = $config->get('dtm-client.port');
+        $port = $config->get('dtm-client.port.http');
         $clientFactory = $container->get(ClientFactory::class);
         return $clientFactory->create([
             'base_uri' => $server . ':' . $port,

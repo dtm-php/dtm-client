@@ -13,17 +13,17 @@ namespace DtmClient\Api;
 
 interface ApiInterface
 {
-    public function generateGid(string $dtmServer): string;
+    public function generateGid(): string;
 
-    public function prepare(string $dtmServer, array $body);
+    public function prepare(array $body);
 
-    public function submit(string $dtmServer, array $body);
+    public function submit(array $body);
 
-    public function abort(string $dtmServer, array $body);
+    public function abort(array $body);
 
-    public function registerBranch(string $dtmServer, array $body);
+    public function registerBranch(array $body);
 
-    public function query(string $dtmServer, array $body);
+    public function query(array $body);
 
-    public function queryAll(string $dtmServer, array $body);
+    public function queryAll(array $body);
 }

@@ -11,6 +11,9 @@ declare(strict_types=1);
  */
 return [
     'protocol' => \Dtm\DtmClient\Constants\Protocol::HTTP,
-    'server' => 'http://127.0.0.1',
-    'port' => 80,
+    'server' => '127.0.0.1',
+    'port' => [
+        'http' => 36789,
+        'grpc' => 36790,
+    ],
 ];

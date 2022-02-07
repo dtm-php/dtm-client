@@ -29,9 +29,9 @@ class HttpApi implements ApiInterface
         $this->config = $config;
     }
 
-    public function generateGid(string $dtmServer): string
+    public function generateGid(): string
     {
-        $url = sprintf('%s/api/dtmsvr/newGid', $dtmServer);
+        $url = sprintf('/api/dtmsvr/newGid');
         $response = $this->client->get($url)->getBody()->getContents();
         $responseContent = json_decode($response, true);
         if ($responseContent['dtm_result'] !== 'SUCCESS' || empty($responseContent['gid'])) {
@@ -40,43 +40,43 @@ class HttpApi implements ApiInterface
         return $responseContent['gid'];
     }
 
-    public function prepare(string $dtmServer, array $body)
+    public function prepare(array $body)
     {
-        return $this->transCallDtm($dtmServer, $body, Operation::PREPARE);
+        return $this->transCallDtm($body, Operation::PREPARE);
     }
 
-    public function submit(string $dtmServer, array $body)
+    public function submit(array $body)
     {
-        return $this->transCallDtm($dtmServer, $body, Operation::SUBMIT);
+        return $this->transCallDtm($body, Operation::SUBMIT);
     }
 
-    public function abort(string $dtmServer, array $body)
+    public function abort(array $body)
     {
-        return $this->transCallDtm($dtmServer, $body, Operation::ABORT);
+        return $this->transCallDtm($body, Operation::ABORT);
     }
 
-    public function registerBranch(string $dtmServer, array $body)
+    public function registerBranch(array $body)
     {
-        return $this->transCallDtm($dtmServer, $body, Operation::REGISTER_BRANCH);
+        return $this->transCallDtm($body, Operation::REGISTER_BRANCH);
     }
 
-    public function query(string $dtmServer, array $body)
+    public function query(array $body)
     {
-        return $this->transCallDtm($dtmServer, $body, Operation::QUERY);
+        return $this->transCallDtm($body, Operation::QUERY);
     }
 
-    public function queryAll(string $dtmServer, array $body)
+    public function queryAll(array $body)
     {
-        return $this->transCallDtm($dtmServer, $body, Operation::QUERY_ALL);
+        return $this->transCallDtm($body, Operation::QUERY_ALL);
     }
 
     /**
      * @throws \DtmClient\Exception\RequestException
      */
-    protected function transCallDtm(string $dtmServer, array $body, string $operation)
+    protected function transCallDtm(array $body, string $operation)
     {
         try {
-            $url = sprintf('%s/api/dtmsvr/%s', $dtmServer, $operation);
+            $url = sprintf('/api/dtmsvr/%s', $operation);
             $response = $this->getClient()->post($url, [
                 'json' => $body,
             ]);
