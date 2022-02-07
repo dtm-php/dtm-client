@@ -13,9 +13,8 @@ use DtmClient\Constants\Operation;
 use DtmClient\Constants\TransType;
 use DtmClient\Exception\RequestException;
 
-class TCC
+class TCC extends AbstractTransaction
 {
-    protected ApiInterface $api;
 
     protected array $branch = [];
 
@@ -25,11 +24,6 @@ class TCC
     {
         $this->api = $api;
         $this->branchIdGenerate = $branchIdGenerate;
-    }
-
-    public function generateGid(): string
-    {
-        return $this->api->generateGid();
     }
 
     public function tccGlobalTransaction(string $gid, callable $callback)
