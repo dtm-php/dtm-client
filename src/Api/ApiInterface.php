@@ -24,5 +24,5 @@ interface ApiInterface
 
     public function queryAll(array $body);
 
-    public function transRequestBranch();
+    public function transRequestBranch(string $method, array $body, string $branchID, string $op, string $url, array $branchHeaders = []);
 }

@@ -9,11 +9,13 @@ declare(strict_types=1);
 namespace DtmClient\Api;
 
 use DtmClient\Constants\Operation;
+use DtmClient\Constants\RequestMessage;
 use DtmClient\Exception\GenerateException;
 use DtmClient\Exception\RequestException;
+use DtmClient\TransContext;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Hyperf\Contract\ConfigInterface;
-use Hyperf\Engine\Http\Client;
 
 class HttpApi implements ApiInterface
 {
@@ -40,32 +42,32 @@ class HttpApi implements ApiInterface
 
     public function prepare(array $body)
     {
-        return $this->transCallDtm($body, Operation::PREPARE);
+        return $this->transCallDtm('POST', $body, Operation::PREPARE);
     }
 
     public function submit(array $body)
     {
-        return $this->transCallDtm($body, Operation::SUBMIT);
+        return $this->transCallDtm('POST', $body, Operation::SUBMIT);
     }
 
     public function abort(array $body)
     {
-        return $this->transCallDtm($body, Operation::ABORT);
+        return $this->transCallDtm('POST', $body, Operation::ABORT);
     }
 
     public function registerBranch(array $body)
     {
-        return $this->transCallDtm($body, Operation::REGISTER_BRANCH);
+        return $this->transCallDtm('POST', $body, Operation::REGISTER_BRANCH);
     }
 
     public function query(array $body)
     {
-        return $this->transCallDtm($body, Operation::QUERY);
+        return $this->transCallDtm('GET', [], Operation::QUERY, $body);
     }
 
     public function queryAll(array $body)
     {
-        return $this->transCallDtm($body, Operation::QUERY_ALL);
+        return $this->transCallDtm('GET', [], Operation::QUERY_ALL, $body);
     }
 
     public function getClient(): Client
@@ -79,28 +81,58 @@ class HttpApi implements ApiInterface
         return $this;
     }
 
+    public function transRequestBranch(string $method, array $body, string $branchID, string $op, string $url, array $branchHeaders = [])
+    {
+        $dtm = config('dtm-client.server', '127.0.0.1') . config('dtm-client.port.http', 36789);
+        $response = $this->client->request($method, $url, [
+            'query' => [
+                [
+                    'dtm' => $dtm,
+                    'gid' => TransContext::getGid(),
+                    'branch_id' => $branchID,
+                    'trans_type' => TransContext::getTransType(),
+                    'op' => $op,
+                ],
+            ],
+            'header' => $branchHeaders,
+        ]);
+
+        $responseInfo = $response->getBody()->getContents();
+        $responseContent = json_decode($responseInfo, true) ?: [];
+        $statusCode = $response->getStatusCode();
+        if ($statusCode == 425 || $responseContent['dtm_result'] == RequestMessage::ResultOngoing) {
+            throw new RequestException($responseInfo, 425);
+        }
+
+        if ($statusCode == 409 || $responseContent['dtm_result'] == RequestMessage::ResultFailure) {
+            throw new RequestException($responseInfo, 409);
+        }
+
+        if ($statusCode != 200) {
+            throw new RequestException($responseInfo);
+        }
+
+        return null;
+    }
+
     /**
      * @throws \DtmClient\Exception\RequestException
      */
-    protected function transCallDtm(array $body, string $operation)
+    protected function transCallDtm(string $method, array $body, string $operation, array $query = [])
     {
         try {
             $url = sprintf('/api/dtmsvr/%s', $operation);
-            $response = $this->getClient()->post($url, [
+            $response = $this->getClient()->request($method, $url, [
                 'json' => $body,
             ]);
-            $responseContent = json_decode($response->getBody()->getContents(), true);
-            if ($responseContent['dtm_result'] !== 'SUCCESS' || $response->getStatusCode() !== 200) {
+            $statusCode = $response->getStatusCode();
+            $responseContent = json_decode($response->getBody()->getContents(), true) ?: [];
+            if ($responseContent['dtm_result'] !== 'SUCCESS' || $statusCode !== 200) {
                 throw new RequestException($responseContent['message'] ?? '');
             }
         } catch (GuzzleException $exception) {
             throw new RequestException($exception->getMessage(), $exception->getCode(), $exception);
         }
         return null;
-    }
-
-    public function transRequestBranch()
-    {
-
     }
 }
