@@ -17,11 +17,15 @@ class HttpApiFactory
     public function __invoke(ContainerInterface $container)
     {
         $config = $container->get(ConfigInterface::class);
-        $server = $config->get('dtm-client.server');
-        $port = $config->get('dtm-client.port.http');
+        $server = $config->get('dtm-client.server', '127.0.0.1');
+        $port = $config->get('dtm-client.port.http', 36789);
+        $options = $config->get('dtm-client.guzzle.options', []);
         $clientFactory = $container->get(ClientFactory::class);
-        return $clientFactory->create([
-            'base_uri' => $server . ':' . $port,
-        ]);
+        return $clientFactory->create(array_merge(
+            [
+                'base_uri' => $server . ':' . $port,
+            ],
+            $options
+        ));
     }
 }

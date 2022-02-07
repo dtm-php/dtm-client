@@ -15,4 +15,7 @@ return [
         'http' => 36789,
         'grpc' => 36790,
     ],
+    'guzzle' => [
+        'options' => [],
+    ],
 ];
