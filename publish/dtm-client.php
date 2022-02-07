@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 return [
-    'protocol' => \Dtm\DtmClient\Constants\Protocol::HTTP,
+    'protocol' => \DtmClient\Constants\Protocol::HTTP,
     'server' => '127.0.0.1',
     'port' => [
         'http' => 36789,
