@@ -55,11 +55,10 @@ class TransContext extends Context
      */
     protected static string $queryPrepared;
 
-    public static function init(string $gid, string $transType, string $dtm, string $branchId)
+    public static function init(string $gid, string $transType, string $branchId)
     {
         static::setGid($gid);
         static::setTransType($transType);
-        static::setDtm($dtm);
         static::setBranchId($branchId);
     }
 
@@ -113,6 +112,11 @@ class TransContext extends Context
         static::set(static::class . '.steps', $steps);
     }
 
+    public static function appendSteps(array $steps)
+    {
+        static::setSteps(array_merge(static::getSteps(), $steps));
+    }
+
     public static function getPayloads(): array
     {
         return static::get(static::class . '.payloads');
@@ -123,6 +127,11 @@ class TransContext extends Context
         static::set(static::class . '.payloads', $payloads);
     }
 
+    public static function appendPayloads(array $payloads)
+    {
+        static::setPayloads(array_merge(static::getPayloads(), $payloads));
+    }
+
     public static function getBinPayLoads(): array
     {
         return static::get(static::class . '.binPayLoads');
@@ -131,6 +140,11 @@ class TransContext extends Context
     public static function setBinPayLoads(array $binPayLoads)
     {
         static::set(static::class . '.binPayLoads', $binPayLoads);
+    }
+
+    public static function appendBinPayload(array $binPayLoads)
+    {
+        static::setBinPayLoads(array_merge(static::getBinPayLoads(), $binPayLoads));
     }
 
     public static function getBranchId(): string
