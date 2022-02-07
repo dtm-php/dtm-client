@@ -2,12 +2,9 @@
 
 declare(strict_types=1);
 /**
- * This file is part of Hyperf.
+ * This file is part of DTM-PHP.
  *
- * @link     https://www.hyperf.io
- * @document https://doc.hyperf.io
- * @contact  group@hyperf.io
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ * @license  https://github.com/dtm-php/dtm-client/blob/master/LICENSE
  */
 namespace DtmClient;
 
@@ -22,6 +19,7 @@ class ConfigProvider
         return [
             'dependencies' => [
                 HttpApi::class => HttpApiFactory::class,
+                BranchIdGenerateInterface::class => BranchIdGenerate::class,
                 ApiInterface::class => ApiFactory::class,
             ],
             'commands' => [
