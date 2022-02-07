@@ -33,11 +33,11 @@ class Saga extends AbstractTransaction
 
     public function add(string $action, string $compensate, array|object $payload): static
     {
-        TransContext::appendSteps([
+        TransContext::addStep([
             'action' => $action,
             'compensate' => $compensate,
         ]);
-        TransContext::appendPayloads(json_encode($payload));
+        TransContext::addPayload([json_encode($payload)]);
         return $this;
     }
 
@@ -55,12 +55,13 @@ class Saga extends AbstractTransaction
     public function submit()
     {
         $this->addConcurrentContext();
-        return $this->api->submit([
+        $body = [
             'gid' => TransContext::getGid(),
             'trans_type' => TransType::SAGA,
             'payloads' => TransContext::getPayloads(),
             'steps' => TransContext::getSteps(),
-        ]);
+        ];
+        return $this->api->submit($body);
     }
 
     public function addConcurrentContext()

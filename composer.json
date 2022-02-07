@@ -22,7 +22,7 @@
         "php": ">=8.0",
         "hyperf/config": "^2.2",
         "hyperf/guzzle": "^2.2",
-        "symfony/finder": "^5.0"
+        "psr/http-server-middleware": "^1.0"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",

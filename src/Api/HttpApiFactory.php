@@ -21,11 +21,12 @@ class HttpApiFactory
         $port = $config->get('dtm-client.port.http', 36789);
         $options = $config->get('dtm-client.guzzle.options', []);
         $clientFactory = $container->get(ClientFactory::class);
-        return $clientFactory->create(array_merge(
+        $client = $clientFactory->create(array_merge(
             [
                 'base_uri' => $server . ':' . $port,
             ],
             $options
         ));
+        return new HttpApi($client, $config);
     }
 }

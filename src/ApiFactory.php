@@ -21,7 +21,7 @@ class ApiFactory
 
     public function __invoke(ContainerInterface $container): ApiInterface
     {
-        $protocol = $container->get(ConfigInterface::class)->get('dtm-client.protocol');
+        $protocol = $container->get(ConfigInterface::class)->get('dtm-client.protocol', Protocol::HTTP);
         switch ($protocol) {
             case Protocol::HTTP:
                 return $container->get(HttpApi::class);

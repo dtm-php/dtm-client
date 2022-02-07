@@ -104,7 +104,7 @@ class TransContext extends Context
 
     public static function getSteps(): array
     {
-        return static::get(static::class . '.steps');
+        return static::get(static::class . '.steps') ?? [];
     }
 
     public static function setSteps(array $steps)
@@ -112,14 +112,14 @@ class TransContext extends Context
         static::set(static::class . '.steps', $steps);
     }
 
-    public static function appendSteps(array $steps)
+    public static function addStep(array $step)
     {
-        static::setSteps(array_merge(static::getSteps(), $steps));
+        static::setSteps(array_merge(static::getSteps(), [$step]));
     }
 
     public static function getPayloads(): array
     {
-        return static::get(static::class . '.payloads');
+        return static::get(static::class . '.payloads') ?? [];
     }
 
     public static function setPayloads(array $payloads)
@@ -127,14 +127,14 @@ class TransContext extends Context
         static::set(static::class . '.payloads', $payloads);
     }
 
-    public static function appendPayloads(array $payloads)
+    public static function addPayload(array $payload)
     {
-        static::setPayloads(array_merge(static::getPayloads(), $payloads));
+        static::setPayloads(array_merge(static::getPayloads(), $payload));
     }
 
     public static function getBinPayLoads(): array
     {
-        return static::get(static::class . '.binPayLoads');
+        return static::get(static::class . '.binPayLoads') ?? [];
     }
 
     public static function setBinPayLoads(array $binPayLoads)
@@ -142,9 +142,9 @@ class TransContext extends Context
         static::set(static::class . '.binPayLoads', $binPayLoads);
     }
 
-    public static function appendBinPayload(array $binPayLoads)
+    public static function addBinPayload(array $binPayLoad)
     {
-        static::setBinPayLoads(array_merge(static::getBinPayLoads(), $binPayLoads));
+        static::setBinPayLoads(array_merge(static::getBinPayLoads(), $binPayLoad));
     }
 
     public static function getBranchId(): string
