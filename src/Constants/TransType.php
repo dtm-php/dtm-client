@@ -12,7 +12,7 @@ class TransType
 {
     public const TCC = 'tcc';
 
-    public const SAGE = 'sage';
+    public const SAGA = 'saga';
 
     public const XA = 'xa';
 

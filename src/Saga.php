@@ -12,7 +12,7 @@ namespace DtmClient;
 use DtmClient\Api\ApiInterface;
 use DtmClient\Constants\TransType;
 
-class Sage
+class Saga extends AbstractTransaction
 {
 
     protected array $orders = [];
@@ -57,7 +57,7 @@ class Sage
         $this->addConcurrentContext();
         return $this->api->submit([
             'gid' => TransContext::getGid(),
-            'trans_type' => TransType::SAGE,
+            'trans_type' => TransType::SAGA,
             'payloads' => TransContext::getPayloads(),
             'steps' => TransContext::getSteps(),
         ]);
