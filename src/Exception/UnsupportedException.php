@@ -1,6 +1,6 @@
 <?php
 
-namespace Dtm\DtmClient\Exception;
+namespace DtmClient\Exception;
 
 class UnsupportedException extends \Exception
 {

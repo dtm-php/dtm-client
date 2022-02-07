@@ -9,7 +9,10 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-namespace Dtm\DtmClient;
+namespace DtmClient;
+
+use DtmClient\Api\HttpApi;
+use DtmClient\Api\HttpApiFactory;
 
 class ConfigProvider
 {
@@ -17,6 +20,7 @@ class ConfigProvider
     {
         return [
             'dependencies' => [
+                HttpApi::class => HttpApiFactory::class,
             ],
             'commands' => [
             ],

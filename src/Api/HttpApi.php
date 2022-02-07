@@ -9,21 +9,24 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-namespace Dtm\DtmClient\Api;
+namespace DtmClient\Api;
 
-use Dtm\DtmClient\Constants\Operation;
-use Dtm\DtmClient\Exception\GenerateGidException;
-use Dtm\DtmClient\Exception\RequestException;
+use DtmClient\Constants\Operation;
+use DtmClient\Exception\GenerateGidException;
+use DtmClient\Exception\RequestException;
 use GuzzleHttp\Client;
-use Hyperf\Guzzle\ClientFactory;
+use GuzzleHttp\Exception\GuzzleException;
+use Hyperf\Contract\ConfigInterface;
 
 class HttpApi implements ApiInterface
 {
     protected Client $client;
+    protected ConfigInterface $config;
 
-    public function __construct(ClientFactory $clientFactory)
+    public function __construct(Client $client, ConfigInterface $config)
     {
-        $this->client = $clientFactory->create();
+        $this->client = $client;
+        $this->config = $config;
     }
 
     public function generateGid(string $dtmServer): string
@@ -67,16 +70,34 @@ class HttpApi implements ApiInterface
         return $this->transCallDtm($dtmServer, $body, Operation::QUERY_ALL);
     }
 
+    /**
+     * @throws \DtmClient\Exception\RequestException
+     */
     protected function transCallDtm(string $dtmServer, array $body, string $operation)
     {
-        $url = sprintf('%s/api/dtmsvr/%s', $dtmServer, $operation);
-        $response = $this->client->post($url, [
-            'json' => $body,
-        ]);
-        $responseContent = json_decode($response->getBody()->getContents(), true);
-        if ($responseContent['dtm_result'] !== 'SUCCESS' || $response->getStatusCode() !== 200) {
-            throw new RequestException($responseContent['message'] ?? '');
+        try {
+            $url = sprintf('%s/api/dtmsvr/%s', $dtmServer, $operation);
+            $response = $this->getClient()->post($url, [
+                'json' => $body,
+            ]);
+            $responseContent = json_decode($response->getBody()->getContents(), true);
+            if ($responseContent['dtm_result'] !== 'SUCCESS' || $response->getStatusCode() !== 200) {
+                throw new RequestException($responseContent['message'] ?? '');
+            }
+        } catch (GuzzleException $exception) {
+            throw new RequestException($exception->getMessage(), $exception->getCode(), $exception);
         }
         return null;
+    }
+
+    public function getClient(): Client
+    {
+        return $this->client;
+    }
+
+    public function setClient(Client $client): static
+    {
+        $this->client = $client;
+        return $this;
     }
 }
