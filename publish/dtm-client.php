@@ -2,15 +2,14 @@
 
 declare(strict_types=1);
 /**
- * This file is part of Hyperf.
+ * This file is part of DTM-PHP.
  *
- * @link     https://www.hyperf.io
- * @document https://hyperf.wiki
- * @contact  group@hyperf.io
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ * @license  https://github.com/dtm-php/dtm-client/blob/master/LICENSE
  */
+use DtmClient\Constants\Protocol;
+
 return [
-    'protocol' => \DtmClient\Constants\Protocol::HTTP,
+    'protocol' => Protocol::HTTP,
     'server' => '127.0.0.1',
     'port' => [
         'http' => 36789,

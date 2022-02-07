@@ -12,20 +12,15 @@ declare(strict_types=1);
 namespace DtmClient;
 
 use DtmClient\Api\ApiInterface;
-use Psr\Container\ContainerInterface;
 
 class TCC
 {
-    protected ContainerInterface $container;
-
     protected ApiInterface $api;
 
     protected array $branch = [];
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(ApiFactory $apiFactory)
     {
-        $this->container = $container;
-        $apiFactory = $this->container->get(ApiFactory::class);
         $this->api = $apiFactory->create();
     }
 

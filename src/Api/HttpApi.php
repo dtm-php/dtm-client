@@ -2,25 +2,23 @@
 
 declare(strict_types=1);
 /**
- * This file is part of Hyperf.
+ * This file is part of DTM-PHP.
  *
- * @link     https://www.hyperf.io
- * @document https://hyperf.wiki
- * @contact  group@hyperf.io
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ * @license  https://github.com/dtm-php/dtm-client/blob/master/LICENSE
  */
 namespace DtmClient\Api;
 
 use DtmClient\Constants\Operation;
 use DtmClient\Exception\GenerateGidException;
 use DtmClient\Exception\RequestException;
-use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Hyperf\Contract\ConfigInterface;
+use Hyperf\Engine\Http\Client;
 
 class HttpApi implements ApiInterface
 {
     protected Client $client;
+
     protected ConfigInterface $config;
 
     public function __construct(Client $client, ConfigInterface $config)
@@ -70,6 +68,17 @@ class HttpApi implements ApiInterface
         return $this->transCallDtm($body, Operation::QUERY_ALL);
     }
 
+    public function getClient(): Client
+    {
+        return $this->client;
+    }
+
+    public function setClient(Client $client): static
+    {
+        $this->client = $client;
+        return $this;
+    }
+
     /**
      * @throws \DtmClient\Exception\RequestException
      */
@@ -88,16 +97,5 @@ class HttpApi implements ApiInterface
             throw new RequestException($exception->getMessage(), $exception->getCode(), $exception);
         }
         return null;
-    }
-
-    public function getClient(): Client
-    {
-        return $this->client;
-    }
-
-    public function setClient(Client $client): static
-    {
-        $this->client = $client;
-        return $this;
     }
 }
