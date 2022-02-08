@@ -138,7 +138,7 @@ class HttpApi implements ApiInterface
             throw new RequestException($responseInfo);
         }
 
-        return null;
+        return $responseContent;
     }
 
     /**
