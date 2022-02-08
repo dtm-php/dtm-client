@@ -18,11 +18,11 @@ class BranchIdGenerator implements BranchIdGeneratorInterface
         $branchId = TransContext::getBranchId();
         $subBranchId = TransContext::getSubBranchId() ?? 0;
         if ($subBranchId >= 99) {
-            throw new GenerateException('branch id is larger than 99');
+            throw new GenerateException('Branch ID can not larger than 99');
         }
 
         if (strlen($branchId) >= 20) {
-            throw new GenerateException('total branch id is longer than 20');
+            throw new GenerateException('Total Branch ID can not longer than 20');
         }
 
         $subBranchId = $subBranchId + 1;
