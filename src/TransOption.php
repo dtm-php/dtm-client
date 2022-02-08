@@ -8,6 +8,10 @@ declare(strict_types=1);
  */
 namespace DtmClient;
 
+/**
+ * All properties in this class are read-only.
+ * All properties data will be stored in the coroutine context.
+ */
 trait TransOption
 {
     public static bool $waitResult;
@@ -25,52 +29,52 @@ trait TransOption
 
     public static function isWaitResult(): ?bool
     {
-        return self::$waitResult ?? null;
+        return static::get(TransContext::class . '.waitResult');
     }
 
     public static function setWaitResult(bool $waitResult)
     {
-        self::$waitResult = $waitResult;
+        static::set(TransContext::class . '.waitResult', $waitResult);
     }
 
     public static function getTimeoutToFail(): ?int
     {
-        return self::$timeoutToFail ?? null;
+        return static::get(TransContext::class . '.timeoutToFail');
     }
 
     public static function setTimeoutToFail(int $timeoutToFail)
     {
-        self::$timeoutToFail = $timeoutToFail;
+        static::set(TransContext::class . '.timeoutToFail', $timeoutToFail);
     }
 
     public static function getRetryInterval(): ?int
     {
-        return self::$retryInterval ?? null;
+        return static::get(TransContext::class . '.retryInterval');
     }
 
     public static function setRetryInterval(int $retryInterval)
     {
-        self::$retryInterval = $retryInterval;
+        static::set(TransContext::class . '.retryInterval', $retryInterval);
     }
 
     public static function getPassthroughHeaders(): array
     {
-        return self::$passthroughHeaders;
+        return static::get(TransContext::class . '.passthroughHeaders');
     }
 
     public static function setPassthroughHeaders(array $passthroughHeaders)
     {
-        self::$passthroughHeaders = $passthroughHeaders;
+        static::set(TransContext::class . '.passthroughHeaders', $passthroughHeaders);
     }
 
     public static function getBranchHeaders(): array
     {
-        return self::$branchHeaders;
+        return static::get(TransContext::class . '.branchHeaders');
     }
 
     public static function setBranchHeaders(array $branchHeaders)
     {
-        self::$branchHeaders = $branchHeaders;
+        static::set(TransContext::class . '.branchHeaders', $branchHeaders);
     }
 
 }

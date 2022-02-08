@@ -23,12 +23,17 @@ class TCC extends AbstractTransaction
         $this->branchIdGenerator = $branchIdGenerate;
     }
 
-    public function globalTransaction(callable $callback, ?string $gid = null)
+    public function init(?string $gid = null)
     {
         if ($gid === null) {
             $gid = $this->generateGid();
         }
         TransContext::init($gid, TransType::TCC, '');
+    }
+
+    public function globalTransaction(callable $callback, ?string $gid = null)
+    {
+        $this->init($gid);
         $requestBody = TransContext::toArray();
         try {
             $this->api->prepare($requestBody);

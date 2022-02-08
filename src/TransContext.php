@@ -11,50 +11,54 @@ namespace DtmClient;
 use DtmClient\Util\Str;
 use Hyperf\Utils\Context;
 
+/**
+ * All properties in this class are read-only.
+ * All properties data will be stored in the coroutine context.
+ */
 class TransContext extends Context
 {
     use TransOption;
 
-    protected static string $gid;
+    private static string $gid;
 
-    protected static string $transType;
+    private static string $transType;
 
-    protected static string $dtm;
+    private static string $dtm;
 
-    protected static string $customData;
+    private static string $customData;
 
     /**
      * Use in MSG/SAGA.
      */
-    protected static array $steps;
+    private static array $steps;
 
     /**
      * Use in MSG/SAGA.
      * @var string[]
      */
-    protected static array $payloads;
+    private static array $payloads;
 
-    protected static array $binPayLoads;
-
-    /**
-     * Use in XA/TCC.
-     */
-    protected static string $branchId;
+    private static array $binPayLoads;
 
     /**
      * Use in XA/TCC.
      */
-    protected static int $subBranchId;
+    private static string $branchId;
 
     /**
      * Use in XA/TCC.
      */
-    protected static string $op;
+    private static int $subBranchId;
+
+    /**
+     * Use in XA/TCC.
+     */
+    private static string $op;
 
     /**
      * Use in MSG.
      */
-    protected static string $queryPrepared;
+    private static string $queryPrepared;
 
     public static function toArray(): array
     {
@@ -65,7 +69,6 @@ class TransContext extends Context
                 $array[Str::snake(str_replace(TransContext::class . '.', '', $key))] = $value;
             }
         }
-
         return $array;
     }
 
@@ -200,17 +203,14 @@ class TransContext extends Context
     {
         static::set(static::class . '.queryPrepared', $queryPrepared);
     }
-    
+
     public static function setBarrierID(int $barrierID)
     {
         static::set(static::class . '.barrierID', $barrierID);
     }
 
-    public static function getBarrierID(): int 
+    public static function getBarrierID(): int
     {
         static::get(static::class . '.barrierID', 0);
     }
-
-
-
 }
