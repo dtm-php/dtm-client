@@ -15,7 +15,7 @@ use DtmClient\Exception\RequestException;
 
 class TCC extends AbstractTransaction
 {
-    protected BranchIdGenerateInterface $branchIdGenerate;
+    protected BranchIdGeneratorInterface $branchIdGenerate;
 
     public function __construct(ApiInterface $api, BranchIdGenerateInterface $branchIdGenerate)
     {
@@ -23,16 +23,15 @@ class TCC extends AbstractTransaction
         $this->branchIdGenerate = $branchIdGenerate;
     }
 
-    public function tccGlobalTransaction(string $gid, callable $callback)
+    public function globalTransaction(callable $callback, ?string $gid = null)
     {
+        if ($gid === null) {
+            $gid = $this->generateGid();
+        }
         TransContext::init($gid, TransType::TCC, '');
-        $requestBody = [
-            'gid' => $gid,
-            'trans_type' => TransType::TCC,
-        ];
+        $requestBody = TransContext::toArray();
         try {
             $this->api->prepare($requestBody);
-
             $callback($this);
         } catch (\Throwable $throwable) {
             $this->api->abort($requestBody);
@@ -40,16 +39,6 @@ class TCC extends AbstractTransaction
         }
 
         $this->api->submit($requestBody);
-    }
-
-    public function tccFromQuery()
-    {
-        $gid = TransContext::getGid();
-        $branchId = TransContext::getBranchId();
-        if (empty($gid)) {
-            throw new RequestException(sprintf('bad tcc info. gid: %s parentID: %s', $gid, $branchId));
-        }
-        return $this->api->query(['gid' => $gid]);
     }
 
     public function callBranch(array $body, string $tryUrl, string $confirmUrl, string $cancelUrl)

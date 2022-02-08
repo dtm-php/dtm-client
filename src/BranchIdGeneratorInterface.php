@@ -8,7 +8,7 @@ declare(strict_types=1);
  */
 namespace DtmClient;
 
-interface BranchIdGenerateInterface
+interface BranchIdGeneratorInterface
 {
     public function generateSubBranchId(): string;
 
