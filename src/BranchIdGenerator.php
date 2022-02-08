@@ -12,9 +12,6 @@ use DtmClient\Exception\GenerateException;
 
 class BranchIdGenerator implements BranchIdGeneratorInterface
 {
-    private ?string $branchId = null;
-
-    private int $subBranchId = 0;
 
     public function generateSubBranchId(): string
     {
@@ -29,11 +26,11 @@ class BranchIdGenerator implements BranchIdGeneratorInterface
         }
 
         $subBranchId = $subBranchId + 1;
-        return $this->getCurrentSubBranchID();
+        return $this->getCurrentSubBranchId($subBranchId);
     }
 
-    public function getCurrentSubBranchID(): string
+    public function getCurrentSubBranchId(int $subBranchId): string
     {
-        return $this->branchId . sprintf('%02d', $this->subBranchId);
+        return TransContext::getBranchId() . sprintf('%02d', $subBranchId);
     }
 }

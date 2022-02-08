@@ -12,5 +12,5 @@ interface BranchIdGeneratorInterface
 {
     public function generateSubBranchId(): string;
 
-    public function getCurrentSubBranchID(): string;
+    public function getCurrentSubBranchId(): string;
 }

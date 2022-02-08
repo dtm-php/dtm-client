@@ -15,12 +15,12 @@ use DtmClient\Exception\RequestException;
 
 class TCC extends AbstractTransaction
 {
-    protected BranchIdGeneratorInterface $branchIdGenerate;
+    protected BranchIdGeneratorInterface $branchIdGenerator;
 
     public function __construct(ApiInterface $api, BranchIdGenerateInterface $branchIdGenerate)
     {
         $this->api = $api;
-        $this->branchIdGenerate = $branchIdGenerate;
+        $this->branchIdGenerator = $branchIdGenerate;
     }
 
     public function globalTransaction(callable $callback, ?string $gid = null)
@@ -43,7 +43,7 @@ class TCC extends AbstractTransaction
 
     public function callBranch(array $body, string $tryUrl, string $confirmUrl, string $cancelUrl)
     {
-        $branchId = $this->branchIdGenerate->generateSubBranchId();
+        $branchId = $this->branchIdGenerator->generateSubBranchId();
         $this->api->registerBranch([
             'data' => json_encode($body),
             'branch_id' => $branchId,
