@@ -83,7 +83,7 @@ class HttpApi implements ApiInterface
 
     public function transRequestBranch(string $method, array $body, string $branchID, string $op, string $url, array $branchHeaders = [])
     {
-        $dtm = config('dtm-client.server', '127.0.0.1') . config('dtm-client.port.http', 36789);
+        $dtm = $this->config->get('dtm-client.server', '127.0.0.1') . ':' . $this->config->get('dtm-client.port.http', 36789);
         $response = $this->client->request($method, $url, [
             'query' => [
                 [
@@ -100,15 +100,15 @@ class HttpApi implements ApiInterface
         $responseInfo = $response->getBody()->getContents();
         $responseContent = json_decode($responseInfo, true) ?: [];
         $statusCode = $response->getStatusCode();
-        if ($statusCode == 425 || $responseContent['dtm_result'] == RequestMessage::ResultOngoing) {
+        if ($statusCode === 425 || $responseContent['dtm_result'] === RequestMessage::ResultOngoing) {
             throw new RequestException($responseInfo, 425);
         }
 
-        if ($statusCode == 409 || $responseContent['dtm_result'] == RequestMessage::ResultFailure) {
+        if ($statusCode === 409 || $responseContent['dtm_result'] === RequestMessage::ResultFailure) {
             throw new RequestException($responseInfo, 409);
         }
 
-        if ($statusCode != 200) {
+        if ($statusCode !== 200) {
             throw new RequestException($responseInfo);
         }
 
