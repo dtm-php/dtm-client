@@ -15,7 +15,8 @@ jobs:
         os: [ ubuntu-latest ]
         php-version: [ '8.0', '8.1' ]
         engine: [ 'none', 'swoole', 'swow' ]
-      max-parallel: 5
+      max-parallel: 6
+      fail-fast: false
     steps:
       - name: Checkout
         uses: actions/checkout@v2
