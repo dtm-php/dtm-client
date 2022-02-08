@@ -64,12 +64,12 @@ class HttpApi implements ApiInterface
 
     public function query(array $body)
     {
-        return $this->transCallDtm('GET', [], Operation::QUERY, $body);
+        return $this->transQuery($body, Operation::QUERY);
     }
 
     public function queryAll(array $body)
     {
-        return $this->transCallDtm('GET', [], Operation::QUERY_ALL, $body);
+        return $this->transQuery($body, Operation::QUERY_ALL);
     }
 
     public function getClient(): Client
@@ -150,6 +150,7 @@ class HttpApi implements ApiInterface
             $url = sprintf('/api/dtmsvr/%s', $operation);
             $response = $this->getClient()->request($method, $url, [
                 'json' => $body,
+                'query' => $query
             ]);
             $statusCode = $response->getStatusCode();
             $responseContent = json_decode($response->getBody()->getContents(), true) ?: [];
@@ -160,5 +161,24 @@ class HttpApi implements ApiInterface
             throw new RequestException($exception->getMessage(), $exception->getCode(), $exception);
         }
         return null;
+    }
+
+    protected function transQuery(array $query, string $operation)
+    {
+        try {
+            $url = sprintf('/api/dtmsvr/%s', $operation);
+            $response = $this->getClient()->get($url, [
+                'query' => $query
+            ]);
+            $statusCode = $response->getStatusCode();
+            $responseContent = json_decode($response->getBody()->getContents(), true) ?: [];
+            if ($statusCode !== 200) {
+                throw new RequestException($responseContent['message'] ?? '');
+            }
+        } catch (GuzzleException $exception) {
+            throw new RequestException($exception->getMessage(), $exception->getCode(), $exception);
+        }
+
+        return $responseContent;
     }
 }
