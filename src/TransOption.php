@@ -10,16 +10,67 @@ namespace DtmClient;
 
 trait TransOption
 {
-    public bool $waitResult;
+    public static bool $waitResult;
 
-    public int $timeoutToFail;
+    public static int $timeoutToFail;
 
-    public int $retryInterval;
+    public static int $retryInterval;
 
     /**
      * @var string[]
      */
-    public array $passthroughHeaders = [];
+    public static array $passthroughHeaders = [];
 
-    public array $branchHeaders = [];
+    public static array $branchHeaders = [];
+
+    public static function isWaitResult(): ?bool
+    {
+        return self::$waitResult ?? null;
+    }
+
+    public static function setWaitResult(bool $waitResult)
+    {
+        self::$waitResult = $waitResult;
+    }
+
+    public static function getTimeoutToFail(): ?int
+    {
+        return self::$timeoutToFail ?? null;
+    }
+
+    public static function setTimeoutToFail(int $timeoutToFail)
+    {
+        self::$timeoutToFail = $timeoutToFail;
+    }
+
+    public static function getRetryInterval(): ?int
+    {
+        return self::$retryInterval ?? null;
+    }
+
+    public static function setRetryInterval(int $retryInterval)
+    {
+        self::$retryInterval = $retryInterval;
+    }
+
+    public static function getPassthroughHeaders(): array
+    {
+        return self::$passthroughHeaders;
+    }
+
+    public static function setPassthroughHeaders(array $passthroughHeaders)
+    {
+        self::$passthroughHeaders = $passthroughHeaders;
+    }
+
+    public static function getBranchHeaders(): array
+    {
+        return self::$branchHeaders;
+    }
+
+    public static function setBranchHeaders(array $branchHeaders)
+    {
+        self::$branchHeaders = $branchHeaders;
+    }
+
 }

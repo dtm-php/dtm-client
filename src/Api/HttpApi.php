@@ -42,11 +42,13 @@ class HttpApi implements ApiInterface
 
     public function prepare(array $body)
     {
+        $body = $this->handleOptions($body);
         return $this->transCallDtm('POST', $body, Operation::PREPARE);
     }
 
     public function submit(array $body)
     {
+        $body = $this->handleOptions($body);
         return $this->transCallDtm('POST', $body, Operation::SUBMIT);
     }
 
@@ -79,6 +81,30 @@ class HttpApi implements ApiInterface
     {
         $this->client = $client;
         return $this;
+    }
+
+    protected function handleOptions(array $body): array
+    {
+        $appendBody = [];
+        if (TransContext::isWaitResult() !== null) {
+            $appendBody['wait_result'] = TransContext::isWaitResult();
+        }
+        if (TransContext::getTimeoutToFail() !== null) {
+            $appendBody['timeout_to_fail'] = TransContext::getTimeoutToFail();
+        }
+        if (TransContext::getRetryInterval() !== null) {
+            $appendBody['retry_interval'] = TransContext::getRetryInterval();
+        }
+        if (TransContext::getPassthroughHeaders()) {
+            $appendBody['passthrough_headers'] = TransContext::getPassthroughHeaders();
+        }
+        if (TransContext::getBranchHeaders()) {
+            $appendBody['branch_headers'] = TransContext::getBranchHeaders();
+        }
+        if ($appendBody) {
+            $body = array_merge($body, $appendBody);
+        }
+        return $body;
     }
 
     public function transRequestBranch(string $method, array $body, string $branchID, string $op, string $url, array $branchHeaders = [])
