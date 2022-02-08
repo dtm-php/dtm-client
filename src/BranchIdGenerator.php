@@ -16,7 +16,7 @@ class BranchIdGenerator implements BranchIdGeneratorInterface
     public function generateSubBranchId(): string
     {
         $branchId = TransContext::getBranchId();
-        $subBranchId = TransContext::getSubBranchId();
+        $subBranchId = TransContext::getSubBranchId() ?? 0;
         if ($subBranchId >= 99) {
             throw new GenerateException('branch id is larger than 99');
         }

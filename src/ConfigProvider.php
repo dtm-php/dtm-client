@@ -19,7 +19,7 @@ class ConfigProvider
         return [
             'dependencies' => [
                 HttpApi::class => HttpApiFactory::class,
-                BranchIdGenerateInterface::class => BranchIdGenerate::class,
+                BranchIdGeneratorInterface::class => BranchIdGenerator::class,
                 ApiInterface::class => ApiFactory::class,
             ],
             'commands' => [

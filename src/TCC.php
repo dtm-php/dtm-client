@@ -17,7 +17,7 @@ class TCC extends AbstractTransaction
 {
     protected BranchIdGeneratorInterface $branchIdGenerator;
 
-    public function __construct(ApiInterface $api, BranchIdGenerateInterface $branchIdGenerate)
+    public function __construct(ApiInterface $api, BranchIdGeneratorInterface $branchIdGenerate)
     {
         $this->api = $api;
         $this->branchIdGenerator = $branchIdGenerate;
