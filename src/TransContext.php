@@ -176,7 +176,7 @@ class TransContext extends Context
 
     public static function getSubBranchId(): int
     {
-        return static::get(static::class . '.subBranchId');
+        return static::get(static::class . '.subBranchId', 0);
     }
 
     public static function setSubBranchId(int $subBranchId)

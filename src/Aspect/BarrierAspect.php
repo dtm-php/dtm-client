@@ -18,17 +18,11 @@ class BarrierAspect extends AbstractAspect
         Barrier::class,
     ];
 
-    protected $opMap = [
-        'cancel' => 'try',
-        'compensate' => 'action'
-    ];
-
     public function process(ProceedingJoinPoint $proceedingJoinPoint)
     {
         return \DtmClient\Barrier::call(function () use ($proceedingJoinPoint) {
             return $proceedingJoinPoint->process();
         });
-
     }
 
 }
