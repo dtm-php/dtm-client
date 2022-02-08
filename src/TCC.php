@@ -15,9 +15,6 @@ use DtmClient\Exception\RequestException;
 
 class TCC extends AbstractTransaction
 {
-
-    protected array $branch = [];
-
     protected BranchIdGenerateInterface $branchIdGenerate;
 
     public function __construct(ApiInterface $api, BranchIdGenerateInterface $branchIdGenerate)
