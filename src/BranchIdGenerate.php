@@ -12,22 +12,24 @@ use DtmClient\Exception\GenerateException;
 
 class BranchIdGenerate implements BranchIdGenerateInterface
 {
-    private string $branchId = '';
+    private ?string $branchId = null;
 
     private int $subBranchId = 0;
 
     public function generateSubBranchId(): string
     {
+        $this->branchId === null &&  $this->branchId = TransContext::getBranchId();
         if ($this->subBranchId >= 99) {
             throw new GenerateException('branch id is larger than 99');
         }
+
 
         if (strlen($this->branchId) >= 20) {
             throw new GenerateException('total branch id is longer than 20');
         }
 
         $this->subBranchId = $this->subBranchId + 1;
-        return $this->generateSubBranchId();
+        return $this->getCurrentSubBranchID();
     }
 
     public function getCurrentSubBranchID(): string

@@ -2,7 +2,6 @@
 
 namespace DtmClient;
 
-
 class Msg extends AbstractTransaction
 {
 

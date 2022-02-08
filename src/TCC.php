@@ -15,9 +15,6 @@ use DtmClient\Exception\RequestException;
 
 class TCC extends AbstractTransaction
 {
-
-    protected array $branch = [];
-
     protected BranchIdGenerateInterface $branchIdGenerate;
 
     public function __construct(ApiInterface $api, BranchIdGenerateInterface $branchIdGenerate)
@@ -29,25 +26,20 @@ class TCC extends AbstractTransaction
     public function tccGlobalTransaction(string $gid, callable $callback)
     {
         TransContext::init($gid, TransType::TCC, '');
-
+        $requestBody = [
+            'gid' => $gid,
+            'trans_type' => TransType::TCC,
+        ];
         try {
-            $callback();
-            $this->api->prepare([
-                'gid' => $gid,
-                'trans_type' => TransType::TCC,
-            ]);
+            $this->api->prepare($requestBody);
+
+            $callback($this);
         } catch (\Throwable $throwable) {
-            $this->api->abort([
-                'gid' => $gid,
-                'trans_type' => TransType::TCC,
-            ]);
+            $this->api->abort($requestBody);
             throw $throwable;
         }
 
-        $this->api->submit([
-            'gid' => $gid,
-            'trans_type' => 'tcc',
-        ]);
+        $this->api->submit($requestBody);
     }
 
     public function tccFromQuery()
@@ -64,12 +56,14 @@ class TCC extends AbstractTransaction
     {
         $branchId = $this->branchIdGenerate->generateSubBranchId();
         $this->api->registerBranch([
-            'data' => $body,
+            'data' => json_encode($body),
             'branch_id' => $branchId,
             'confirm' => $confirmUrl,
             'cancel' => $cancelUrl,
+            'gid' => TransContext::getGid(),
+            'trans_type' => TransType::TCC,
         ]);
 
-        $this->api->transRequestBranch('POST', $body, $branchId, Operation::TRY, $tryUrl);
+        return $this->api->transRequestBranch('POST', $body, $branchId, Operation::TRY, $tryUrl);
     }
 }
