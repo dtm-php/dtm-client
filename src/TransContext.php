@@ -211,6 +211,6 @@ class TransContext extends Context
 
     public static function getBarrierID(): int
     {
-        static::get(static::class . '.barrierID', 0);
+        return static::get(static::class . '.barrierID', 0);
     }
 }
