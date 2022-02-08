@@ -26,8 +26,11 @@ class Saga extends AbstractTransaction
         $this->api = $api;
     }
 
-    public function init(string $gid)
+    public function init(?string $gid = null)
     {
+        if ($gid === null) {
+            $gid = $this->generateGid();
+        }
         TransContext::init($gid, TransType::SAGA, '');
     }
 
