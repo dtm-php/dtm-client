@@ -8,6 +8,7 @@ declare(strict_types=1);
  */
 namespace DtmClient;
 
+use DtmClient\Util\Str;
 use Hyperf\Utils\Context;
 
 class TransContext extends Context
@@ -54,6 +55,19 @@ class TransContext extends Context
      * Use in MSG.
      */
     protected static string $queryPrepared;
+
+    public static function toArray(): array
+    {
+        $data = self::getContainer();
+        $array = [];
+        foreach ($data as $key => $value) {
+            if (str_starts_with($key, TransContext::class . '.')) {
+                $array[Str::snake(str_replace(TransContext::class . '.', '', $key))] = $value;
+            }
+        }
+
+        return $array;
+    }
 
     public static function init(string $gid, string $transType, string $branchId)
     {

@@ -58,13 +58,7 @@ class Saga extends AbstractTransaction
     public function submit()
     {
         $this->addConcurrentContext();
-        $body = [
-            'gid' => TransContext::getGid(),
-            'trans_type' => TransType::SAGA,
-            'payloads' => TransContext::getPayloads(),
-            'steps' => TransContext::getSteps(),
-        ];
-        return $this->api->submit($body);
+        return $this->api->submit(TransContext::toArray());
     }
 
     public function addConcurrentContext()
