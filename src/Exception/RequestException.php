@@ -2,7 +2,7 @@
 
 namespace DtmClient\Exception;
 
-class RequestException extends \Exception
+class RequestException extends DtmException
 {
 
 }

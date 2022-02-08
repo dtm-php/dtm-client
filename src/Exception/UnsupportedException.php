@@ -2,7 +2,7 @@
 
 namespace DtmClient\Exception;
 
-class UnsupportedException extends \Exception
+class UnsupportedException extends DtmException
 {
 
 }

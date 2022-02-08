@@ -2,7 +2,7 @@
 
 namespace DtmClient\Exception;
 
-class GenerateException extends \Exception
+class GenerateException extends DtmException
 {
 
 }
