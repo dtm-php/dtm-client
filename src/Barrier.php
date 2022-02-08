@@ -4,6 +4,7 @@ namespace DtmClient;
 
 
 use DtmClient\Exception\DtmException;
+use Hyperf\DB\DB;
 
 class Barrier
 {
@@ -20,5 +21,26 @@ class Barrier
         }
         return $branchBarrier;
     }
+
+    public static function insertBarrier(string $transType, string $gid, string $branchId, string $op, string $barrierID, string $reason)
+    {
+        if (empty($op)) {
+            return null;
+        }
+
+        DB::insert(
+            'INSERT IGNORE INTO `barrier` (trans_type, gid, branch_id, op, barrier_id, reason) values(?,?,?,?,?,?)',
+            [$transType, $gid, $branchId, $op, $barrierID, $reason]
+        );
+    }
+
+    public static function call(callable $callback)
+    {
+        $barrierID = 1;
+
+        $bid = sprintf('%02d', $barrierID);
+    }
+
+    
 
 }

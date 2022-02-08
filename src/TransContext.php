@@ -200,6 +200,16 @@ class TransContext extends Context
     {
         static::set(static::class . '.queryPrepared', $queryPrepared);
     }
+    
+    public static function setBarrierID(int $barrierID)
+    {
+        static::set(static::class . '.barrierID', $barrierID);
+    }
+
+    public static function getBarrierID(): int 
+    {
+        static::get(static::class . '.barrierID', 0);
+    }
 
 
 

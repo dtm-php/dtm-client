@@ -21,6 +21,7 @@
     "require": {
         "php": ">=8.0",
         "hyperf/config": "^2.2",
+        "hyperf/db": "^2.2",
         "hyperf/guzzle": "^2.2",
         "psr/http-server-middleware": "^1.0"
     },
