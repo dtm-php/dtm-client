@@ -48,7 +48,7 @@ class MySqlBarrier implements BarrierInterface
         }
     }
 
-    public static function call()
+    public static function call(): bool
     {
         $gid =  TransContext::getGid();
         $branchId = TransContext::getBranchId();
@@ -69,14 +69,13 @@ class MySqlBarrier implements BarrierInterface
             static::hasSimpleDb() ? SimpleDB::commit() : Db::commit();
 
             if (
-                ($op == Operation::BRANCH_CANCEL || $op == Operation::BRANCH_COMPENSATE) // null compensate
-                && $originAffected > 0 // repeated request or dangled request
+                ($op == Operation::BRANCH_CANCEL || $op == Operation::BRANCH_COMPENSATE)  && $originAffected > 0 || // null compensate
+                $currentAffected == 0// repeated request or dangled request
             ) {
-                $currentAffected = 0;
                 return true;
             }
 
-            return true;
+            return false;
         } catch (\Throwable $throwable) {
             static::hasSimpleDb() ? SimpleDB::rollback() : Db::rollback();
             throw $throwable;

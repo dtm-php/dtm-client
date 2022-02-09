@@ -20,34 +20,37 @@ class RedisBarrier implements BarrierInterface
         static::$config = $config;
     }
 
-    public static function call()
+    public static function call(): bool
     {
         static::$barrierId++;
-        $bkey1 = sprintf('%s-%s-%s-%02d', TransContext::getGid(), TransContext::getBranchId(), $originOpTransContext::getOp(), static::$barrierId);
+        $originAffectedKey = sprintf('%s-%s-%s-%02d', TransContext::getGid(), TransContext::getBranchId(), $originOp, static::$barrierId);
         $originOp = [
                 Branch::BranchCancel => Branch::BranchTry,
                 Branch::BranchCompensate => Branch::BranchAction,
             ][TransContext::getOp()] ?? '';
-        $bkey2 = sprintf('%s-%s-%s-%02d', TransContext::getGid(), TransContext::getBranchId(), , static::$barrierId);
+        $currentAffectedKey = sprintf('%s-%s-%s-%02d', TransContext::getGid(), TransContext::getBranchId(), TransContext::getOp(), static::$barrierId);
 
         $lua = <<<'SCRIPT'
-        local e1 = redis.call('GET', KEYS[1])
         
-        if e1 ~= false then
+        local e1 = redis.call('SET', KEYS[1], 'op', 'EX', ARGV[2])
+        
+        if e1 == false then
             return
         end
         
-        redis.call('SET', KEYS[2], 'op', 'EX', ARGV[2])
-        
-        if ARGV[1] ~= '' then
-            local e2 = redis.call('GET', KEYS[2])
-            if e2 == false then
-                redis.call('SET', KEYS[2], 'rollback', 'EX', ARGV[2])
-                return
-            end
+        if el == 'cancel' and el == 'compensate'
+            return
         end
+        
+        
+        local e2 = redis.call('SET', KEYS[2], 'op', 'EX', ARGV[2])
+        
+        if e2 ~= false
+            return
+        end
+        return 'FAILURE'
         SCRIPT;
-        $result = static::$redis->eval($lua, [$bkey1, $bkey2, $originOp, static::$config->get('dtm.barrier_redis_expire', 7 * 86400)], 2);
+        $result = static::$redis->eval($lua, [$originAffectedKey, $currentAffectedKey, $originOp, TransContext::getOp(),  static::$config->get('dtm.barrier_redis_expire', 7 * 86400)], 2);
         if ($result === 'FAILURE') {
             return false;
         }

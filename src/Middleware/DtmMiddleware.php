@@ -17,10 +17,13 @@ use Psr\Http\Server\RequestHandlerInterface;
 class DtmMiddleware implements MiddlewareInterface
 {
     protected Barrier $barrier;
+    
+    protected ResponseInterface $response;
 
-    public function __construct(Barrier $barrier)
+    public function __construct(Barrier $barrier,ResponseInterface $response)
     {
         $this->barrier = $barrier;
+        $this->response = $response;
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
@@ -42,8 +45,8 @@ class DtmMiddleware implements MiddlewareInterface
 
             $annotations = AnnotationCollector::getClassMethodAnnotation($class, $method);
 
-            if (isset($annotations[BarrierAnnotation::class])) {
-                $this->barrier->call();
+            if (isset($annotations[BarrierAnnotation::class]) && $this->barrier->call()) {
+                return $this->response->withStatus(200);
             }
         }
 
