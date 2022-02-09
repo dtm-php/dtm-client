@@ -10,7 +10,10 @@ namespace DtmClient\Api;
 
 use DtmClient\Constants\Operation;
 use DtmClient\Constants\RequestMessage;
+use DtmClient\Constants\Result;
+use DtmClient\Exception\FailureException;
 use DtmClient\Exception\GenerateException;
+use DtmClient\Exception\OngingException;
 use DtmClient\Exception\RequestException;
 use DtmClient\TransContext;
 use GuzzleHttp\Client;
@@ -97,22 +100,16 @@ class HttpApi implements ApiInterface
             'header' => $branchHeaders,
         ]);
 
-        $responseInfo = $response->getBody()->getContents();
-        $responseContent = json_decode($responseInfo, true) ?: [];
         $statusCode = $response->getStatusCode();
-        if ($statusCode === 425 || $responseContent['dtm_result'] === RequestMessage::ResultOngoing) {
-            throw new RequestException($responseInfo, 425);
+        if (Result::isOngoing($response)) {
+            throw new OngingException();
+        } elseif (Result::isFailure($response)) {
+            throw new FailureException();
+        } elseif (! Result::isSuccess($response)) {
+            throw new RequestException($response->getReasonPhrase(), $response->getStatusCode());
         }
 
-        if ($statusCode === 409 || $responseContent['dtm_result'] === RequestMessage::ResultFailure) {
-            throw new RequestException($responseInfo, 409);
-        }
-
-        if ($statusCode !== 200) {
-            throw new RequestException($responseInfo);
-        }
-
-        return $responseContent;
+        return $response;
     }
 
     /**
@@ -126,15 +123,13 @@ class HttpApi implements ApiInterface
                 'json' => $body,
                 'query' => $query
             ]);
-            $statusCode = $response->getStatusCode();
-            $responseContent = json_decode($response->getBody()->getContents(), true) ?: [];
-            if ($responseContent['dtm_result'] !== 'SUCCESS' || $statusCode !== 200) {
-                throw new RequestException($responseContent['message'] ?? '');
+            if (! Result::isSuccess($response)) {
+                throw new RequestException($response->getReasonPhrase(), $response->getStatusCode());
             }
         } catch (GuzzleException $exception) {
             throw new RequestException($exception->getMessage(), $exception->getCode(), $exception);
         }
-        return null;
+        return $response;
     }
 
     protected function transQuery(array $query, string $operation)
@@ -144,15 +139,13 @@ class HttpApi implements ApiInterface
             $response = $this->getClient()->get($url, [
                 'query' => $query
             ]);
-            $statusCode = $response->getStatusCode();
-            $responseContent = json_decode($response->getBody()->getContents(), true) ?: [];
-            if ($statusCode !== 200) {
-                throw new RequestException($responseContent['message'] ?? '');
+            if (! Result::isSuccess($response)) {
+                throw new RequestException($response->getReasonPhrase(), $response->getStatusCode());
             }
         } catch (GuzzleException $exception) {
             throw new RequestException($exception->getMessage(), $exception->getCode(), $exception);
         }
 
-        return $responseContent;
+        return $response;
     }
 }
