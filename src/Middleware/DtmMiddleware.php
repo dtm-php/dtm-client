@@ -19,15 +19,13 @@ class DtmMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $queryParams = $request->getQueryParams();
+        var_dump($queryParams);
         $transType = $queryParams['trans_type'] ?? null;
         $gid = $queryParams['gid'] ?? null;
         $branchId = $queryParams['branch_id'] ?? null;
         $op = $queryParams['op'] ?? null;
         if ($transType && $gid && $branchId && $op) {
-            TransContext::setTransType($transType);
-            TransContext::setGid($gid);
-            TransContext::setBranchId($branchId);
-            TransContext::setOp($op);
+            Barrier::barrierFrom($transType, $gid, $branchId, $op);
         }
 
         /** @var Dispatched $dispatched */

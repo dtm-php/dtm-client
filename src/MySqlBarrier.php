@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace DtmClient;
 
 use DtmClient\Constants\Operation;
+use DtmClient\Constants\Branch;
 use Hyperf\Utils\Context;
 use DtmClient\Exception\DtmException;
 use Hyperf\DB\DB as SimpleDB;
@@ -20,21 +21,19 @@ class MySqlBarrier implements BarrierInterface
     protected static int $barrierId = 0;
 
     protected static $opMap = [
-        'cancel' => 'try',
-        'compensate' => 'action'
+        Branch::BranchCancel => Branch::BranchTry,
+        Branch::BranchCompensate => Branch::BranchAction
     ];
 
     public static function barrierFrom(string $transType, string $gid, string $branchId, string $op)
     {
-        $branchBarrier = new BranchBarrier();
-        $branchBarrier->transType = $transType;
-        $branchBarrier->gid = $gid;
-        $branchBarrier->branchId = $branchId;
-        $branchBarrier->op = $op;
-        if (! $branchBarrier->isValid()) {
+        TransContext::setTransType($transType);
+        TransContext::setGid($gid);
+        TransContext::setBranchId($branchId);
+        TransContext::setOp($op);
+        if (! TransContext::getTransType() || ! TransContext::getGid() || ! TransContext::getBranchId() || ! TransContext::getOp()) {
             throw new DtmException(sprintf('Invalid transaction info: %s', $branchBarrier));
         }
-        return $branchBarrier;
     }
 
     public static function insertBarrier(string $transType, string $gid, string $branchId, string $op, string $barrierID, string $reason)
@@ -42,13 +41,21 @@ class MySqlBarrier implements BarrierInterface
         if (empty($op)) {
             return 0;
         }
-        $sql = 'INSERT IGNORE INTO `barrier` (trans_type, gid, branch_id, op, barrier_id, reason) values(?,?,?,?,?,?)';
-        $bindings = [$transType, $gid, $branchId, $op, $barrierID, $reason];
 
         if (static::hasSimpleDb()) {
-            return SimpleDB::execute($sql, $bindings);
+            return SimpleDB::execute(
+                'INSERT IGNORE INTO `barrier` (trans_type, gid, branch_id, op, barrier_id, reason) values(?,?,?,?,?,?)',
+                [$transType, $gid, $branchId, $op, $barrierID, $reason]
+            );
         } else {
-            return Db::execute($sql, $bindings);
+            return Db::table('barrier')->insertOrIgnore([
+                'trans_type' => $transType,
+                'gid' => $gid,
+                'branch_id' => $branchId,
+                'op' => $op,
+                'barrier_id' => $barrierID,
+                'reason' => $reason
+            ]);
         }
     }
 
