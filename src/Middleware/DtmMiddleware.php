@@ -4,6 +4,7 @@ namespace DtmClient\Middleware;
 
 
 use DtmClient\Annotation\Barrier as BarrierAnnotation;
+use DtmClient\Barrier;
 use DtmClient\BarrierFactory;
 use DtmClient\TransContext;
 use Hyperf\Di\Annotation\AnnotationCollector;
@@ -15,6 +16,12 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class DtmMiddleware implements MiddlewareInterface
 {
+    protected Barrier $barrier;
+
+    public function __construct(Barrier $barrier)
+    {
+        $this->barrier = $barrier;
+    }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
@@ -24,7 +31,7 @@ class DtmMiddleware implements MiddlewareInterface
         $branchId = $queryParams['branch_id'] ?? null;
         $op = $queryParams['op'] ?? null;
         if ($transType && $gid && $branchId && $op) {
-            BarrierFactory::barrierFrom($transType, $gid, $branchId, $op);
+            $this->barrier->barrierFrom($transType, $gid, $branchId, $op);
         }
 
         /** @var Dispatched $dispatched */
@@ -36,7 +43,7 @@ class DtmMiddleware implements MiddlewareInterface
             $annotations = AnnotationCollector::getClassMethodAnnotation($class, $method);
 
             if (isset($annotations[BarrierAnnotation::class])) {
-                BarrierFactory::call();
+                $this->barrier->call();
             }
         }
 
