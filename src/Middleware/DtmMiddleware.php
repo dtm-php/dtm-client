@@ -3,7 +3,11 @@
 namespace DtmClient\Middleware;
 
 
+use DtmClient\Annotation\Barrier as BarrierAnnotation;
+use DtmClient\BarrierFactory;
 use DtmClient\TransContext;
+use Hyperf\Di\Annotation\AnnotationCollector;
+use Hyperf\HttpServer\Router\Dispatched;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -25,7 +29,20 @@ class DtmMiddleware implements MiddlewareInterface
             TransContext::setBranchId($branchId);
             TransContext::setOp($op);
         }
-        $response = $handler->handle($request);
-        return $response;
+
+        /** @var Dispatched $dispatched */
+        $dispatched = $request->getAttribute(Dispatched::class);
+
+        [$class, $method] = $dispatched->handler->callback;
+
+        $result = AnnotationCollector::get($class);
+
+        if (! isset($result['_m'][$method][BarrierAnnotation::class])) {
+            return $handler->handle($request);
+        }
+
+        BarrierFactory::call();
+
+        return $handler->handle($request);
     }
 }

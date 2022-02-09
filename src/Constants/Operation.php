@@ -23,4 +23,8 @@ class Operation
     public const QUERY_ALL = 'all';
 
     public const TRY = 'try';
+
+    public const BRANCH_CANCEL = 'cancel';
+
+    public const BRANCH_COMPENSATE = 'compensate';
 }

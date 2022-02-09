@@ -7,10 +7,12 @@ declare(strict_types=1);
  * @license  https://github.com/dtm-php/dtm-client/blob/master/LICENSE
  */
 use DtmClient\Constants\Protocol;
+use DtmClient\Constants\DbType;
 
 return [
     'protocol' => Protocol::HTTP,
     'server' => '127.0.0.1',
+    'barrier_db_type' => DbType::MySql,
     'port' => [
         'http' => 36789,
         'grpc' => 36790,
