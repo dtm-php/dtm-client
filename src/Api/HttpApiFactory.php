@@ -17,9 +17,9 @@ class HttpApiFactory
     public function __invoke(ContainerInterface $container)
     {
         $config = $container->get(ConfigInterface::class);
-        $server = $config->get('dtm-client.server', '127.0.0.1');
-        $port = $config->get('dtm-client.port.http', 36789);
-        $options = $config->get('dtm-client.guzzle.options', []);
+        $server = $config->get('dtm.server', '127.0.0.1');
+        $port = $config->get('dtm.port.http', 36789);
+        $options = $config->get('dtm.guzzle.options', []);
         $clientFactory = $container->get(ClientFactory::class);
         $client = $clientFactory->create(array_merge(
             [

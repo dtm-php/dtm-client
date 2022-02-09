@@ -86,7 +86,7 @@ class HttpApi implements ApiInterface
 
     public function transRequestBranch(string $method, array $body, string $branchID, string $op, string $url, array $branchHeaders = [])
     {
-        $dtm = $this->config->get('dtm-client.server', '127.0.0.1') . ':' . $this->config->get('dtm-client.port.http', 36789);
+        $dtm = $this->config->get('dtm.server', '127.0.0.1') . ':' . $this->config->get('dtm.port.http', 36789);
         $response = $this->client->request($method, $url, [
             'query' => [
                 [
