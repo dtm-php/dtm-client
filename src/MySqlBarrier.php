@@ -25,17 +25,6 @@ class MySqlBarrier implements BarrierInterface
         Branch::BranchCompensate => Branch::BranchAction
     ];
 
-    public static function barrierFrom(string $transType, string $gid, string $branchId, string $op)
-    {
-        TransContext::setTransType($transType);
-        TransContext::setGid($gid);
-        TransContext::setBranchId($branchId);
-        TransContext::setOp($op);
-        if (! TransContext::getTransType() || ! TransContext::getGid() || ! TransContext::getBranchId() || ! TransContext::getOp()) {
-            throw new DtmException(sprintf('Invalid transaction info: %s', $branchBarrier));
-        }
-    }
-
     public static function insertBarrier(string $transType, string $gid, string $branchId, string $op, string $barrierID, string $reason)
     {
         if (empty($op)) {
@@ -74,11 +63,10 @@ class MySqlBarrier implements BarrierInterface
 
         static::hasSimpleDb() ? SimpleDB::beginTransaction() : Db::beginTransaction();
 
-
         try {
             $originAffected = MySqlBarrier::insertBarrier($transType, $gid, $branchId, $originOP, $bid, $op);
             $currentAffected = MySqlBarrier::insertBarrier($transType, $gid, $branchId, $op, $bid, $op);
-            static::hasSimpleDb() ? SimpleDB::rollback() : Db::rollback();
+            static::hasSimpleDb() ? SimpleDB::commit() : Db::commit();
 
             if (
                 ($op == Operation::BRANCH_CANCEL || $op == Operation::BRANCH_COMPENSATE) // null compensate
@@ -90,7 +78,7 @@ class MySqlBarrier implements BarrierInterface
 
             return true;
         } catch (\Throwable $throwable) {
-            static::hasSimpleDb() ? SimpleDB::commit() : Db::commit();
+            static::hasSimpleDb() ? SimpleDB::rollback() : Db::rollback();
             throw $throwable;
         }
     }
