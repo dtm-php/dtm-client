@@ -3,6 +3,7 @@
 namespace DtmClient\Middleware;
 
 
+use DtmClient\Barrier;
 use DtmClient\TransContext;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -20,10 +21,7 @@ class DtmMiddleware implements MiddlewareInterface
         $branchId = $queryParams['branch_id'] ?? null;
         $op = $queryParams['op'] ?? null;
         if ($transType && $gid && $branchId && $op) {
-            TransContext::setTransType($transType);
-            TransContext::setGid($gid);
-            TransContext::setBranchId($branchId);
-            TransContext::setOp($op);
+            Barrier::barrierFrom($transType, $gid, $branchId, $op);
         }
         $response = $handler->handle($request);
         return $response;
