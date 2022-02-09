@@ -13,6 +13,7 @@ return [
     'protocol' => Protocol::HTTP,
     'server' => '127.0.0.1',
     'barrier_db_type' => DbType::MySql,
+    'barrier_redis_expire' => 7 * 86400,
     'port' => [
         'http' => 36789,
         'grpc' => 36790,

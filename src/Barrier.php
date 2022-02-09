@@ -23,6 +23,8 @@ class Barrier
         switch ($this->config->get('dtm.barrier_db_type', DbType::MySql)) {
             case DbType::MySql:
                 return MySqlBarrier::call();
+            case DbType::Redis:
+                return RedisBarrier::call();
             default:
                 throw new UnsupportedException('barrier db type is unsupported.');
         }
