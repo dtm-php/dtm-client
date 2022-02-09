@@ -166,7 +166,7 @@ class TransContext extends Context
 
     public static function getBranchId(): string
     {
-        return static::get(static::class . '.branchId');
+        return static::get(static::class . '.branchId', '');
     }
 
     public static function setBranchId(string $branchId)
@@ -204,13 +204,4 @@ class TransContext extends Context
         static::set(static::class . '.queryPrepared', $queryPrepared);
     }
 
-    public static function setBarrierID(int $barrierID)
-    {
-        static::set(static::class . '.barrierID', $barrierID);
-    }
-
-    public static function getBarrierID(): int
-    {
-        return static::get(static::class . '.barrierID', 0);
-    }
 }

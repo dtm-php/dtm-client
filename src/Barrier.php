@@ -8,12 +8,15 @@ declare(strict_types=1);
  */
 namespace DtmClient;
 
+use Hyperf\Utils\Context;
 use DtmClient\Exception\DtmException;
 use Hyperf\DB\DB;
-use Psr\Http\Message\RequestInterface;
+use Hyperf\HttpServer\Contract\RequestInterface;
 
 class Barrier
 {
+    protected static int $barrierId = 0;
+
     protected static $opMap = [
         'cancel' => 'try',
         'compensate' => 'action'
@@ -46,29 +49,20 @@ class Barrier
 
     public static function call(callable $callback)
     {
-        /** @var RequestInterface $request */
-        $request = Context::get(RequestInterface::class);
+        $gid =  TransContext::getGid();
+        $branchId = TransContext::getBranchId();
+        $transType = TransContext::getTransType();
+        $op = TransContext::getOp();
 
-        $inputs = $request->all();
-
-        $op = $inputs[0]['op'] ?? $inputs['op'];
-        $gid = $inputs[0]['gid']?? $inputs['gid'];
-        $branchId = $inputs[0]['branch_id']?? $inputs['branch_id'];
-        $transType = $inputs[0]['trans_type']?? $inputs['trans_type'];
-        TransContext::setGid();
-        TransContext::setBranchId($branchId);
-        TransContext::setTransType($transType);
-        TransContext::setOp($op);
-
-        TransContext::setBarrierID(TransContext::getBarrierID() + 1);
-        $barrierID = TransContext::getBarrierID();
+        static::$barrierId++;
+        $barrierID = static::$barrierId;
         $bid = sprintf('%02d', $barrierID);
 
         $originOP = static::$opMap[$op] ?? '';
         DB::beginTransaction();
         try {
-            \DtmClient\Barrier::insertBarrier($transType, $gid, $branchId, $originOP, $bid, $barrierID);
-            \DtmClient\Barrier::insertBarrier($transType, $gid, $branchId, $op, $bid, $barrierID);
+            \DtmClient\Barrier::insertBarrier($transType, $gid, $branchId, $originOP, $bid, $op);
+            \DtmClient\Barrier::insertBarrier($transType, $gid, $branchId, $op, $bid, $op);
             $result = $callback();
             DB::commit();
             return $result;

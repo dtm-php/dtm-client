@@ -3,9 +3,10 @@
 namespace DtmClient\Annotation;
 
 use Attribute;
+use Hyperf\Di\Annotation\AbstractAnnotation;
 
 #[Attribute(Attribute::TARGET_METHOD)]
-class Barrier
+class Barrier extends AbstractAnnotation
 {
     public string $dbType = 'mysql';
 
