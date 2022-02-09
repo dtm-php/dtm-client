@@ -47,8 +47,6 @@ class DtmMiddleware implements MiddlewareInterface
             }
         }
 
-        $this->barrier->call();
-
         return $handler->handle($request);
     }
 }
