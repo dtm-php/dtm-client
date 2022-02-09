@@ -37,12 +37,14 @@ class DtmMiddleware implements MiddlewareInterface
         /** @var Dispatched $dispatched */
         $dispatched = $request->getAttribute(Dispatched::class);
 
-        [$class, $method] = $dispatched->handler->callback;
+        if ($dispatched instanceof Dispatched) {
+            [$class, $method] = $dispatched->handler->callback;
 
-        $result = AnnotationCollector::get($class);
+            $annotations = AnnotationCollector::getClassMethodAnnotation($class, $method);
 
-        if (! isset($result['_m'][$method][BarrierAnnotation::class])) {
-            return $handler->handle($request);
+            if (isset($annotations[BarrierAnnotation::class])) {
+                $this->barrier->call();
+            }
         }
 
         $this->barrier->call();
