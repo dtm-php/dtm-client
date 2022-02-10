@@ -7,11 +7,6 @@ class Str
 {
 
     /**
-     * The cache of snake-cased words.
-     */
-    protected static $snakeCache = [];
-
-    /**
      * Convert a string to snake case.
      * Code from https://github.com/hyperf/hyperf/blob/master/src/utils/src/Str.php
      */
@@ -19,17 +14,13 @@ class Str
     {
         $key = $value;
 
-        if (isset(static::$snakeCache[$key][$delimiter])) {
-            return static::$snakeCache[$key][$delimiter];
-        }
-
         if (! ctype_lower($value)) {
             $value = preg_replace('/\s+/u', '', ucwords($value));
 
             $value = static::lower(preg_replace('/(.)(?=[A-Z])/u', '$1' . $delimiter, $value));
         }
 
-        return static::$snakeCache[$key][$delimiter] = $value;
+        return $value;
     }
 
     /**
@@ -39,6 +30,29 @@ class Str
     public static function lower(string $value): string
     {
         return mb_strtolower($value, 'UTF-8');
+    }
+
+    /**
+     * Convert a value to camel case.
+     *
+     * @param string $value
+     * @return string
+     */
+    public static function camel($value)
+    {
+        return lcfirst(static::studly($value));
+    }
+
+    /**
+     * Convert a value to studly caps case.
+     */
+    public static function studly(string $value, string $gap = ''): string
+    {
+        $key = $value;
+
+        $value = ucwords(str_replace(['-', '_'], ' ', $value));
+
+        return str_replace(' ', $gap, $value);
     }
 
 }
