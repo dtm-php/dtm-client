@@ -12,22 +12,20 @@ use DtmClient\Constants\DbType;
 return [
     'protocol' => Protocol::HTTP,
     'server' => '127.0.0.1',
+    'port' => [
+        'http' => 36789,
+        'grpc' => 36790,
+    ],
     'barrier' => [
         'db' => [
             'type' => DbType::MySQL
         ],
         'redis' => [
             'expire_seconds' => 7 * 86400,
-        ]
-    ],
-    'port' => [
-        'http' => 36789,
-        'grpc' => 36790,
+        ],
+        'apply' => [],
     ],
     'guzzle' => [
         'options' => [],
     ],
-    'barrier' => [
-        
-    ]
 ];
