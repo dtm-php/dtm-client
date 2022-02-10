@@ -1,7 +1,7 @@
 {
     "name": "dtm/dtm-client",
     "type": "library",
-    "license": "BSD-3-Clause",
+    "license": "MIT",
     "keywords": [
         "php",
         "dtm",
@@ -38,7 +38,9 @@
         "ext-json": "Required to use JSON.",
         "ext-pdo": "Required to use MySQL Client.",
         "ext-pdo_mysql": "Required to use MySQL Client.",
-        "ext-redis": "Required to use Redis Client."
+        "ext-redis": "Required to use Redis Client.",
+        "hyperf/di": "^2.2",
+        "hyperf/grpc-client": "^2.2"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
