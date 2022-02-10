@@ -12,7 +12,6 @@ use DtmClient\Exception\GenerateException;
 
 class BranchIdGenerator implements BranchIdGeneratorInterface
 {
-
     public function generateSubBranchId(): string
     {
         $branchId = TransContext::getBranchId();

@@ -10,7 +10,6 @@ namespace DtmClient\Api;
 
 use DtmClient\Constants\Operation;
 use DtmClient\Constants\Protocol;
-use DtmClient\Constants\RequestMessage;
 use DtmClient\Constants\Result;
 use DtmClient\Exception\FailureException;
 use DtmClient\Exception\GenerateException;
@@ -36,7 +35,7 @@ class HttpApi implements ApiInterface
 
     public function getProtocol(): string
     {
-        return  Protocol::HTTP;
+        return Protocol::HTTP;
     }
 
     public function generateGid(): string
@@ -110,9 +109,11 @@ class HttpApi implements ApiInterface
 
         if (Result::isOngoing($response)) {
             throw new OngingException();
-        } elseif (Result::isFailure($response)) {
+        }
+        if (Result::isFailure($response)) {
             throw new FailureException();
-        } elseif (! Result::isSuccess($response)) {
+        }
+        if (! Result::isSuccess($response)) {
             throw new RequestException($response->getReasonPhrase(), $response->getStatusCode());
         }
 
@@ -128,7 +129,7 @@ class HttpApi implements ApiInterface
             $url = sprintf('/api/dtmsvr/%s', $operation);
             $response = $this->getClient()->request($method, $url, [
                 'json' => $body,
-                'query' => $query
+                'query' => $query,
             ]);
             if (! Result::isSuccess($response)) {
                 throw new RequestException($response->getReasonPhrase(), $response->getStatusCode());
@@ -144,7 +145,7 @@ class HttpApi implements ApiInterface
         try {
             $url = sprintf('/api/dtmsvr/%s', $operation);
             $response = $this->getClient()->get($url, [
-                'query' => $query
+                'query' => $query,
             ]);
             if (! Result::isSuccess($response)) {
                 throw new RequestException($response->getReasonPhrase(), $response->getStatusCode());

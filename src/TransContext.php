@@ -203,5 +203,4 @@ class TransContext extends Context
     {
         static::set(static::class . '.queryPrepared', $queryPrepared);
     }
-
 }

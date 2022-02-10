@@ -8,8 +8,6 @@ declare(strict_types=1);
  */
 namespace DtmClient\Api;
 
-use Google\Protobuf\Internal\Message;
-
 interface ApiInterface
 {
     public function getProtocol(): string;

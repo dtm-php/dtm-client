@@ -37,8 +37,7 @@ class HttpApiTest extends AbstractTestCase
     protected function createHttpApi(): HttpApi
     {
         $container = $this->createContainer();
-        $httpApi = $container->get(HttpApi::class);
-        return $httpApi;
+        return $container->get(HttpApi::class);
     }
 
     protected function createContainer(): ContainerInterface|Mockery\MockInterface|Mockery\LegacyMockInterface

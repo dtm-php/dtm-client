@@ -14,11 +14,8 @@ use DtmClient\Constants\Operation;
 use DtmClient\Constants\Protocol;
 use DtmClient\Constants\TransType;
 use DtmClient\Exception\InvalidArgumentException;
-use DtmClient\Exception\RequestException;
 use DtmClient\Exception\UnsupportedException;
 use DtmClient\Grpc\Message\DtmBranchRequest;
-use Google\Protobuf\Internal\FieldDescriptorProto\Type;
-use Google\Protobuf\Internal\MapField;
 use Google\Protobuf\Internal\Message;
 
 class TCC extends AbstractTransaction
@@ -81,7 +78,7 @@ class TCC extends AbstractTransaction
                     'TransType' => TransType::TCC,
                     'BranchID' => $branchId,
                     'BusiPayload' => $body->serializeToString(),
-                    'Data' => ['confirm' => $confirmUrl, 'cancel' => $cancelUrl]
+                    'Data' => ['confirm' => $confirmUrl, 'cancel' => $cancelUrl],
                 ];
                 $argument = new DtmBranchRequest($formatBody);
                 $this->api->registerBranch($formatBody);
@@ -101,6 +98,5 @@ class TCC extends AbstractTransaction
                 throw new UnsupportedException('Unsupported protocol');
                 break;
         }
-
     }
 }

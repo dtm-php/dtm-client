@@ -16,13 +16,10 @@ use DtmClient\Grpc\GrpcClientManager;
 use DtmClient\Grpc\Message\DtmBranchRequest;
 use DtmClient\Grpc\Message\DtmRequest;
 use DtmClient\Grpc\Message\DtmTransOptions;
-use DtmClient\Util\Str;
-use Google\Protobuf\Internal\Message;
 use Hyperf\Contract\ConfigInterface;
 
 class GrpcApi implements ApiInterface
 {
-
     protected ConfigInterface $config;
 
     protected GrpcClientManager $grpcClientManager;
@@ -35,7 +32,7 @@ class GrpcApi implements ApiInterface
 
     public function getProtocol(): string
     {
-        return  Protocol::GRPC;
+        return Protocol::GRPC;
     }
 
     public function generateGid(): string

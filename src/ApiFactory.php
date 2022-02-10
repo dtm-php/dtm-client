@@ -18,7 +18,6 @@ use Psr\Container\ContainerInterface;
 
 class ApiFactory
 {
-
     public function __invoke(ContainerInterface $container): ApiInterface
     {
         $protocol = $container->get(ConfigInterface::class)->get('dtm.protocol', Protocol::HTTP);

@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+/**
+ * This file is part of DTM-PHP.
+ *
+ * @license  https://github.com/dtm-php/dtm-client/blob/master/LICENSE
+ */
 namespace DtmClient\Util;
-
 
 class Str
 {
-
     /**
      * Convert a string to snake case.
-     * Code from https://github.com/hyperf/hyperf/blob/master/src/utils/src/Str.php
+     * Code from https://github.com/hyperf/hyperf/blob/master/src/utils/src/Str.php.
      */
     public static function snake(string $value, string $delimiter = '_'): string
     {
@@ -25,7 +29,7 @@ class Str
 
     /**
      * Convert the given string to lower-case.
-     * Code from https://github.com/hyperf/hyperf/blob/master/src/utils/src/Str.php
+     * Code from https://github.com/hyperf/hyperf/blob/master/src/utils/src/Str.php.
      */
     public static function lower(string $value): string
     {
@@ -54,5 +58,4 @@ class Str
 
         return str_replace(' ', $gap, $value);
     }
-
 }

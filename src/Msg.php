@@ -1,5 +1,11 @@
 <?php
 
+declare(strict_types=1);
+/**
+ * This file is part of DTM-PHP.
+ *
+ * @license  https://github.com/dtm-php/dtm-client/blob/master/LICENSE
+ */
 namespace DtmClient;
 
 use DtmClient\Constants\TransType;
@@ -7,7 +13,6 @@ use DtmClient\Exception\FailureException;
 
 class Msg extends AbstractTransaction
 {
-
     protected Barrier $barrier;
 
     public function __construct(Barrier $barrier)

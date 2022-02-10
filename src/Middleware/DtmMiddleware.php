@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+/**
+ * This file is part of DTM-PHP.
+ *
+ * @license  https://github.com/dtm-php/dtm-client/blob/master/LICENSE
+ */
 namespace DtmClient\Middleware;
-
 
 use DtmClient\Annotation\Barrier as BarrierAnnotation;
 use DtmClient\Barrier;
-use DtmClient\BarrierFactory;
-use DtmClient\TransContext;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Di\Annotation\AnnotationCollector;
 use Hyperf\HttpServer\Contract\ResponseInterface as HttpResponse;

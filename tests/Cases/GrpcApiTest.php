@@ -9,13 +9,9 @@ declare(strict_types=1);
 namespace DtmClientTest\Cases;
 
 use DtmClient\Api\GrpcApi;
-use DtmClient\Grpc\GrpcClient;
-use GuzzleHttp\Client;
 use Hyperf\Contract\ConfigInterface;
-use Hyperf\Guzzle\ClientFactory;
 use Hyperf\Utils\ApplicationContext;
 use Hyperf\Utils\ChannelPool;
-use Hyperf\Utils\Coroutine;
 use Mockery;
 use Psr\Container\ContainerInterface;
 
@@ -40,8 +36,7 @@ class GrpcApiTest extends AbstractTestCase
     protected function createGrpcApi(): GrpcApi
     {
         $container = $this->createContainer();
-        $grpcApi = $container->get(GrpcApi::class);
-        return $grpcApi;
+        return $container->get(GrpcApi::class);
     }
 
     protected function createContainer(): ContainerInterface|Mockery\MockInterface|Mockery\LegacyMockInterface

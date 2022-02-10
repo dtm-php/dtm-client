@@ -76,5 +76,4 @@ trait TransOption
     {
         static::set(TransContext::class . '.branchHeaders', $branchHeaders);
     }
-
 }

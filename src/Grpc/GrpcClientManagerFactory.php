@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+/**
+ * This file is part of DTM-PHP.
+ *
+ * @license  https://github.com/dtm-php/dtm-client/blob/master/LICENSE
+ */
 namespace DtmClient\Grpc;
 
-
-use DtmClient\TransContext;
 use Hyperf\Contract\ConfigInterface;
-use PDO;
 use Psr\Container\ContainerInterface;
 
 class GrpcClientManagerFactory
 {
-
     public function __invoke(ContainerInterface $container)
     {
         $manager = new GrpcClientManager();
@@ -21,5 +23,4 @@ class GrpcClientManagerFactory
         $manager->addClient($hostname, new GrpcClient($hostname));
         return $manager;
     }
-
 }

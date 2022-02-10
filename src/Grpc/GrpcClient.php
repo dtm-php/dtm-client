@@ -1,20 +1,19 @@
 <?php
 
+declare(strict_types=1);
+/**
+ * This file is part of DTM-PHP.
+ *
+ * @license  https://github.com/dtm-php/dtm-client/blob/master/LICENSE
+ */
 namespace DtmClient\Grpc;
 
-
-use DtmClient\Constants\Operation;
-use DtmClient\Grpc\Message\DtmBranchRequest;
 use DtmClient\Grpc\Message\DtmGidReply;
-use DtmClient\Grpc\Message\DtmRequest;
-use DtmClient\TransContext;
 use Google\Protobuf\GPBEmpty;
 use Google\Protobuf\Internal\Message;
-use Hyperf\GrpcClient\BaseClient;
 
-class GrpcClient extends BaseClient
+class GrpcClient extends UniversalGrpcClient
 {
-
     protected const SERVICE = '/dtmgimp.Dtm/';
 
     public function newGid(): DtmGidReply
@@ -36,11 +35,4 @@ class GrpcClient extends BaseClient
         );
         return $reply;
     }
-
-    public function invoke(string $method, Message $argument, array $deserialize, array $metadata = [], array $options = []): array
-    {
-        $response = $this->_simpleRequest($method, $argument, $deserialize, $metadata, $options);
-        return $response;
-    }
-
 }

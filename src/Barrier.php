@@ -1,12 +1,17 @@
 <?php
 
+declare(strict_types=1);
+/**
+ * This file is part of DTM-PHP.
+ *
+ * @license  https://github.com/dtm-php/dtm-client/blob/master/LICENSE
+ */
 namespace DtmClient;
 
 use DtmClient\Constants\DbType;
 use DtmClient\Exception\DtmException;
 use DtmClient\Exception\UnsupportedException;
 use Hyperf\Contract\ConfigInterface;
-use Hyperf\Utils\ApplicationContext;
 
 class Barrier
 {
@@ -34,7 +39,7 @@ class Barrier
                 throw new UnsupportedException('Barrier DB type is unsupported.');
         }
     }
-    
+
     public function barrierFrom(string $transType, string $gid, string $branchId, string $op)
     {
         TransContext::setTransType($transType);
@@ -46,5 +51,4 @@ class Barrier
             throw new DtmException(sprintf('Invalid transaction info: %s', $info));
         }
     }
-    
 }
