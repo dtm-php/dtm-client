@@ -13,6 +13,7 @@ use DtmClient\Api\HttpApi;
 use DtmClient\Api\HttpApiFactory;
 use DtmClient\Grpc\GrpcClientManager;
 use DtmClient\Grpc\GrpcClientManagerFactory;
+use Hyperf\HttpMessage\Server\Response;
 
 class ConfigProvider
 {

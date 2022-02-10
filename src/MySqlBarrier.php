@@ -18,20 +18,51 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 
 class MySqlBarrier implements BarrierInterface
 {
-    protected static int $barrierId = 0;
+    protected int $barrierId = 0;
 
-    protected static $opMap = [
-        Branch::BranchCancel => Branch::BranchTry,
-        Branch::BranchCompensate => Branch::BranchAction
-    ];
+    public function call(): bool
+    {
+        $gid =  TransContext::getGid();
+        $branchId = TransContext::getBranchId();
+        $transType = TransContext::getTransType();
+        $op = TransContext::getOp();
 
-    public static function insertBarrier(string $transType, string $gid, string $branchId, string $op, string $barrierID, string $reason)
+        $barrierID = ++$this->barrierId;
+        $bid = sprintf('%02d', $barrierID);
+
+        $originOP = [
+                Branch::BranchCancel => Branch::BranchTry,
+                Branch::BranchCompensate => Branch::BranchAction
+            ][$op] ?? '';
+
+        $this->hasSimpleDb() ? SimpleDB::beginTransaction() : Db::beginTransaction();
+
+        try {
+            $originAffected = $this->insertBarrier($transType, $gid, $branchId, $originOP, $bid, $op);
+            $currentAffected = $this->insertBarrier($transType, $gid, $branchId, $op, $bid, $op);
+            $this->hasSimpleDb() ? SimpleDB::commit() : Db::commit();
+
+            if (
+                ($op == Operation::BRANCH_CANCEL || $op == Operation::BRANCH_COMPENSATE)  && $originAffected > 0 || // null compensate
+                $currentAffected == 0// repeated request or dangled request
+            ) {
+                return true;
+            }
+
+            return false;
+        } catch (\Throwable $throwable) {
+            $this->hasSimpleDb() ? SimpleDB::rollback() : Db::rollback();
+            throw $throwable;
+        }
+    }
+
+    protected function insertBarrier(string $transType, string $gid, string $branchId, string $op, string $barrierID, string $reason)
     {
         if (empty($op)) {
             return 0;
         }
 
-        if (static::hasSimpleDb()) {
+        if ($this->hasSimpleDb()) {
             return SimpleDB::execute(
                 'INSERT IGNORE INTO `barrier` (trans_type, gid, branch_id, op, barrier_id, reason) values(?,?,?,?,?,?)',
                 [$transType, $gid, $branchId, $op, $barrierID, $reason]
@@ -48,42 +79,7 @@ class MySqlBarrier implements BarrierInterface
         }
     }
 
-    public static function call()
-    {
-        $gid =  TransContext::getGid();
-        $branchId = TransContext::getBranchId();
-        $transType = TransContext::getTransType();
-        $op = TransContext::getOp();
-
-        static::$barrierId++;
-        $barrierID = static::$barrierId;
-        $bid = sprintf('%02d', $barrierID);
-
-        $originOP = static::$opMap[$op] ?? '';
-
-        static::hasSimpleDb() ? SimpleDB::beginTransaction() : Db::beginTransaction();
-
-        try {
-            $originAffected = MySqlBarrier::insertBarrier($transType, $gid, $branchId, $originOP, $bid, $op);
-            $currentAffected = MySqlBarrier::insertBarrier($transType, $gid, $branchId, $op, $bid, $op);
-            static::hasSimpleDb() ? SimpleDB::commit() : Db::commit();
-
-            if (
-                ($op == Operation::BRANCH_CANCEL || $op == Operation::BRANCH_COMPENSATE) // null compensate
-                && $originAffected > 0 // repeated request or dangled request
-            ) {
-                $currentAffected = 0;
-                return true;
-            }
-
-            return true;
-        } catch (\Throwable $throwable) {
-            static::hasSimpleDb() ? SimpleDB::rollback() : Db::rollback();
-            throw $throwable;
-        }
-    }
-
-    public static function hasSimpleDb()
+    protected function hasSimpleDb(): bool
     {
         return class_exists(SimpleDB::class);
     }

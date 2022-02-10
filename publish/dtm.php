@@ -15,6 +15,9 @@ return [
     'barrier' => [
         'db' => [
             'type' => DbType::MySQL
+        ],
+        'redis' => [
+            'expire_seconds' => 7 * 86400,
         ]
     ],
     'port' => [
@@ -24,4 +27,7 @@ return [
     'guzzle' => [
         'options' => [],
     ],
+    'barrier' => [
+        
+    ]
 ];
