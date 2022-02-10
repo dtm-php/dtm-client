@@ -123,7 +123,7 @@ dtm-client 的使用非常简单，我们提供了一个示例项目 [dtm-php/dt
 
 ## TCC 模式
 
-TCC 模式是一种非常流行的柔性事务解决方案，由 Try-Confirm-Cancel 三个单词的首字母缩写分别组成 TCC 的概念，最早是由 Pat Helland 于 2007 年发表的一篇名为《Life beyond Distributed Transactions:an Apostate’s Opinion》的论文中提出。
+TCC 模式是一种非常流行的柔性事务解决方案，由 Try-Confirm-Cancel 三个单词的首字母缩写分别组成 TCC 的概念，最早是由 Pat Helland 于 2007 年发表的一篇名为 [Life beyond Distributed Transactions:an Apostate’s Opinion](https://www.ics.uci.edu/~cs223/papers/cidr07p15.pdf) 的论文中提出。
 
 ### TCC 的 3 个阶段
 
