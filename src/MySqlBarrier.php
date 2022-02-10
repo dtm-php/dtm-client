@@ -38,8 +38,8 @@ class MySqlBarrier implements BarrierInterface
         $this->hasSimpleDb() ? SimpleDB::beginTransaction() : Db::beginTransaction();
 
         try {
-            $originAffected = MySqlBarrier::insertBarrier($transType, $gid, $branchId, $originOP, $bid, $op);
-            $currentAffected = MySqlBarrier::insertBarrier($transType, $gid, $branchId, $op, $bid, $op);
+            $originAffected = $this->insertBarrier($transType, $gid, $branchId, $originOP, $bid, $op);
+            $currentAffected = $this->insertBarrier($transType, $gid, $branchId, $op, $bid, $op);
             $this->hasSimpleDb() ? SimpleDB::commit() : Db::commit();
 
             if (
@@ -56,7 +56,7 @@ class MySqlBarrier implements BarrierInterface
         }
     }
 
-    public function insertBarrier(string $transType, string $gid, string $branchId, string $op, string $barrierID, string $reason)
+    protected function insertBarrier(string $transType, string $gid, string $branchId, string $op, string $barrierID, string $reason)
     {
         if (empty($op)) {
             return 0;
@@ -79,7 +79,7 @@ class MySqlBarrier implements BarrierInterface
         }
     }
 
-    public function hasSimpleDb(): bool
+    protected function hasSimpleDb(): bool
     {
         return class_exists(SimpleDB::class);
     }
