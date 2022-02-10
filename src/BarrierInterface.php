@@ -4,5 +4,5 @@ namespace DtmClient;
 
 interface BarrierInterface
 {
-    public static function call(): bool;
+    public function call(): bool;
 }

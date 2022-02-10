@@ -8,27 +8,27 @@ use Hyperf\Redis\Redis;
 
 class RedisBarrier implements BarrierInterface
 {
-    protected static int $barrierId = 0;
+    protected int $barrierId = 0;
     
-    protected static Redis $redis;
+    protected Redis $redis;
 
-    protected static ConfigInterface $config;
+    protected ConfigInterface $config;
     
     public function __construct(Redis $redis, ConfigInterface $config)
     {
-        static::$redis = $redis;
-        static::$config = $config;
+        $this->redis = $redis;
+        $this->config = $config;
     }
 
-    public static function call(): bool
+    public function call(): bool
     {
-        static::$barrierId++;
-        $originAffectedKey = sprintf('%s-%s-%s-%02d', TransContext::getGid(), TransContext::getBranchId(), $originOp, static::$barrierId);
+        $this->barrierId++;
+        $originAffectedKey = sprintf('%s-%s-%s-%02d', TransContext::getGid(), TransContext::getBranchId(), $originOp, $this->barrierId);
         $originOp = [
                 Branch::BranchCancel => Branch::BranchTry,
                 Branch::BranchCompensate => Branch::BranchAction,
             ][TransContext::getOp()] ?? '';
-        $currentAffectedKey = sprintf('%s-%s-%s-%02d', TransContext::getGid(), TransContext::getBranchId(), TransContext::getOp(), static::$barrierId);
+        $currentAffectedKey = sprintf('%s-%s-%s-%02d', TransContext::getGid(), TransContext::getBranchId(), TransContext::getOp(), $this->barrierId);
 
         $lua = <<<'SCRIPT'
         
@@ -50,7 +50,7 @@ class RedisBarrier implements BarrierInterface
         end
         return 'FAILURE'
         SCRIPT;
-        $result = static::$redis->eval($lua, [$originAffectedKey, $currentAffectedKey, $originOp, TransContext::getOp(),  static::$config->get('dtm.barrier_redis_expire', 7 * 86400)], 2);
+        $result = $this->redis->eval($lua, [$originAffectedKey, $currentAffectedKey, $originOp, TransContext::getOp(),  $this->config->get('dtm.barrier_redis_expire', 7 * 86400)], 2);
         if ($result === 'FAILURE') {
             return false;
         }

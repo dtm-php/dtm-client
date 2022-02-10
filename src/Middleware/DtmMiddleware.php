@@ -7,7 +7,9 @@ use DtmClient\Annotation\Barrier as BarrierAnnotation;
 use DtmClient\Barrier;
 use DtmClient\BarrierFactory;
 use DtmClient\TransContext;
+use Hyperf\Contract\ConfigInterface;
 use Hyperf\Di\Annotation\AnnotationCollector;
+use Hyperf\HttpServer\Contract\ResponseInterface as HttpResponse;
 use Hyperf\HttpServer\Router\Dispatched;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -17,13 +19,16 @@ use Psr\Http\Server\RequestHandlerInterface;
 class DtmMiddleware implements MiddlewareInterface
 {
     protected Barrier $barrier;
-    
-    protected ResponseInterface $response;
 
-    public function __construct(Barrier $barrier,ResponseInterface $response)
+    protected HttpResponse $response;
+
+    protected ConfigInterface $config;
+
+    public function __construct(Barrier $barrier, HttpResponse $response, ConfigInterface $config)
     {
         $this->barrier = $barrier;
         $this->response = $response;
+        $this->config = $config;
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
@@ -42,6 +47,11 @@ class DtmMiddleware implements MiddlewareInterface
 
         if ($dispatched instanceof Dispatched) {
             [$class, $method] = $dispatched->handler->callback;
+
+            $barrier = $this->config->get('dtm.barrier', []);
+            if (in_array($class . '::' . $method, $barrier) && $this->barrier->call()) {
+                return $this->response->withStatus(200);
+            }
 
             $annotations = AnnotationCollector::getClassMethodAnnotation($class, $method);
 

@@ -11,6 +11,7 @@ namespace DtmClient;
 use DtmClient\Api\ApiInterface;
 use DtmClient\Api\HttpApi;
 use DtmClient\Api\HttpApiFactory;
+use Hyperf\HttpMessage\Server\Response;
 
 class ConfigProvider
 {

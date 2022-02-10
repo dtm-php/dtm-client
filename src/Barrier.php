@@ -12,9 +12,15 @@ class Barrier
 {
     protected ConfigInterface $config;
 
-    public function __construct(ConfigInterface $config)
+    protected MySqlBarrier $mySqlBarrier;
+
+    protected RedisBarrier $redisBarrier;
+
+    public function __construct(ConfigInterface $config, MySqlBarrier $mySqlBarrier, RedisBarrier $redisBarrier)
     {
         $this->config = $config;
+        $this->mySqlBarrier = $mySqlBarrier;
+        $this->redisBarrier = $redisBarrier;
     }
 
 
@@ -22,9 +28,9 @@ class Barrier
     {
         switch ($this->config->get('dtm.barrier_db_type', DbType::MySql)) {
             case DbType::MySql:
-                return MySqlBarrier::call();
+                return $this->mySqlBarrier->call();
             case DbType::Redis:
-                return RedisBarrier::call();
+                return $this->redisBarrier->call();
             default:
                 throw new UnsupportedException('barrier db type is unsupported.');
         }

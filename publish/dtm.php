@@ -21,4 +21,7 @@ return [
     'guzzle' => [
         'options' => [],
     ],
+    'barrier' => [
+        
+    ]
 ];
