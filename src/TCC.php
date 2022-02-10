@@ -9,9 +9,17 @@ declare(strict_types=1);
 namespace DtmClient;
 
 use DtmClient\Api\ApiInterface;
+use DtmClient\Api\RequestBranch;
 use DtmClient\Constants\Operation;
+use DtmClient\Constants\Protocol;
 use DtmClient\Constants\TransType;
+use DtmClient\Exception\InvalidArgumentException;
 use DtmClient\Exception\RequestException;
+use DtmClient\Exception\UnsupportedException;
+use DtmClient\Grpc\Message\DtmBranchRequest;
+use Google\Protobuf\Internal\FieldDescriptorProto\Type;
+use Google\Protobuf\Internal\MapField;
+use Google\Protobuf\Internal\Message;
 
 class TCC extends AbstractTransaction
 {
@@ -46,18 +54,53 @@ class TCC extends AbstractTransaction
         $this->api->submit($requestBody);
     }
 
-    public function callBranch(array $body, string $tryUrl, string $confirmUrl, string $cancelUrl)
+    /**
+     * @param array|Message $body
+     */
+    public function callBranch($body, string $tryUrl, string $confirmUrl, string $cancelUrl)
     {
         $branchId = $this->branchIdGenerator->generateSubBranchId();
-        $this->api->registerBranch([
-            'data' => json_encode($body),
-            'branch_id' => $branchId,
-            'confirm' => $confirmUrl,
-            'cancel' => $cancelUrl,
-            'gid' => TransContext::getGid(),
-            'trans_type' => TransType::TCC,
-        ]);
+        switch ($this->api->getProtocol()) {
+            case Protocol::HTTP:
+                $this->api->registerBranch([
+                    'data' => json_encode($body),
+                    'branch_id' => $branchId,
+                    'confirm' => $confirmUrl,
+                    'cancel' => $cancelUrl,
+                    'gid' => TransContext::getGid(),
+                    'trans_type' => TransType::TCC,
+                ]);
+                return $this->api->transRequestBranch('POST', $body, $branchId, Operation::TRY, $tryUrl);
+                break;
+            case Protocol::GRPC:
+                if (! $body instanceof Message) {
+                    throw new InvalidArgumentException('$body must be instance of Message');
+                }
+                $formatBody = [
+                    'Gid' => TransContext::getGid(),
+                    'TransType' => TransType::TCC,
+                    'BranchID' => $branchId,
+                    'BusiPayload' => $body->serializeToString(),
+                    'Data' => ['confirm' => $confirmUrl, 'cancel' => $cancelUrl]
+                ];
+                $argument = new DtmBranchRequest($formatBody);
+                $this->api->registerBranch($formatBody);
+                $branchRequest = new RequestBranch();
+                $branchRequest->grpcArgument = $argument;
+                $branchRequest->url = $tryUrl;
+                $branchRequest->metadata = [
+                    'dtm-gid' => [$formatBody['Gid']],
+                    'dtm-trans_type' => [$formatBody['TransType']],
+                    'dtm-branch_id' => [$formatBody['BranchID']],
+                    'dtm-op' => [Operation::TRY],
+                    'dtm-dtm' => [TransContext::getDtm()],
+                ];
+                $this->api->transRequestBranch($branchRequest);
+                break;
+            default:
+                throw new UnsupportedException('Unsupported protocol');
+                break;
+        }
 
-        return $this->api->transRequestBranch('POST', $body, $branchId, Operation::TRY, $tryUrl);
     }
 }

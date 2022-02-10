@@ -8,6 +8,13 @@ use DtmClient\Exception\FailureException;
 class Msg extends AbstractTransaction
 {
 
+    protected Barrier $barrier;
+
+    public function __construct(Barrier $barrier)
+    {
+        $this->barrier = $barrier;
+    }
+
     public function add(string $action, $payload)
     {
         TransContext::addStep(['action' => $action]);
@@ -27,13 +34,13 @@ class Msg extends AbstractTransaction
 
     public function doAndSubmit(string $queryPrepared, callable $businessCall)
     {
-        Barrier::barrierFrom(TransType::MSG, TransContext::getGid(), '00', 'msg');
+        $this->barrier->barrierFrom(TransType::MSG, TransContext::getGid(), '00', 'msg');
         $this->prepare($queryPrepared);
         try {
-            $result = $businessCall();
+            $businessCall();
             $this->submit();
         } catch (FailureException $failureException) {
-            $this->api->abort($body);
+            $this->api->abort(TransContext::toArray());
         } catch (\Exception $exception) {
             // If busicall return an error other than failure, we will query the result
             $this->api->transRequestBranch('GET', [], TransContext::getBranchId(), TransContext::getOp(), $queryPrepared);

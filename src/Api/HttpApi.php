@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace DtmClient\Api;
 
 use DtmClient\Constants\Operation;
+use DtmClient\Constants\Protocol;
 use DtmClient\Constants\RequestMessage;
 use DtmClient\Constants\Result;
 use DtmClient\Exception\FailureException;
@@ -18,6 +19,7 @@ use DtmClient\Exception\RequestException;
 use DtmClient\TransContext;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\RequestOptions;
 use Hyperf\Contract\ConfigInterface;
 
 class HttpApi implements ApiInterface
@@ -30,6 +32,11 @@ class HttpApi implements ApiInterface
     {
         $this->client = $client;
         $this->config = $config;
+    }
+
+    public function getProtocol(): string
+    {
+        return  Protocol::HTTP;
     }
 
     public function generateGid(): string
@@ -84,23 +91,23 @@ class HttpApi implements ApiInterface
         return $this;
     }
 
-    public function transRequestBranch(string $method, array $body, string $branchID, string $op, string $url, array $branchHeaders = [])
+    public function transRequestBranch(RequestBranch $requestBranch)
     {
         $dtm = $this->config->get('dtm.server', '127.0.0.1') . ':' . $this->config->get('dtm.port.http', 36789);
         $response = $this->client->request($method, $url, [
-            'query' => [
+            RequestOptions::QUERY => [
                 [
                     'dtm' => $dtm,
                     'gid' => TransContext::getGid(),
-                    'branch_id' => $branchID,
+                    'branch_id' => $requestBranch->branchId,
                     'trans_type' => TransContext::getTransType(),
-                    'op' => $op,
+                    'op' => $requestBranch->op,
                 ],
             ],
-            'header' => $branchHeaders,
+            RequestOptions::JSON => $requestBranch->body,
+            RequestOptions::HEADERS => $requestBranch->branchHeaders,
         ]);
 
-        $statusCode = $response->getStatusCode();
         if (Result::isOngoing($response)) {
             throw new OngingException();
         } elseif (Result::isFailure($response)) {

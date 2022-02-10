@@ -20,11 +20,11 @@ class Barrier
 
     public function call()
     {
-        switch ($this->config->get('dtm.barrier_db_type', DbType::MySql)) {
-            case DbType::MySql:
+        switch ($this->config->get('dtm.barrier.db.type', DbType::MySQL)) {
+            case DbType::MySQL:
                 return MySqlBarrier::call();
             default:
-                throw new UnsupportedException('barrier db type is unsupported.');
+                throw new UnsupportedException('Barrier DB type is unsupported.');
         }
     }
     
@@ -35,7 +35,8 @@ class Barrier
         TransContext::setBranchId($branchId);
         TransContext::setOp($op);
         if (! TransContext::getTransType() || ! TransContext::getGid() || ! TransContext::getBranchId() || ! TransContext::getOp()) {
-            throw new DtmException(sprintf('Invalid transaction info: %s', $branchBarrier));
+            $info = 'transType:' . TransContext::getTransType() . ' gid:' . TransContext::getGid() . ' branchId:' . TransContext::getBranchId() . ' op:' . TransContext::getOp();
+            throw new DtmException(sprintf('Invalid transaction info: %s', $info));
         }
     }
     

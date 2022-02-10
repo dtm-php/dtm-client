@@ -8,8 +8,12 @@ declare(strict_types=1);
  */
 namespace DtmClient\Api;
 
+use Google\Protobuf\Internal\Message;
+
 interface ApiInterface
 {
+    public function getProtocol(): string;
+
     public function generateGid(): string;
 
     public function prepare(array $body);
@@ -24,5 +28,5 @@ interface ApiInterface
 
     public function queryAll(array $body);
 
-    public function transRequestBranch(string $method, array $body, string $branchID, string $op, string $url, array $branchHeaders = []);
+    public function transRequestBranch(RequestBranch $requestBranch);
 }

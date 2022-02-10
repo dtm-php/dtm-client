@@ -4,5 +4,5 @@ namespace DtmClient\Constants;
 
 class DbType
 {
-    public const MySql = 'MySql';
+    public const MySQL = 'MySQL';
 }

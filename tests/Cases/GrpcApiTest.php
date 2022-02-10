@@ -8,11 +8,14 @@ declare(strict_types=1);
  */
 namespace DtmClientTest\Cases;
 
-use DtmClient\Api\HttpApi;
-use DtmClient\Api\HttpApiFactory;
+use DtmClient\Api\GrpcApi;
+use DtmClient\Grpc\GrpcClient;
 use GuzzleHttp\Client;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Guzzle\ClientFactory;
+use Hyperf\Utils\ApplicationContext;
+use Hyperf\Utils\ChannelPool;
+use Hyperf\Utils\Coroutine;
 use Mockery;
 use Psr\Container\ContainerInterface;
 
@@ -20,25 +23,25 @@ use Psr\Container\ContainerInterface;
  * @internal
  * @coversNothing
  */
-class HttpApiTest extends AbstractTestCase
+class GrpcApiTest extends AbstractTestCase
 {
-    public function testHttpApiConstructor()
+    public function testGrpcApiConstructor()
     {
-        $this->assertTrue($this->createHttpApi() instanceof HttpApi);
+        $this->assertTrue($this->createGrpcApi() instanceof GrpcApi);
     }
 
     public function testGenerateGid()
     {
-        $httpApi = $this->createHttpApi();
-        $result = $httpApi->generateGid();
+        $grpcApi = $this->createGrpcApi();
+        $result = $grpcApi->generateGid();
         $this->assertEquals(22, strlen($result));
     }
 
-    protected function createHttpApi(): HttpApi
+    protected function createGrpcApi(): GrpcApi
     {
         $container = $this->createContainer();
-        $httpApi = $container->get(HttpApi::class);
-        return $httpApi;
+        $grpcApi = $container->get(GrpcApi::class);
+        return $grpcApi;
     }
 
     protected function createContainer(): ContainerInterface|Mockery\MockInterface|Mockery\LegacyMockInterface
@@ -47,17 +50,13 @@ class HttpApiTest extends AbstractTestCase
         $config->shouldReceive('get')->with('dtm.server', '127.0.0.1')->andReturn('127.0.0.1');
         $config->shouldReceive('get')->with('dtm.port.http', 36789)->andReturn(36789);
         $config->shouldReceive('get')->with('dtm.port.grpc', 36790)->andReturn(36790);
-        $config->shouldReceive('get')->with('dtm.guzzle.options', [])->andReturn([]);
         $container = Mockery::mock(ContainerInterface::class);
         $container->shouldReceive('get')->with(ConfigInterface::class)->andReturn($config);
-        $httpApiFactory = new HttpApiFactory();
-        $container->shouldReceive('get')->with(ClientFactory::class)->andReturn(new ClientFactory($container));
-        $container->shouldReceive('get')->with(Client::class)->andReturn(
-            $httpApiFactory($container)
+        $container->shouldReceive('get')->with(ChannelPool::class)->andReturn(ChannelPool::getInstance());
+        $container->shouldReceive('get')->with(GrpcApi::class)->andReturn(
+            new GrpcApi($container->get(ConfigInterface::class))
         );
-        $container->shouldReceive('get')->with(HttpApi::class)->andReturn(
-            new HttpApi($container->get(Client::class), $container->get(ConfigInterface::class))
-        );
+        ApplicationContext::setContainer($container);
         return $container;
     }
 }

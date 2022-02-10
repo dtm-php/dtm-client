@@ -11,16 +11,27 @@ namespace DtmClient;
 use DtmClient\Api\ApiInterface;
 use DtmClient\Api\HttpApi;
 use DtmClient\Api\HttpApiFactory;
+use DtmClient\Grpc\GrpcClientManager;
+use DtmClient\Grpc\GrpcClientManagerFactory;
 
 class ConfigProvider
 {
     public function __invoke(): array
     {
         return [
+            'publish' => [
+                [
+                    'id' => 'config',
+                    'description' => 'The config for dtm client.',
+                    'source' => __DIR__ . '/../publish/dtm.php',
+                    'destination' => BASE_PATH . '/config/autoload/dtm.php',
+                ],
+            ],
             'dependencies' => [
                 HttpApi::class => HttpApiFactory::class,
                 BranchIdGeneratorInterface::class => BranchIdGenerator::class,
                 ApiInterface::class => ApiFactory::class,
+                GrpcClientManager::class => GrpcClientManagerFactory::class,
             ],
             'commands' => [
             ],
