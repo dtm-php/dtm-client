@@ -50,7 +50,7 @@ class RedisBarrier implements BarrierInterface
         end
         return 'FAILURE'
         SCRIPT;
-        $result = $this->redis->eval($lua, [$originAffectedKey, $currentAffectedKey, $originOp, TransContext::getOp(),  $this->config->get('dtm.barrier_redis_expire', 7 * 86400)], 2);
+        $result = $this->redis->eval($lua, [$originAffectedKey, $currentAffectedKey, $originOp, TransContext::getOp(),  $this->config->get('dtm.barrier.redis.expire_seconds', 7 * 86400)], 2);
         if ($result === 'FAILURE') {
             return false;
         }
