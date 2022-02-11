@@ -15,7 +15,7 @@ use DtmClient\Exception\DuplicatedException;
 use Hyperf\DB\DB as SimpleDB;
 use Hyperf\DbConnection\Db;
 
-class MySqlBarrier implements BarrierInterface
+class MySqlBarrier extends AbstractBarrier
 {
     protected int $barrierId = 0;
 
@@ -82,10 +82,5 @@ class MySqlBarrier implements BarrierInterface
             'barrier_id' => $barrierID,
             'reason' => $reason,
         ]);
-    }
-
-    protected function hasSimpleDb(): bool
-    {
-        return class_exists(SimpleDB::class);
     }
 }

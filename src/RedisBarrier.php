@@ -10,6 +10,8 @@ namespace DtmClient;
 
 use DtmClient\Constants\Branch;
 use Hyperf\Contract\ConfigInterface;
+use Hyperf\DB\DB as SimpleDB;
+use Hyperf\DbConnection\Db;
 use Hyperf\Redis\Redis;
 
 class RedisBarrier implements BarrierInterface
@@ -60,8 +62,13 @@ class RedisBarrier implements BarrierInterface
         if ($result === 'FAILURE') {
             return false;
         }
-
-        $businessCall();
+        $this->hasSimpleDb() ? SimpleDB::beginTransaction() : Db::beginTransaction();
+        try {
+            $businessCall();
+            $this->hasSimpleDb() ? SimpleDB::commit() : Db::commit();
+        } catch (\Throwable $exception) {
+            $this->hasSimpleDb() ? SimpleDB::rollback() : Db::rollback();
+        }
 
         return true;
     }
