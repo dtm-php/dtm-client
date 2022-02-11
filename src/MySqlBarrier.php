@@ -16,7 +16,7 @@ use DtmClient\Exception\DuplicatedException;
 use Hyperf\DB\DB as SimpleDB;
 use Hyperf\DbConnection\Db;
 
-class MySqlBarrier extends AbstractBarrier
+class MySqlBarrier implements BarrierInterface
 {
     protected int $barrierId = 0;
     
