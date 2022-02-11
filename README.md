@@ -133,7 +133,7 @@ Cancel 阶段：如果所有分支的 Try 有一个失败了，则走到 Cancel 
 
 如果我们要进行一个类似于银行跨行转账的业务，转出（TransOut）和转入（TransIn）分别在不同的微服务里，一个成功完成的 TCC 事务典型的时序图如下：
 
-![tcc_normal](https://dtm.pub/assets/tcc_normal.dea14fb3.jpg)
+<img src="https://dtm.pub/assets/tcc_normal.dea14fb3.jpg" height=600 />
 
 ### 代码示例
 
@@ -217,7 +217,7 @@ Saga 是一种最终一致性事务，也是一种柔性事务，又被叫做 �
 
 下面是一个成功完成的 SAGA 事务典型的时序图：
 
-![saga_normal](https://dtm.pub/assets/saga_normal.a2849672.jpg)
+<img src="https://dtm.pub/assets/saga_normal.a2849672.jpg" height=428 />
 
 ### 代码示例
 
