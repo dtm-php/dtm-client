@@ -20,9 +20,7 @@
     },
     "require": {
         "php": ">=8.0",
-        "hyperf/config": "^2.2",
         "hyperf/guzzle": "^2.2",
-        "hyperf/db-connection": "^2.2",
         "psr/http-server-middleware": "^1.0"
     },
     "require-dev": {
@@ -32,15 +30,16 @@
         "phpunit/phpunit": ">=7.0"
     },
     "suggest": {
-        "hyperf/db": "More efficient SQL operations.",
-        "hyperf/redis": "Required to use redis barrier.",
+        "hyperf/config": "^2.2",
+        "hyperf/db": "^2,2",
+        "hyperf/redis": "^2,2",
+        "hyperf/di": "^2.2",
+        "hyperf/grpc-client": "^2.2",
         "ext-openssl": "Required to use HTTPS.",
         "ext-json": "Required to use JSON.",
         "ext-pdo": "Required to use MySQL Client.",
         "ext-pdo_mysql": "Required to use MySQL Client.",
-        "ext-redis": "Required to use Redis Client.",
-        "hyperf/di": "^2.2",
-        "hyperf/grpc-client": "^2.2"
+        "ext-redis": "Required to use Redis Client."
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

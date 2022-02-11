@@ -52,13 +52,18 @@ class DtmMiddleware implements MiddlewareInterface
             [$class, $method] = $dispatched->handler->callback;
 
             $barrier = $this->config->get('dtm.barrier.apply', []);
-            if (in_array($class . '::' . $method, $barrier) && $this->barrier->call()) {
+
+            $businessCall = function () use ($handler, $request) {
+                $handler->handle($request);
+            };
+
+            if (in_array($class . '::' . $method, $barrier) && $this->barrier->call($businessCall)) {
                 return $this->response->withStatus(200);
             }
 
             $annotations = AnnotationCollector::getClassMethodAnnotation($class, $method);
 
-            if (isset($annotations[BarrierAnnotation::class]) && $this->barrier->call()) {
+            if (isset($annotations[BarrierAnnotation::class]) && $this->barrier->call($businessCall)) {
                 return $this->response->withStatus(200);
             }
         }

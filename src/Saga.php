@@ -6,7 +6,6 @@ declare(strict_types=1);
  *
  * @license  https://github.com/dtm-php/dtm-client/blob/master/LICENSE
  */
-
 namespace DtmClient;
 
 use DtmClient\Api\ApiInterface;
@@ -14,7 +13,6 @@ use DtmClient\Constants\TransType;
 
 class Saga extends AbstractTransaction
 {
-
     protected array $orders = [];
 
     protected bool $concurrent = false;
@@ -70,5 +68,4 @@ class Saga extends AbstractTransaction
             ]));
         }
     }
-
 }

@@ -10,5 +10,5 @@ namespace DtmClient;
 
 interface BarrierInterface
 {
-    public function call(): bool;
+    public function call(callable $businessCall): bool;
 }

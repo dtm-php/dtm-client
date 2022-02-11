@@ -10,6 +10,8 @@ namespace DtmClient;
 
 use DtmClient\Constants\Branch;
 use DtmClient\Constants\Operation;
+use DtmClient\Constants\TransType;
+use DtmClient\Exception\DuplicatedException;
 use Hyperf\DB\DB as SimpleDB;
 use Hyperf\DbConnection\Db;
 
@@ -17,7 +19,7 @@ class MySqlBarrier implements BarrierInterface
 {
     protected int $barrierId = 0;
 
-    public function call(): bool
+    public function call(callable $businessCall): bool
     {
         $gid = TransContext::getGid();
         $branchId = TransContext::getBranchId();
@@ -37,7 +39,10 @@ class MySqlBarrier implements BarrierInterface
         try {
             $originAffected = $this->insertBarrier($transType, $gid, $branchId, $originOP, $bid, $op);
             $currentAffected = $this->insertBarrier($transType, $gid, $branchId, $op, $bid, $op);
-            $this->hasSimpleDb() ? SimpleDB::commit() : Db::commit();
+            // for msg's DoAndSubmit, repeated insert should be rejected.
+            if ($op == TransType::MSG && $currentAffected == 0) {
+                throw new DuplicatedException();
+            }
 
             if (
                 ($op == Operation::BRANCH_CANCEL || $op == Operation::BRANCH_COMPENSATE) && $originAffected > 0 // null compensate
@@ -45,6 +50,10 @@ class MySqlBarrier implements BarrierInterface
             ) {
                 return true;
             }
+
+            $businessCall();
+
+            $this->hasSimpleDb() ? SimpleDB::commit() : Db::commit();
 
             return false;
         } catch (\Throwable $throwable) {

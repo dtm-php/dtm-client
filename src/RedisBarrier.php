@@ -26,7 +26,7 @@ class RedisBarrier implements BarrierInterface
         $this->config = $config;
     }
 
-    public function call(): bool
+    public function call(callable $businessCall): bool
     {
         ++$this->barrierId;
         $originAffectedKey = sprintf('%s-%s-%s-%02d', TransContext::getGid(), TransContext::getBranchId(), $originOp, $this->barrierId);
@@ -60,6 +60,9 @@ class RedisBarrier implements BarrierInterface
         if ($result === 'FAILURE') {
             return false;
         }
+
+        $businessCall();
+
         return true;
     }
 }

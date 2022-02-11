@@ -27,6 +27,11 @@ class Result
 
     public const ONGOING_STATUS = 425;
 
+    // error of DUPLICATED for only msg if QueryPrepared executed before call. then DoAndSubmit return this error
+    public const ERR_DUPLICATED = 'DUPLICATED';
+
+    public const ERR_DUPLICATED_STATUS = 425;
+
     public static function isOngoing(ResponseInterface $response)
     {
         return $response->getStatusCode() === self::ONGOING_STATUS;
@@ -40,5 +45,10 @@ class Result
     public static function isFailure(ResponseInterface $response)
     {
         return $response->getStatusCode() === self::FAILURE_STATUS;
+    }
+
+    public static function isErrDuplicated(ResponseInterface $response)
+    {
+        return $response->getStatusCode() === self::ERR_DUPLICATED_STATUS;
     }
 }
