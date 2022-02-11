@@ -168,7 +168,7 @@ class TccController
                 // 创建子事务 A 的调用数据
                 $tcc->callBranch(
                     // 调用 Try 方法的参数
-                    ['amount' => 30'],
+                    ['amount' => 30],
                     // Try 方法的 URL
                     $this->serviceUri . '/tcc/transA/try',
                     // Confirm 方法的 URL
@@ -178,7 +178,7 @@ class TccController
                 );
                 // 创建子事务 B 的调用数据，以此类推
                 $tcc->callBranch(
-                    ['amount' => 30'],
+                    ['amount' => 30],
                     $this->serviceUri . '/tcc/transB/try',
                     $this->serviceUri . '/tcc/transB/confirm',
                     $this->serviceUri . '/tcc/transB/cancel'
