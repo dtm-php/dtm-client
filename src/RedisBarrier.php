@@ -13,6 +13,7 @@ use Hyperf\Contract\ConfigInterface;
 use Hyperf\DB\DB as SimpleDB;
 use Hyperf\DbConnection\Db;
 use Hyperf\Redis\Redis;
+use DtmClient\DbTransaction\DBTransactionInterface;
 
 class RedisBarrier implements BarrierInterface
 {
@@ -22,10 +23,13 @@ class RedisBarrier implements BarrierInterface
 
     protected ConfigInterface $config;
 
-    public function __construct(Redis $redis, ConfigInterface $config)
+    protected DBTransactionInterface $DBTransaction;
+
+    public function __construct(Redis $redis, ConfigInterface $config, DBTransactionInterface $DBTransaction)
     {
         $this->redis = $redis;
         $this->config = $config;
+        $this->DBTransaction = $DBTransaction;
     }
 
     public function call(callable $businessCall): bool
@@ -62,12 +66,12 @@ class RedisBarrier implements BarrierInterface
         if ($result === 'FAILURE') {
             return false;
         }
-        $this->hasSimpleDb() ? SimpleDB::beginTransaction() : Db::beginTransaction();
+        $this->DBTransaction->beginTransaction();
         try {
             $businessCall();
-            $this->hasSimpleDb() ? SimpleDB::commit() : Db::commit();
+            $this->DBTransaction->commit();
         } catch (\Throwable $exception) {
-            $this->hasSimpleDb() ? SimpleDB::rollback() : Db::rollback();
+            $this->DBTransaction->rollback();
         }
 
         return true;

@@ -11,6 +11,8 @@ namespace DtmClient;
 use DtmClient\Api\ApiInterface;
 use DtmClient\Api\HttpApi;
 use DtmClient\Api\HttpApiFactory;
+use DtmClient\DbTransaction\HyperfDbTransaction;
+use DtmClient\DbTransaction\DBTransactionInterface;
 use DtmClient\Grpc\GrpcClientManager;
 use DtmClient\Grpc\GrpcClientManagerFactory;
 
@@ -32,6 +34,7 @@ class ConfigProvider
                 BranchIdGeneratorInterface::class => BranchIdGenerator::class,
                 ApiInterface::class => ApiFactory::class,
                 GrpcClientManager::class => GrpcClientManagerFactory::class,
+                DBTransactionInterface::class => HyperfDbTransaction::class,
             ],
             'commands' => [
             ],

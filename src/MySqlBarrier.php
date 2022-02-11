@@ -11,6 +11,7 @@ namespace DtmClient;
 use DtmClient\Constants\Branch;
 use DtmClient\Constants\Operation;
 use DtmClient\Constants\TransType;
+use DtmClient\DbTransaction\DBTransactionInterface;
 use DtmClient\Exception\DuplicatedException;
 use Hyperf\DB\DB as SimpleDB;
 use Hyperf\DbConnection\Db;
@@ -18,6 +19,13 @@ use Hyperf\DbConnection\Db;
 class MySqlBarrier extends AbstractBarrier
 {
     protected int $barrierId = 0;
+    
+    protected DBTransactionInterface $DBTransaction;
+
+    public function __construct(DBTransactionInterface $DBTransaction)
+    {
+        $this->DBTransaction = $DBTransaction;
+    }
 
     public function call(callable $businessCall): bool
     {
@@ -34,7 +42,7 @@ class MySqlBarrier extends AbstractBarrier
             Branch::BranchCompensate => Branch::BranchAction,
         ][$op] ?? '';
 
-        $this->hasSimpleDb() ? SimpleDB::beginTransaction() : Db::beginTransaction();
+        $this->DBTransaction->beginTransaction();
 
         try {
             $originAffected = $this->insertBarrier($transType, $gid, $branchId, $originOP, $bid, $op);
@@ -53,11 +61,11 @@ class MySqlBarrier extends AbstractBarrier
 
             $businessCall();
 
-            $this->hasSimpleDb() ? SimpleDB::commit() : Db::commit();
+            $this->DBTransaction->commit();
 
             return false;
         } catch (\Throwable $throwable) {
-            $this->hasSimpleDb() ? SimpleDB::rollback() : Db::rollback();
+            $this->DBTransaction->rollback();
             throw $throwable;
         }
     }
@@ -68,19 +76,23 @@ class MySqlBarrier extends AbstractBarrier
             return 0;
         }
 
-        if ($this->hasSimpleDb()) {
-            return SimpleDB::execute(
-                'INSERT IGNORE INTO `barrier` (trans_type, gid, branch_id, op, barrier_id, reason) values(?,?,?,?,?,?)',
-                [$transType, $gid, $branchId, $op, $barrierID, $reason]
-            );
-        }
-        return Db::table('barrier')->insertOrIgnore([
-            'trans_type' => $transType,
-            'gid' => $gid,
-            'branch_id' => $branchId,
-            'op' => $op,
-            'barrier_id' => $barrierID,
-            'reason' => $reason,
-        ]);
+         return $this->DBTransaction->execInsert(
+            'INSERT IGNORE INTO `barrier` (trans_type, gid, branch_id, op, barrier_id, reason) values(?,?,?,?,?,?)',
+            [$transType, $gid, $branchId, $op, $barrierID, $reason]
+        );
+//        if ($this->hasSimpleDb()) {
+//            return SimpleDB::execute(
+//                'INSERT IGNORE INTO `barrier` (trans_type, gid, branch_id, op, barrier_id, reason) values(?,?,?,?,?,?)',
+//                [$transType, $gid, $branchId, $op, $barrierID, $reason]
+//            );
+//        }
+//        return Db::table('barrier')->insertOrIgnore([
+//            'trans_type' => $transType,
+//            'gid' => $gid,
+//            'branch_id' => $branchId,
+//            'op' => $op,
+//            'barrier_id' => $barrierID,
+//            'reason' => $reason,
+//        ]);
     }
 }
