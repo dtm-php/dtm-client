@@ -8,15 +8,19 @@ declare(strict_types=1);
  */
 namespace DtmClient;
 
+use DtmClient\Api\ApiInterface;
+use DtmClient\Api\RequestBranch;
 use DtmClient\Constants\TransType;
 use DtmClient\Exception\FailureException;
+use GuzzleHttp\Psr7\Response;
 
 class Msg extends AbstractTransaction
 {
     protected Barrier $barrier;
 
-    public function __construct(Barrier $barrier)
+    public function __construct(ApiInterface $api, Barrier $barrier)
     {
+        $this->api = $api;
         $this->barrier = $barrier;
     }
 
@@ -45,10 +49,30 @@ class Msg extends AbstractTransaction
             $businessCall();
             $this->submit();
         } catch (FailureException $failureException) {
-            $this->api->abort(TransContext::toArray());
+            $this->queryPrepared($queryPrepared);
+            throw $failureException;
         } catch (\Exception $exception) {
-            // If busicall return an error other than failure, we will query the result
-            $this->api->transRequestBranch('GET', [], TransContext::getBranchId(), TransContext::getOp(), $queryPrepared);
+            $this->queryPrepared($queryPrepared);
+            throw $exception;
         }
+    }
+
+    protected function queryPrepared(string $queryPrepared)
+    {
+        // If busicall return an error other than failure, we will query the result
+        $requestBranch = new RequestBranch();
+        $requestBranch->method = 'GET';
+        $requestBranch->branchId = TransContext::getBranchId();
+        $requestBranch->op = TransContext::getOp();
+        $requestBranch->url = $queryPrepared;
+        /** @var Response $response */
+        $response = $this->api->transRequestBranch($requestBranch);
+        // if local transaction is success, then sumit transaction
+        if ($response->getStatusCode() == 200) {
+            $this->api->submit(TransContext::toArray());
+        }
+
+        // if local transaction is success, then abort transaction
+        $this->api->abort(TransContext::toArray());
     }
 }

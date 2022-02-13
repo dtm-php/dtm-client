@@ -48,7 +48,7 @@ class DtmMiddleware implements MiddlewareInterface
         /** @var Dispatched $dispatched */
         $dispatched = $request->getAttribute(Dispatched::class);
 
-        if ($dispatched instanceof Dispatched) {
+        if ($dispatched instanceof Dispatched && ! empty($dispatched->handler->callback)) {
             [$class, $method] = $dispatched->handler->callback;
 
             $barrier = $this->config->get('dtm.barrier.apply', []);
