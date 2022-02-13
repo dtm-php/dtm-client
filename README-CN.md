@@ -1,6 +1,6 @@
 English | [中文](./README-CN.md)
 
-<p align="center"><a href="https://hyperf.wiki" target="_blank" rel="noopener noreferrer"><img width="70" src="https://avatars.githubusercontent.com/u/6055142?s=200&v=4" alt="Hyperf Logo"></a></p>
+<p align="center"><a href="https://hyperf.wiki" target="_blank" rel="noopener noreferrer"><img width="70" src="https://avatars.githubusercontent.com/u/6055142?s=200&v=4" alt="DTM Logo"></a></p>
 
 <p align="center">
   <a href="https://github.com/dtm-php/dtm-client/releases"><img src="https://poser.pugx.org/dtm-php/dtm-client/v/stable" alt="Stable Version"></a>
@@ -8,7 +8,7 @@ English | [中文](./README-CN.md)
   <a href="https://github.com/dtm-php/dtm-client/blob/master/LICENSE"><img src="https://img.shields.io/github/license/dtm-php/dtm-client.svg?maxAge=2592000" alt="dtm-client License"></a>
 </p>
 <p align="center">
-  <a href="https://github.com/dtm-php/dtm-client/actions"><img src="https://github.com/dtm-php/dtm-client/workflows/PHPUnit%20for%20Hyperf/badge.svg" alt="PHPUnit for dtm-client"></a>
+  <a href="https://github.com/dtm-php/dtm-client/actions"><img src="https://github.com/dtm-php/dtm-client/workflows/PHPUnit%20for%20dtm-client/badge.svg" alt="PHPUnit for dtm-client"></a>
   <a href="https://packagist.org/packages/dtm/dtm-client"><img src="https://poser.pugx.org/dtm/dtm-client/downloads" alt="Total Downloads"></a>
   <a href="https://packagist.org/packages/dtm/dtm-client"><img src="https://poser.pugx.org/dtm/dtm-client/d/monthly" alt="Monthly Downloads"></a>
 </p>
@@ -127,8 +127,8 @@ TCC 模式是一种非常流行的柔性事务解决方案，由 Try-Confirm-Can
 
 ### TCC 的 3 个阶段
 
-Try 阶段：尝试执行，完成所有业务检查（一致性）, 预留必须业务资源（准隔离性）
-Confirm 阶段：如果所有分支的 Try 都成功了，则走到 Confirm 阶段。Confirm 真正执行业务，不作任何业务检查，只使用 Try 阶段预留的业务资源
+Try 阶段：尝试执行，完成所有业务检查（一致性）, 预留必须业务资源（准隔离性）  
+Confirm 阶段：如果所有分支的 Try 都成功了，则走到 Confirm 阶段。Confirm 真正执行业务，不作任何业务检查，只使用 Try 阶段预留的业务资源  
 Cancel 阶段：如果所有分支的 Try 有一个失败了，则走到 Cancel 阶段。Cancel 释放 Try 阶段预留的业务资源。
 
 如果我们要进行一个类似于银行跨行转账的业务，转出（TransOut）和转入（TransIn）分别在不同的微服务里，一个成功完成的 TCC 事务典型的时序图如下：
@@ -202,9 +202,9 @@ Saga 是一种最终一致性事务，也是一种柔性事务，又被叫做 �
 ### Saga 子事务拆分
 
 比如我们要进行一个类似于银行跨行转账的业务，将 A 账户中的 30 元转到 B 账户，根据 Saga 事务的原理，我们将整个全局事务，拆分为以下服务：
-- 转出（TransOut）服务，这里转出将会进行操作 A 账户扣减 30 元
+- 转出（TransOut）服务，这里将会进行操作 A 账户扣减 30 元
 - 转出补偿（TransOutCompensate）服务，回滚上面的转出操作，即 A 账户增加 30 元
-- 转入（TransIn）服务，转入将会进行 B  账户增加 30 元
+- 转入（TransIn）服务，这里将会进行 B  账户增加 30 元
 - 转出补偿（TransInCompensate）服务，回滚上面的转入操作，即 B 账户减少 30 元
 
 整个事务的逻辑是：
