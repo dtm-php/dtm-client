@@ -8,7 +8,7 @@ English | [中文](./README-CN.md)
   <a href="https://github.com/dtm-php/dtm-client/blob/master/LICENSE"><img src="https://img.shields.io/github/license/dtm-php/dtm-client.svg" alt="dtm-client License"></a>
 </p>
 <p align="center">
-  <a href="https://github.com/dtm-php/dtm-client/actions"><img src="https://github.com/dtm-php/dtm-client/workflows/PHPUnit%20for%20dtm-client/badge.svg" alt="PHPUnit for dtm-client"></a>
+  <a href="https://github.com/dtm-php/dtm-client/actions"><img src="https://github.com/dtm-php/dtm-client/actions/workflows/test.yml/badge.svg" alt="PHPUnit for dtm-client"></a>
   <a href="https://packagist.org/packages/dtm/dtm-client"><img src="https://poser.pugx.org/dtm/dtm-client/downloads" alt="Total Downloads"></a>
   <a href="https://packagist.org/packages/dtm/dtm-client"><img src="https://poser.pugx.org/dtm/dtm-client/d/monthly" alt="Monthly Downloads"></a>
 </p>

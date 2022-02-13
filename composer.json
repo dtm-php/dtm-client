@@ -5,9 +5,10 @@
     "keywords": [
         "php",
         "dtm",
-        "dtm-client"
+        "dtm-client",
+        "hyperf"
     ],
-    "description": "",
+    "description": "A PHP coroutine client for distributed transaction manager DTM. 分布式事务管理器 DTM 的 PHP 协程客户端",
     "autoload": {
         "psr-4": {
             "DtmClient\\": "src/"
@@ -20,6 +21,7 @@
     },
     "require": {
         "php": ">=8.0",
+        "ext-json": "*",
         "hyperf/guzzle": "^2.2",
         "psr/http-server-middleware": "^1.0"
     },
@@ -36,7 +38,6 @@
         "hyperf/di": "^2.2",
         "hyperf/grpc-client": "^2.2",
         "ext-openssl": "Required to use HTTPS.",
-        "ext-json": "Required to use JSON.",
         "ext-pdo": "Required to use MySQL Client.",
         "ext-pdo_mysql": "Required to use MySQL Client.",
         "ext-redis": "Required to use Redis Client."
