@@ -49,7 +49,7 @@ class Msg extends AbstractTransaction
             $businessCall();
             $this->submit();
         } catch (FailureException $failureException) {
-            $this->queryPrepared($queryPrepared);
+            $this->api->abort();
             throw $failureException;
         } catch (\Exception $exception) {
             $this->queryPrepared($queryPrepared);
@@ -67,12 +67,8 @@ class Msg extends AbstractTransaction
         $requestBranch->url = $queryPrepared;
         /** @var Response $response */
         $response = $this->api->transRequestBranch($requestBranch);
-        // if local transaction is success, then sumit transaction
-        if ($response->getStatusCode() == 200) {
-            $this->api->submit(TransContext::toArray());
-        }
 
-        // if local transaction is success, then abort transaction
+        // if local transaction is fail, then abort transaction
         $this->api->abort(TransContext::toArray());
     }
 }
