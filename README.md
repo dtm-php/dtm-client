@@ -1,6 +1,6 @@
 English | [中文](./README-CN.md)
 
-<p align="center"><a href="https://hyperf.wiki" target="_blank" rel="noopener noreferrer"><img width="70" src="https://avatars.githubusercontent.com/u/6055142?s=200&v=4" alt="Hyperf Logo"></a></p>
+<p align="center"><a href="https://hyperf.wiki" target="_blank" rel="noopener noreferrer"><img width="70" src="https://avatars.githubusercontent.com/u/6055142?s=200&v=4" alt="DTM Logo"></a></p>
 
 <p align="center">
   <a href="https://github.com/dtm-php/dtm-client/releases"><img src="https://poser.pugx.org/dtm-php/dtm-client/v/stable" alt="Stable Version"></a>
@@ -8,136 +8,136 @@ English | [中文](./README-CN.md)
   <a href="https://github.com/dtm-php/dtm-client/blob/master/LICENSE"><img src="https://img.shields.io/github/license/dtm-php/dtm-client.svg" alt="dtm-client License"></a>
 </p>
 <p align="center">
-  <a href="https://github.com/dtm-php/dtm-client/actions"><img src="https://github.com/dtm-php/dtm-client/workflows/PHPUnit%20for%20Hyperf/badge.svg" alt="PHPUnit for dtm-client"></a>
+  <a href="https://github.com/dtm-php/dtm-client/actions"><img src="https://github.com/dtm-php/dtm-client/workflows/PHPUnit%20for%20dtm-client/badge.svg" alt="PHPUnit for dtm-client"></a>
   <a href="https://packagist.org/packages/dtm/dtm-client"><img src="https://poser.pugx.org/dtm/dtm-client/downloads" alt="Total Downloads"></a>
   <a href="https://packagist.org/packages/dtm/dtm-client"><img src="https://poser.pugx.org/dtm/dtm-client/d/monthly" alt="Monthly Downloads"></a>
 </p>
 
-# 介绍
+# Introduction
 
-[dtm/dtm-client](https://packagist.org/packages/dtm/dtm-client) 是分布式事务管理器 [DTM](https://github.com/dtm-labs/dtm) 的 PHP 客户端，已支持 TCC模式、Saga、二阶段消息模式的分布式事务模式，并分别实现了与 DTM Server 以 HTTP 协议或 gRPC 协议通讯，该客户端可安全运行于 PHP-FPM 和 Swoole 协程环境中，更是对 [Hyperf](https://github.com/hyperf/hyperf) 做了更加易用的功能支持。
+[dtm/dtm-client](https://packagist.org/packages/dtm/dtm-client) is the PHP client of Distributed Transaction Manager [DTM](https://github.com/dtm-labs/dtm). It has supported distributed transaction patterns of TCC pattern, Saga pattern, and two-phase message pattern. In communicate protocol it has supported communicate with DTM Server through HTTP protocol or gRPC protocol. Also the client can safely run in PHP-FPM and Swoole coroutine environment, and it has also make support more easier for [Hyperf](https://github.com/hyperf/hyperf) framework.
 
-# 关于 DTM
+# About DTM
 
-DTM 是一款基于 Go 语言实现的开源分布式事务管理器，提供跨语言，跨存储引擎组合事务的强大功能。DTM 优雅的解决了幂等、空补偿、悬挂等分布式事务难题，也提供了简单易用、高性能、易水平扩展的分布式事务解决方案。
+DTM is an open source distributed transaction manager based on Go language, which provides the powerful function of combining transactions across languages and storage engines. DTM elegantly solves distributed transaction problems such as interface idempotent, null compensation, and transaction suspension, and also provides a distributed transaction solutions that are easy to use, high performance, and easy to scale horizontally.
 
-## 亮点
+## Advantage
 
-* 极易上手
-  - 零配置启动服务，提供非常简单的 HTTP 接口，极大降低上手分布式事务的难度
-* 跨语言
-  - 可适合多语言栈的公司使用。方便 Go、Python、PHP、NodeJs、Ruby、C# 等各类语言使用。
-* 使用简单
-  - 开发者不再担心悬挂、空补偿、幂等各类问题，首创子事务屏障技术代为处理
-* 易部署、易扩展
-  - 仅依赖 MySQL/Redis，部署简单，易集群化，易水平扩展
-* 多种分布式事务协议支持
-  - TCC、SAGA、XA、二阶段消息，一站式解决多种分布式事务问题
+* Easy to start
+  - Start the service with zero configuration and provide a very simple and clear HTTP interface, which greatly reduces the difficulty of getting started with distributed transactions
+* Cross Programming language
+  - Can be used by companies with multiple language stacks. It is convenient to use in various languages such as Go, Python, PHP, NodeJs, Ruby, C#, etc.
+* Simple to use
+  - Developers no longer worry about transaction suspension, null compensation, interface idempotent and other issues, and the first sub-transaction barrier technology handles it for you
+* Easy to deploy and expand
+  - Depends only on MySQL/Redis, easy to deploy, easy to cluster, and easy to scale horizontally
+* Multiple distributed transaction protocol support
+  - TCC, SAGA, XA, two-stage message, one-stop solution to various distributed transaction problems
 
-## 对比
+## Comparison
 
-在非 Java 语言下，暂未看到除 DTM 之外的成熟的分布式事务管理器，因此这里将 DTM 和 Java 中最成熟的开源项目 Seata 做对比：
+In non-Java languages, there is still no mature distributed transaction manager other than DTM, so here is a comparison between DTM and Seata, the most mature open source project in Java:
 
-|  特性| DTM | SEATA |备注|
-|:-----:|:----:|:----:|:----:|
-|[支持语言](https://dtm.pub/other/opensource.html#lang) |<span style="color:green">Go、C#、Java、Python、PHP...</span>|<span style="color:orange">Java</span>|DTM 可轻松接入一门新语言|
-|[存储引擎](https://dtm.pub/other/opensource.html#store) |<span style="color:green">支持数据库、Redis、Mongo等</span>|<span style="color:orange">数据库</span>||
-|[异常处理](https://dtm.pub/other/opensource.html#exception)| <span style="color:green"> 子事务屏障自动处理 </span>|<span style="color:orange">手动处理</span> |DTM 解决了幂等、悬挂、空补偿|
-|[SAGA事务](https://dtm.pub/other/opensource.html#saga) |<span style="color:green">极简易用</span> |<span style="color:orange">复杂状态机</span> ||
-|[二阶段消息](https://dtm.pub/other/opensource.html#msg)|<span style="color:green">✓</span>|<span style="color:red">✗</span>|最简消息最终一致性架构|
-|[TCC事务](https://dtm.pub/other/opensource.html#tcc)| <span style="color:green">✓</span>|<span style="color:green">✓</span>||
-|[XA事务](https://dtm.pub/other/opensource.html#xa)|<span style="color:green">✓</span>|<span style="color:green">✓</span>||
-|[AT事务](https://dtm.pub/other/opensource.html#at)|<span style="color:orange">建议使用XA</span>|<span style="color:green">✓</span>|AT 与 XA类似，但有脏回滚|
-|[单服务多数据源](https://dtm.pub/other/opensource.html#multidb)|<span style="color:green">✓</span>|<span style="color:red">✗</span>||
-|[通信协议](https://dtm.pub/other/opensource.html#protocol)|HTTP、gRPC|Dubbo等协议|DTM对云原生更加友好|
-|[star数量](https://dtm.pub/other/opensource.html#star)|<img src="https://img.shields.io/github/stars/dtm-labs/dtm.svg?style=social" alt="github stars"/>|<img src="https://img.shields.io/github/stars/seata/seata.svg?style=social" alt="github stars"/>|DTM 从 2021-06-04 发布 0.1版本，发展飞快|
+|                                          Features                                          |                                                DTM                                                |                                              SEATA                                               |                                      Memo                                       |
+|:------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------:|
+|              [language supports](https://dtm.pub/other/opensource.html#lang)               |                     <span style="color:green">Go、C#、Java、Python、PHP...</span>                     |                              <span style="color:orange">Java</span>                              |             DTM is easier implemented the client to a new language              |
+|               [Storage Engine](https://dtm.pub/other/opensource.html#store)                |               <span style="color:green">Support Database, Redis, Mongo, etc.</span>               |                            <span style="color:orange">Database</span>                            ||
+|            [Exception Handle](https://dtm.pub/other/opensource.html#exception)             |        <span style="color:green"> Sub-transaction barrier is handled automatically </span>        |                           <span style="color:orange">By manual</span>                            | DTM solves transaction suspension, null compensation, interface idempotent etc. |
+|                     [SAGA](https://dtm.pub/other/opensource.html#saga)                     |                           <span style="color:green">Easy to use</span>                            |                     <span style="color:orange">Complex state machine</span>                      ||
+|               [Two-phase message](https://dtm.pub/other/opensource.html#msg)               |                                <span style="color:green">✓</span>                                 |                                 <span style="color:red">✗</span>                                 |                Minimal Message Eventual Consistency Architecture                |
+|                      [TCC](https://dtm.pub/other/opensource.html#tcc)                      |                                <span style="color:green">✓</span>                                 |                                <span style="color:green">✓</span>                                ||
+|                       [XA](https://dtm.pub/other/opensource.html#xa)                       |                                <span style="color:green">✓</span>                                 |                                <span style="color:green">✓</span>                                ||
+|                       [AT](https://dtm.pub/other/opensource.html#at)                       |                     <span style="color:orange">XA is more recommended</span>                      |                                <span style="color:green">✓</span>                                |                  AT is similar to XA, but with dirty rollback                   |
+| [Single service with multiple data sources](https://dtm.pub/other/opensource.html#multidb) |                                <span style="color:green">✓</span>                                 |                                 <span style="color:red">✗</span>                                 ||
+|           [Communicate protocol](https://dtm.pub/other/opensource.html#protocol)           |                                             HTTP、gRPC                                             |                                            Dubbo etc.                                            |                      DTM is more friendly to cloud native                       |
+|                   [Github Stargazers](https://dtm.pub/other/opensource.html#star)                    | <img src="https://img.shields.io/github/stars/dtm-labs/dtm.svg?style=social" alt="github stars"/> | <img src="https://img.shields.io/github/stars/seata/seata.svg?style=social" alt="github stars"/> |          DTM released version 0.1 from 2021-06-04, developing rapidly           |
 
-从上面对比的特性来看，DTM 在许多方面都具备很大的优势。如果考虑多语言支持、多存储引擎支持，那么 DTM 毫无疑问是您的首选.
+From the characteristics of the comparison above, DTM has great advantages in many aspects. If you consider multi-language support and multi-storage engine support, then DTM is undoubtedly your first choice.
 
-# 安装
+# Installation
 
-通过 Composer 可以非常方便的安装 dtm-client
+It is very convenient to install dtm-client through Composer
 
 ```bash
 composer require dtm/dtm-client
 ```
 
-* 使用时别忘了启动 DTM Server 哦
+* Don't forget to start DTM Server before you use it
 
-# 配置
+# Configuration
 
-## 配置文件
+## Configuration file
 
-如果您是在 Hyperf 框架中使用，在安装组件后，可通过下面的 `vendor:publish` 命令一件发布配置文件于 `./config/autoload/dtm.php`
+If you are using the Hyperf framework, after installing the component, you can publish a configuration file to `./config/autoload/dtm.php` with the following `vendor:publish` command
 
 ```bash
 php bin/hyperf.php vendor:publish dtm/dtm-client
 ```
 
-如果您是在非 Hyperf 框架中使用，可复制 `./vendor/dtm/dtm-client/publish/dtm.php` 文件到对应的配置目录中。
+If you are using a non-Hyperf framework, copy the `./vendor/dtm/dtm-client/publish/dtm.php` file to the corresponding configuration directory.
 
 ```php
 use DtmClient\Constants\Protocol;
 use DtmClient\Constants\DbType;
 
 return [
-    // 客户端与 DTM Server 通讯的协议，支持 Protocol::HTTP 和 Protocol::GRPC 两种
+    // The communication protocol between the client and the DTM Server, supports Protocol::HTTP and Protocol::GRPC
     'protocol' => Protocol::HTTP,
-    // DTM Server 的地址
+    // DTM Server address
     'server' => '127.0.0.1',
-    // DTM Server 的端口
+    // DTM Server port
     'port' => [
         'http' => 36789,
         'grpc' => 36790,
     ],
-    // 子事务屏障配置
+    // Sub-transaction barrier
     'barrier' => [
-        // DB 模式下的子事务屏障配置
+        // Subtransaction barrier configuration in DB mode 
         'db' => [
             'type' => DbType::MySQL
         ],
-        // Redis 模式下的子事务屏障配置
+        // Subtransaction barrier configuration in Redis mode
         'redis' => [
-            // 子事务屏障记录的超时时间
+            // Timeout for subtransaction barrier records
             'expire_seconds' => 7 * 86400,
         ],
-        // 非 Hyperf 框架下应用子事务屏障的类
+        // Classes that apply sub-transaction barriers in non-Hyperf frameworks or without annotation usage
         'apply' => [],
     ],
-    // HTTP 协议下 Guzzle 客户端的通用配置
+    // Options of Guzzle client under HTTP protocol
     'guzzle' => [
         'options' => [],
     ],
 ];
 ```
 
-## 配置中间件
+## Configure middleware
 
-在使用之前，需要配置 `DtmClient\Middleware\DtmMiddleware` 中间件作为 Server 的全局中间件，该中间件支持 PSR-15 规范，可适用于各个支持该规范的的框架。   
-在 Hyperf 中的中间件配置可参考 [Hyperf文档 - 中间件](https://www.hyperf.wiki/2.2/#/zh-cn/middleware/middleware) 一章。
+Before using it, you need to configure the `DtmClient\Middleware\DtmMiddleware` middleware as the server's global middleware. This middleware supports the PSR-15 specification and is applicable to all frameworks that support this specification.
+For middleware configuration in Hyperf, please refer to [Hyperf Documentation - Middleware](https://www.hyperf.wiki/2.2/#/zh-cn/middleware/middleware) chapter.
 
-# 使用
+# Usage
 
-dtm-client 的使用非常简单，我们提供了一个示例项目 [dtm-php/dtm-sample](https://github.com/dtm-php/dtm-sample) 来帮助大家更好的理解和调试。   
-在使用该组件之前，也强烈建议您先阅读 [DTM 官方文档](https://dtm.pub/)，以做更详细的了解。
+The usage of dtm-client is very simple, we provide a sample project [dtm-php/dtm-sample](https://github.com/dtm-php/dtm-sample) to help you better understand and debug.
+Before using this component, it is also strongly recommended that you read the [DTM official documentation](https://dtm.pub/) for a more detailed understanding.
 
-## TCC 模式
+## TCC pattern
 
-TCC 模式是一种非常流行的柔性事务解决方案，由 Try-Confirm-Cancel 三个单词的首字母缩写分别组成 TCC 的概念，最早是由 Pat Helland 于 2007 年发表的一篇名为 [Life beyond Distributed Transactions:an Apostate’s Opinion](https://www.ics.uci.edu/~cs223/papers/cidr07p15.pdf) 的论文中提出。
+The TCC pattern is a very popular flexible distributed transaction solution. The concept of TCC is composed of the acronyms of the three words Try-Confirm-Cancel. It was first published in a paper named [Life beyond Distributed Transactions:an Apostate’s Opinion](https://www.ics.uci.edu/~cs223/papers/cidr07p15.pdf) by Pat Helland in 2007.
 
-### TCC 的 3 个阶段
+### Three stages of TCC
 
-Try 阶段：尝试执行，完成所有业务检查（一致性）, 预留必须业务资源（准隔离性）
-Confirm 阶段：如果所有分支的 Try 都成功了，则走到 Confirm 阶段。Confirm 真正执行业务，不作任何业务检查，只使用 Try 阶段预留的业务资源
-Cancel 阶段：如果所有分支的 Try 有一个失败了，则走到 Cancel 阶段。Cancel 释放 Try 阶段预留的业务资源。
+Try phase: try to execute, complete all business checks (consistency), reserve necessary business resources (pre-isolation)
+Confirm stage: If all branches of the Try are successful, go to the Confirm stage. Confirm actually executes the business without any business check, and only uses the business resources reserved in the Try phase
+Cancel stage: If one of the Try of all branches fails, go to the Cancel stage. Releases the business resources reserved in the Try phase.
 
-如果我们要进行一个类似于银行跨行转账的业务，转出（TransOut）和转入（TransIn）分别在不同的微服务里，一个成功完成的 TCC 事务典型的时序图如下：
+If we want to carry out a business similar to inter-bank transfer between banks, the transfer out (TransOut) and the transfer in (TransIn) are in different microservices, and a typical sequence diagram of a successfully completed TCC transaction is as follows:
 
 <img src="https://dtm.pub/assets/tcc_normal.dea14fb3.jpg" height=600 />
 
-### 代码示例
+### Example
 
-以下展示在 Hyperf 框架中的使用方法，其它框架类似
+The following shows how to use it in the Hyperf framework, other frameworks are similar
 
 ```php
 <?php
@@ -165,18 +165,18 @@ class TccController
         try {
             
             $this->tcc->globalTransaction(function (TCC $tcc) {
-                // 创建子事务 A 的调用数据
+                // Create call data for subtransaction A
                 $tcc->callBranch(
-                    // 调用 Try 方法的参数
+                    // Arguments for calling the Try method
                     ['amount' => 30],
-                    // Try 方法的 URL
+                    // URL of Try stage
                     $this->serviceUri . '/tcc/transA/try',
-                    // Confirm 方法的 URL
+                    // URL of Confirm stage
                     $this->serviceUri . '/tcc/transA/confirm',
-                    // Cancel 方法的 URL
+                    // URL of Cancel stage
                     $this->serviceUri . '/tcc/transA/cancel'
                 );
-                // 创建子事务 B 的调用数据，以此类推
+                // Create call data for subtransaction B, and so on
                 $tcc->callBranch(
                     ['amount' => 30],
                     $this->serviceUri . '/tcc/transB/try',
@@ -187,41 +187,41 @@ class TccController
         } catch (Throwable $e) {
             var_dump($e->getMessage(), $e->getTraceAsString());
         }
-        // 通过 TransContext::getGid() 获得 全局事务ID 并返回
+        // Get the global transaction ID through TransContext::getGid() and return it to the client
         return TransContext::getGid();
     }
 }
 ```
 
-## Saga 模式
+## Saga pattern
 
-Saga 模式是分布式事务领域最有名气的解决方案之一，也非常流行于各大系统中，最初出现在 1987 年 由 Hector Garcaa-Molrna & Kenneth Salem 发表的论文 [SAGAS](https://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf) 里。
+The Saga pattern is one of the most well-known solutions in the field of distributed transactions, and it is also very popular in major systems. It first appeared in the paper [SAGAS](https://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf) published by Hector Garcaa-Molrna & Kenneth Salem in 1987.
 
-Saga 是一种最终一致性事务，也是一种柔性事务，又被叫做 长时间运行的事务（Long-running-transaction），Saga 是由一系列的本地事务构成。每一个本地事务在更新完数据库之后，会发布一条消息或者一个事件来触发 Saga 全局事务中的下一个本地事务的执行。如果一个本地事务因为某些业务规则无法满足而失败，Saga 会执行在这个失败的事务之前成功提交的所有事务的补偿操作。所以 Saga 模式在对比 TCC 模式时，因缺少了资源预留的步骤，往往在实现回滚逻辑时会变得更麻烦。
+Saga is an eventual consistency transaction, also a flexible transaction, also known as a long-running transaction . Saga is composed of a series of local transactions. After each local transaction updates the database, it will publish a message or an event to trigger the execution of the next local transaction in the Saga global transaction. If a local transaction fails because some business rules cannot be satisfied, Saga performs compensating actions for all transactions that were successfully committed before the failed transaction. Therefore, when the Saga pattern is compared with the TCC pattern, it often becomes more troublesome to implement the rollback logic due to the lack of resource reservation steps.
 
-### Saga 子事务拆分
+### Sub-transaction split of Saga
 
-比如我们要进行一个类似于银行跨行转账的业务，将 A 账户中的 30 元转到 B 账户，根据 Saga 事务的原理，我们将整个全局事务，拆分为以下服务：
-- 转出（TransOut）服务，这里转出将会进行操作 A 账户扣减 30 元
-- 转出补偿（TransOutCompensate）服务，回滚上面的转出操作，即 A 账户增加 30 元
-- 转入（TransIn）服务，转入将会进行 B  账户增加 30 元
-- 转出补偿（TransInCompensate）服务，回滚上面的转入操作，即 B 账户减少 30 元
+For example, we want to carry out a business similar to inter-bank transfer between banks, and transfer 30 dollar in account A to account B. According to the principle of Saga transaction, we will split the entire global transaction into the following services:
+- Transfer out (TransOut) service, the account A will deduct 30 dollar
+- Transfer out compensation (TransOutCompensate) service, roll back the above transfer out operation, that is, increase the account A by 30 dollar
+- Transfer in (TransIn) service, the account B will be increased by 30 dollar
+- Transfer out compensation (TransInCompensate) service, roll back the above transfer in operation, that is, the account B is reduced by 30 dollar
 
-整个事务的逻辑是：
+The logic of the entire transaction is:
 
-执行转出成功 => 执行转入成功 => 全局事务完成
+Execute the transfer out successfully => Execute the transfer in successfully => the global transaction is completed
 
-如果在中间发生错误，例如转入 B 账户发生错误，则会调用已执行分支的补偿操作，即：
+If an error occurs in the middle, such as an error in transferring to the B account, the compensation operation of the executed branch will be called, namely:
 
-执行转出成功 => 执行转入失败 => 执行转入补偿成功 => 执行转出补偿成功 => 全局事务回滚完成
+Execute transfer out successfully => execute transfer in failure => execute transfer in compensation successfully => execute transfer out compensation successfully => global transaction rollback completed
 
-下面是一个成功完成的 SAGA 事务典型的时序图：
+The following is a typical sequence diagram of a successfully completed SAGA transaction:
 
 <img src="https://dtm.pub/assets/saga_normal.a2849672.jpg" height=428 />
 
-### 代码示例
+### Example
 
-以下展示在 Hyperf 框架中的使用方法，其它框架类似
+The following shows how to use it in the Hyperf framework, other frameworks are similar
 
 ```php
 namespace App\Controller;
@@ -245,23 +245,23 @@ class SagaController
     public function successCase(): string
     {
         $payload = ['amount' => 50];
-        // 初始化 Saga 事务
+        // Init Saga global transaction
         $this->saga->init();
-        // 增加转出子事务
+        // Add TransOut sub-transaction
         $this->saga->add(
             $this->serviceUri . '/saga/transOut', 
             $this->serviceUri . '/saga/transOutCompensate', 
             $payload
         );
-        // 增加转入子事务
+        // Add TransIn sub-transaction
         $this->saga->add(
             $this->serviceUri . '/saga/transIn', 
             $this->serviceUri . '/saga/transInCompensate', 
             $payload
         );
-        // 提交 Saga 事务
+        // Submit Saga global transaction
         $this->saga->submit();
-        // 通过 TransContext::getGid() 获得 全局事务ID 并返回
+        // Get the global transaction ID through TransContext::getGid() and return it to the client
         return TransContext::getGid();
     }
 }
