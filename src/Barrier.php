@@ -19,7 +19,6 @@ class Barrier
 
     protected MySqlBarrier $mySqlBarrier;
 
-
     public function __construct(ConfigInterface $config, MySqlBarrier $mySqlBarrier)
     {
         $this->config = $config;

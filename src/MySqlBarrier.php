@@ -13,13 +13,12 @@ use DtmClient\Constants\Operation;
 use DtmClient\Constants\TransType;
 use DtmClient\DbTransaction\DBTransactionInterface;
 use DtmClient\Exception\DuplicatedException;
-use Hyperf\DB\DB as SimpleDB;
 use Hyperf\DbConnection\Db;
 
 class MySqlBarrier implements BarrierInterface
 {
     protected int $barrierId = 0;
-    
+
     protected DBTransactionInterface $DBTransaction;
 
     public function __construct(DBTransactionInterface $DBTransaction)
@@ -76,23 +75,9 @@ class MySqlBarrier implements BarrierInterface
             return 0;
         }
 
-         return $this->DBTransaction->execInsert(
+        return $this->DBTransaction->execInsert(
             'INSERT IGNORE INTO `barrier` (trans_type, gid, branch_id, op, barrier_id, reason) values(?,?,?,?,?,?)',
             [$transType, $gid, $branchId, $op, $barrierID, $reason]
         );
-//        if ($this->hasSimpleDb()) {
-//            return SimpleDB::execute(
-//                'INSERT IGNORE INTO `barrier` (trans_type, gid, branch_id, op, barrier_id, reason) values(?,?,?,?,?,?)',
-//                [$transType, $gid, $branchId, $op, $barrierID, $reason]
-//            );
-//        }
-//        return Db::table('barrier')->insertOrIgnore([
-//            'trans_type' => $transType,
-//            'gid' => $gid,
-//            'branch_id' => $branchId,
-//            'op' => $op,
-//            'barrier_id' => $barrierID,
-//            'reason' => $reason,
-//        ]);
     }
 }

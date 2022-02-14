@@ -20,9 +20,6 @@ return [
         'db' => [
             'type' => DbType::MySQL
         ],
-        'redis' => [
-            'expire_seconds' => 7 * 86400,
-        ],
         'apply' => [],
     ],
     'guzzle' => [

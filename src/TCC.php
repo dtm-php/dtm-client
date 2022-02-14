@@ -67,7 +67,7 @@ class TCC extends AbstractTransaction
                     'gid' => TransContext::getGid(),
                     'trans_type' => TransType::TCC,
                 ]);
-                
+
                 $branchRequest = new RequestBranch();
                 $branchRequest->method = 'POST';
                 $branchRequest->url = $tryUrl;

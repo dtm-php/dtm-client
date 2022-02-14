@@ -11,8 +11,8 @@ namespace DtmClient;
 use DtmClient\Api\ApiInterface;
 use DtmClient\Api\HttpApi;
 use DtmClient\Api\HttpApiFactory;
-use DtmClient\DbTransaction\HyperfDbTransaction;
 use DtmClient\DbTransaction\DBTransactionInterface;
+use DtmClient\DbTransaction\HyperfDbTransaction;
 use DtmClient\Grpc\GrpcClientManager;
 use DtmClient\Grpc\GrpcClientManagerFactory;
 
