@@ -133,7 +133,7 @@ Cancel stage: If one of the Try of all branches fails, go to the Cancel stage. R
 
 If we want to carry out a business similar to inter-bank transfer between banks, the transfer out (TransOut) and the transfer in (TransIn) are in different microservices, and a typical sequence diagram of a successfully completed TCC transaction is as follows:
 
-<img src="https://dtm.pub/assets/tcc_normal.dea14fb3.jpg" height=600 />
+<img src="https://en.dtm.pub/assets/tcc_normal.85ceb661.jpg" height=600 />
 
 ### Example
 
@@ -217,7 +217,7 @@ Execute transfer out successfully => execute transfer in failure => execute tran
 
 The following is a typical sequence diagram of a successfully completed SAGA transaction:
 
-<img src="https://dtm.pub/assets/saga_normal.a2849672.jpg" height=428 />
+<img src="https://en.dtm.pub/assets/saga_normal.59a75c01.jpg" height=428 />
 
 ### Example
 
