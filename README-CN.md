@@ -134,7 +134,6 @@ Cancel 阶段：如果所有分支的 Try 有一个失败了，则走到 Cancel 
 如果我们要进行一个类似于银行跨行转账的业务，转出（TransOut）和转入（TransIn）分别在不同的微服务里，一个成功完成的 TCC 事务典型的时序图如下：
 
 <img src="https://dtm.pub/assets/tcc_normal.dea14fb3.jpg" height=600 />
-![tcc_normal](https://dtm.pub/assets/tcc_normal.dea14fb3.jpg)
 
 ### 代码示例
 
