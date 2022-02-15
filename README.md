@@ -205,7 +205,7 @@ For example, we want to carry out a business similar to inter-bank transfer betw
 - Transfer out (TransOut) service, the account A will deduct 30 dollar
 - Transfer out compensation (TransOutCompensate) service, roll back the above transfer out operation, that is, increase the account A by 30 dollar
 - Transfer in (TransIn) service, the account B will be increased by 30 dollar
-- Transfer out compensation (TransInCompensate) service, roll back the above transfer in operation, that is, the account B is reduced by 30 dollar
+- Transfer in compensation (TransInCompensate) service, roll back the above transfer in operation, that is, the account B is reduced by 30 dollar
 
 The logic of the entire transaction is:
 
