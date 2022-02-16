@@ -81,7 +81,7 @@ class TransContext extends Context
 
     public static function getGid(): string
     {
-        return static::get(static::class . '.gid');
+        return static::get(static::class . '.gid', '');
     }
 
     public static function setGid(string $gid)
