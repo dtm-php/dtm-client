@@ -15,6 +15,8 @@ use DtmClient\DbTransaction\DBTransactionInterface;
 use DtmClient\DbTransaction\HyperfDbTransaction;
 use DtmClient\Grpc\GrpcClientManager;
 use DtmClient\Grpc\GrpcClientManagerFactory;
+use Hyperf\HttpServer\Response;
+use Psr\Http\Message\ResponseInterface;
 
 class ConfigProvider
 {
@@ -35,6 +37,7 @@ class ConfigProvider
                 ApiInterface::class => ApiFactory::class,
                 GrpcClientManager::class => GrpcClientManagerFactory::class,
                 DBTransactionInterface::class => HyperfDbTransaction::class,
+                ResponseInterface::class => Response::class,
             ],
             'commands' => [
             ],

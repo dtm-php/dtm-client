@@ -12,7 +12,6 @@ use DtmClient\Annotation\Barrier as BarrierAnnotation;
 use DtmClient\Barrier;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Di\Annotation\AnnotationCollector;
-use Hyperf\HttpServer\Contract\ResponseInterface as HttpResponse;
 use Hyperf\HttpServer\Router\Dispatched;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -23,11 +22,11 @@ class DtmMiddleware implements MiddlewareInterface
 {
     protected Barrier $barrier;
 
-    protected HttpResponse $response;
+    protected ResponseInterface $response;
 
     protected ConfigInterface $config;
 
-    public function __construct(Barrier $barrier, HttpResponse $response, ConfigInterface $config)
+    public function __construct(Barrier $barrier, ResponseInterface $response, ConfigInterface $config)
     {
         $this->barrier = $barrier;
         $this->response = $response;
