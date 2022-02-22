@@ -101,6 +101,24 @@ class TCC extends AbstractTransaction
                 ];
                 $this->api->transRequestBranch($branchRequest);
                 break;
+            case Protocol::JSONRPC_HTTP:
+                $this->api->registerBranch([
+                    'data' => json_encode($body),
+                    'branch_id' => $branchId,
+                    'confirm' => $confirmUrl,
+                    'cancel' => $cancelUrl,
+                    'gid' => TransContext::getGid(),
+                    'trans_type' => TransType::TCC,
+                ]);
+
+                $branchRequest = new RequestBranch();
+                $branchRequest->method = 'POST';
+                $branchRequest->url = $tryUrl;
+                $branchRequest->branchId = $branchId;
+                $branchRequest->op = Operation::TRY;
+                $branchRequest->body = $body;
+                return $this->api->transRequestBranch($branchRequest);
+                break;
             default:
                 throw new UnsupportedException('Unsupported protocol');
                 break;

@@ -15,6 +15,12 @@ use DtmClient\DbTransaction\DBTransactionInterface;
 use DtmClient\DbTransaction\HyperfDbTransaction;
 use DtmClient\Grpc\GrpcClientManager;
 use DtmClient\Grpc\GrpcClientManagerFactory;
+use Hyperf\Utils\Serializer\SerializerFactory;
+use Hyperf\Utils\Serializer\Serializer;
+use Hyperf\JsonRpc\JsonRpcPoolTransporter;
+use Hyperf\JsonRpc\JsonRpcTransporter;
+use Hyperf\Rpc\Contract\PathGeneratorInterface;
+use DtmClient\JsonRpc\DtmPatchGenerator;
 
 class ConfigProvider
 {
@@ -35,6 +41,9 @@ class ConfigProvider
                 ApiInterface::class => ApiFactory::class,
                 GrpcClientManager::class => GrpcClientManagerFactory::class,
                 DBTransactionInterface::class => HyperfDbTransaction::class,
+//                Hyperf\Contract\NormalizerInterface::class => new SerializerFactory(Serializer::class),
+                PathGeneratorInterface::class => DtmPatchGenerator::class,
+                JsonRpcTransporter::class => JsonRpcPoolTransporter::class,
             ],
             'commands' => [
             ],
