@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace DtmClient;
 
 use DtmClient\Util\Str;
-use Hyperf\Utils\Context;
+use Hyperf\Context\Context;
 
 /**
  * All properties in this class are read-only.
