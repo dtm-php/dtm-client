@@ -32,4 +32,8 @@ class RequestBranch
     public array $grpcDeserialize = [GPBEmpty::class, 'decode'];
 
     public array $grpcOptions = [];
+
+    public string $jsonRpcServiceName = '';
+
+    public array $jsonRpcServiceParams = [];
 }

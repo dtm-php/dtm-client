@@ -13,7 +13,6 @@ use DtmClient\Constants\Operation;
 use DtmClient\Constants\TransType;
 use DtmClient\DbTransaction\DBTransactionInterface;
 use DtmClient\Exception\DuplicatedException;
-use Hyperf\DbConnection\Db;
 
 class MySqlBarrier implements BarrierInterface
 {

@@ -1,44 +1,44 @@
 <?php
 
+declare(strict_types=1);
+/**
+ * This file is part of DTM-PHP.
+ *
+ * @license  https://github.com/dtm-php/dtm-client/blob/master/LICENSE
+ */
 namespace DtmClient\Api;
 
-use DtmClient\Constants\Operation;
 use DtmClient\Constants\Protocol;
 use DtmClient\Constants\Result;
 use DtmClient\Exception\FailureException;
-use DtmClient\Exception\GenerateException;
 use DtmClient\Exception\OngingException;
 use DtmClient\Exception\RequestException;
 use DtmClient\Exception\UnsupportedException;
 use DtmClient\JsonRpc\DtmPatchGenerator;
+use DtmClient\JsonRpc\JsonRpcClientManager;
 use DtmClient\TransContext;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\RequestOptions;
 use Hyperf\Contract\ConfigInterface;
-use Hyperf\JsonRpc\DataFormatter;
-use Hyperf\JsonRpc\JsonRpcHttpTransporter;
-use Hyperf\JsonRpc\PathGenerator;
-use Hyperf\Rpc\ProtocolManager;
 use Hyperf\RpcClient\AbstractServiceClient;
-use Hyperf\Utils\Packer\JsonPacker;
 use Psr\Container\ContainerInterface;
 
 class JsonRpcHttpApi extends AbstractServiceClient implements ApiInterface
 {
     protected $serviceName = 'dtmserver';
-    
+
     protected $protocol = 'jsonrpc-http';
 
     protected ConfigInterface $config;
 
+    protected JsonRpcClientManager $jsonRpcClientManager;
 
-    public function __construct(ContainerInterface $container, DtmPatchGenerator $patchGenerator)
+    public function __construct(ContainerInterface $container, DtmPatchGenerator $patchGenerator, JsonRpcClientManager $jsonRpcClientManager)
     {
         parent::__construct($container);
 
         $this->pathGenerator = $patchGenerator;
         $this->config = $container->get(ConfigInterface::class);
+        $this->jsonRpcClientManager = $jsonRpcClientManager;
     }
 
     public function getProtocol(): string
@@ -48,28 +48,28 @@ class JsonRpcHttpApi extends AbstractServiceClient implements ApiInterface
 
     public function generateGid(): string
     {
-        $res = $this->__request('NewGid', []);
+        $res = $this->__request('newGid', []);
         return $res['gid'];
     }
 
     public function prepare(array $body)
     {
-        return $this->__request('Prepare', $body);
+        return $this->__request('prepare', $body);
     }
 
     public function submit(array $body)
     {
-        return $this->__request('Submit', $body);
+        return $this->__request('submit', $body);
     }
 
     public function abort(array $body)
     {
-        return $this->__request('Abort', $body);
+        return $this->__request('abort', $body);
     }
 
     public function registerBranch(array $body)
     {
-        return $this->__request('RegisterBranch', $body);
+        return $this->__request('registerBranch', $body);
     }
 
     public function query(array $body)
@@ -95,45 +95,37 @@ class JsonRpcHttpApi extends AbstractServiceClient implements ApiInterface
 
     public function transRequestBranch(RequestBranch $requestBranch)
     {
-        $dtm = $this->config->get('dtm.server', '127.0.0.1') . ':' . $this->config->get('dtm.port.http', 36789) . '/api/dtmsvr';
-        $response = $this->client->request($requestBranch->method, $requestBranch->url, [
-            RequestOptions::QUERY => [
-                [
-                    'dtm' => $dtm,
-                    'gid' => TransContext::getGid(),
-                    'branch_id' => $requestBranch->branchId,
-                    'trans_type' => TransContext::getTransType(),
-                    'op' => $requestBranch->op,
-                ],
-            ],
-            RequestOptions::JSON => $requestBranch->body,
-            RequestOptions::HEADERS => $requestBranch->branchHeaders,
-        ]);
-        
-        
-        $this->__request($requestBranch->method, [
-            RequestOptions::QUERY => [
-                [
-                    'dtm' => $dtm,
-                    'gid' => TransContext::getGid(),
-                    'branch_id' => $requestBranch->branchId,
-                    'trans_type' => TransContext::getTransType(),
-                    'op' => $requestBranch->op,
-                ],
-            ],
-            RequestOptions::BODY => $requestBranch->body,
+        [$serviceName, $method] = $this->parseServiceNameAndMethod($requestBranch->url);
+        $response = $this->jsonRpcClientManager->getClient($serviceName)->send($method, [
+            'dtm' => $this->getServiceName(),
+            'gid' => TransContext::getGid(),
+            'branch_id' => $requestBranch->branchId,
+            'trans_type' => TransContext::getTransType(),
+            'op' => $requestBranch->op,
+            'body' => $requestBranch->body,
         ]);
 
         if (Result::isOngoing($response)) {
             throw new OngingException();
         }
+
         if (Result::isFailure($response)) {
             throw new FailureException();
         }
+
         if (! Result::isSuccess($response)) {
             throw new RequestException($response->getReasonPhrase(), $response->getStatusCode());
         }
 
-        return $response;
+        return $response['result'];
+    }
+
+    protected function parseServiceNameAndMethod(string $url): array
+    {
+        $path = explode('.', $url);
+        $serviceName = $path[0];
+        array_shift($path);
+        $method = implode('.', $path);
+        return [$serviceName, $method];
     }
 }

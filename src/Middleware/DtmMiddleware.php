@@ -36,7 +36,7 @@ class DtmMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $queryParams = $request->getQueryParams();
+        $queryParams = $request->getQueryParams() ?: $request->getParsedBody();
         $transType = $queryParams['trans_type'] ?? null;
         $gid = $queryParams['gid'] ?? null;
         $branchId = $queryParams['branch_id'] ?? null;
