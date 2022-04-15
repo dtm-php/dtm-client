@@ -64,9 +64,10 @@ jobs:
           composer require symfony/finder:^5.0
           composer require hyperf/di
           composer require hyperf/grpc-client
-          composer require symfony/console:^5.0
+          composer require symfony/console:^5.4
           composer require psr/log:^1.0
           composer require hyperf/server
-          composer require hyperf/http-serve
+          composer require hyperf/http-server
+          composer require hyperf/db
           composer analyse
           composer test
