@@ -27,7 +27,7 @@ class Msg extends AbstractTransaction
     public function add(string $action, $payload)
     {
         TransContext::addStep(['action' => $action]);
-        TransContext::addPayload(json_encode($payload));
+        TransContext::addPayload($payload);
     }
 
     public function prepare(string $queryPrepared)
