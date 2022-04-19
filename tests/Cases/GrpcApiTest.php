@@ -9,7 +9,9 @@ declare(strict_types=1);
 namespace DtmClientTest\Cases;
 
 use DtmClient\Api\GrpcApi;
+use DtmClient\Grpc\GrpcClientManager;
 use Hyperf\Contract\ConfigInterface;
+use Hyperf\GrpcClient\BaseClient;
 use Hyperf\Utils\ApplicationContext;
 use Hyperf\Utils\ChannelPool;
 use Mockery;
@@ -30,7 +32,7 @@ class GrpcApiTest extends AbstractTestCase
     {
         $grpcApi = $this->createGrpcApi();
         $result = $grpcApi->generateGid();
-        $this->assertEquals(22, strlen($result));
+        $this->assertEquals('22', $result);
     }
 
     protected function createGrpcApi(): GrpcApi
@@ -46,10 +48,12 @@ class GrpcApiTest extends AbstractTestCase
         $config->shouldReceive('get')->with('dtm.port.http', 36789)->andReturn(36789);
         $config->shouldReceive('get')->with('dtm.port.grpc', 36790)->andReturn(36790);
         $container = Mockery::mock(ContainerInterface::class);
+        $grpcClientManagerStub = Mockery::mock(GrpcClientManager::class);
+        $grpcClientManagerStub->shouldReceive('getClient')->andReturn(Mockery::mock(BaseClient::class));
         $container->shouldReceive('get')->with(ConfigInterface::class)->andReturn($config);
         $container->shouldReceive('get')->with(ChannelPool::class)->andReturn(ChannelPool::getInstance());
         $container->shouldReceive('get')->with(GrpcApi::class)->andReturn(
-            new GrpcApi($container->get(ConfigInterface::class))
+            new GrpcApiStub($container->get(ConfigInterface::class), $grpcClientManagerStub)
         );
         ApplicationContext::setContainer($container);
         return $container;
