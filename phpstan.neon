@@ -1,0 +1,18 @@
+# Magic behaviour with __get, __set, __call and __callStatic is not exactly static analyser-friendly :)
+# Fortunately, You can ingore it by the following config.
+#
+# vendor/bin/phpstan analyse app --memory-limit 200M -l 0
+#
+parameters:
+  level: 1
+  ignoreErrors:
+        - '#Call to static method beginTransaction\(\) on an unknown class Illuminate\\Support\\Facades\\DB\.#'
+        - '#Call to static method commit\(\) on an unknown class Illuminate\\Support\\Facades\\DB\.#'
+        - '#Call to static method rollback\(\) on an unknown class Illuminate\\Support\\Facades\\DB\.#'
+        - '#Static call to instance method Hyperf\\DB\\DB::beginTransaction\(\)\.#'
+        - '#Static call to instance method Hyperf\\DB\\DB::commit\(\)\.#'
+        - '#Static call to instance method Hyperf\\DB\\DB::rollback\(\)\.#'
+        - '#Static call to instance method Hyperf\\DB\\DB::execute\(\)\.#'
+        - '#Call to static method affectingStatement\(\) on an unknown class Illuminate\\Support\\Facades\\DB\.#'
+        - '#Call to static method currentRouteAction\(\) on an unknown class Illuminate\\Support\\Facades\\Route\.#'
+        - '#Parameter \$request of method DtmClient\\Middleware\\DtmLaravelMiddleware::handle\(\) has invalid type Illuminate\\Http\\Request\.#'

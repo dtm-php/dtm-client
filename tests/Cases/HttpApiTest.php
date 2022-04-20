@@ -15,6 +15,8 @@ use Hyperf\Contract\ConfigInterface;
 use Hyperf\Guzzle\ClientFactory;
 use Mockery;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * @internal
@@ -31,7 +33,7 @@ class HttpApiTest extends AbstractTestCase
     {
         $httpApi = $this->createHttpApi();
         $result = $httpApi->generateGid();
-        $this->assertEquals(22, strlen($result));
+        $this->assertEquals(22, $result);
     }
 
     protected function createHttpApi(): HttpApi
@@ -49,11 +51,14 @@ class HttpApiTest extends AbstractTestCase
         $config->shouldReceive('get')->with('dtm.guzzle.options', [])->andReturn([]);
         $container = Mockery::mock(ContainerInterface::class);
         $container->shouldReceive('get')->with(ConfigInterface::class)->andReturn($config);
-        $httpApiFactory = new HttpApiFactory();
         $container->shouldReceive('get')->with(ClientFactory::class)->andReturn(new ClientFactory($container));
-        $container->shouldReceive('get')->with(Client::class)->andReturn(
-            $httpApiFactory($container)
-        );
+        $client = Mockery::mock(Client::class);
+        $httpClientResponseStub = Mockery::mock(ResponseInterface::class);
+        $streamInterfaceStub = Mockery::mock(StreamInterface::class);
+        $streamInterfaceStub->shouldReceive('getContents')->andReturn('{"dtm_result":"SUCCESS","gid":"22"}');
+        $httpClientResponseStub->shouldReceive('getBody')->andReturn($streamInterfaceStub);
+        $client->shouldNotReceive('get')->andReturn($httpClientResponseStub);
+        $container->shouldReceive('get')->with(Client::class)->andReturn($client);
         $container->shouldReceive('get')->with(HttpApi::class)->andReturn(
             new HttpApi($container->get(Client::class), $container->get(ConfigInterface::class))
         );
