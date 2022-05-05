@@ -13,4 +13,6 @@ class Protocol
     public const HTTP = 'http';
 
     public const GRPC = 'grpc';
+
+    public const JSONRPC_HTTP = 'jsonrpc-http';
 }

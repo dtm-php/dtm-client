@@ -11,6 +11,7 @@ namespace DtmClient;
 use DtmClient\Api\ApiInterface;
 use DtmClient\Api\GrpcApi;
 use DtmClient\Api\HttpApi;
+use DtmClient\Api\JsonRpcHttpApi;
 use DtmClient\Constants\Protocol;
 use DtmClient\Exception\UnsupportedException;
 use Hyperf\Contract\ConfigInterface;
@@ -26,6 +27,8 @@ class ApiFactory
                 return $container->get(HttpApi::class);
             case Protocol::GRPC:
                 return $container->get(GrpcApi::class);
+            case Protocol::JSONRPC_HTTP:
+                return $container->get(JsonRpcHttpApi::class);
             default:
                 throw new UnsupportedException();
         }

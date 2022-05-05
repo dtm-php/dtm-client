@@ -32,23 +32,41 @@ class Result
 
     public const ERR_DUPLICATED_STATUS = 425;
 
-    public static function isOngoing(ResponseInterface $response)
+    public static function isOngoing(ResponseInterface|array $response)
     {
+        if (is_array($response)) {
+            if (isset($response['error'])) {
+                return $response['error']['code'] === self::ONGOING_STATUS;
+            }
+            return false;
+        }
         return $response->getStatusCode() === self::ONGOING_STATUS;
     }
 
-    public static function isSuccess(ResponseInterface $response)
+    public static function isSuccess(ResponseInterface|array $response)
     {
+        if (is_array($response)) {
+            return isset($response['result']) && ! isset($response['error']);
+        }
         return $response->getStatusCode() === self::SUCCESS_STATUS;
     }
 
-    public static function isFailure(ResponseInterface $response)
+    public static function isFailure(ResponseInterface|array $response)
     {
+        if (is_array($response)) {
+            if (isset($response['error'])) {
+                return $response['error']['code'] === self::FAILURE_STATUS;
+            }
+            return false;
+        }
         return $response->getStatusCode() === self::FAILURE_STATUS;
     }
 
-    public static function isErrDuplicated(ResponseInterface $response)
+    public static function isErrDuplicated(ResponseInterface|array $response)
     {
+        if (is_array($response) && isset($response['error'])) {
+            return $response['error']['code'] === self::ERR_DUPLICATED_STATUS;
+        }
         return $response->getStatusCode() === self::ERR_DUPLICATED_STATUS;
     }
 }
