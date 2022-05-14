@@ -73,5 +73,6 @@ jobs:
           composer require hyperf/db-connection
           composer require hyperf/json-rpc
           composer require hyperf/rpc-client
+          composer require symfony/serializer
           composer analyse
           composer test
