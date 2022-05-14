@@ -25,7 +25,9 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           tools: phpize
-          ini-values: opcache.enable_cli=1
+          ini-values: ｜
+            opcache.enable_cli=1
+
           coverage: none
       - name: Setup Swoole
         if: ${{ matrix.engine == 'swoole' }}
@@ -74,6 +76,6 @@ jobs:
           composer require hyperf/db-connection
           composer require hyperf/json-rpc
           composer require hyperf/rpc-client
-          composer require symfony/serializer
+          composer require symfony/serializer:^5.0
           composer analyse
           composer test
