@@ -25,6 +25,8 @@ class BranchIdGenerator implements BranchIdGeneratorInterface
         }
 
         $subBranchId = $subBranchId + 1;
+        TransContext::setSubBranchId($subBranchId);
+
         return $this->getCurrentSubBranchId($subBranchId);
     }
 
