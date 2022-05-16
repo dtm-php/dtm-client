@@ -95,13 +95,11 @@ class HttpApi implements ApiInterface
         $dtm = $this->config->get('dtm.server', '127.0.0.1') . ':' . $this->config->get('dtm.port.http', 36789) . '/api/dtmsvr';
         $response = $this->client->request($requestBranch->method, $requestBranch->url, [
             RequestOptions::QUERY => [
-                [
-                    'dtm' => $dtm,
-                    'gid' => TransContext::getGid(),
-                    'branch_id' => $requestBranch->branchId,
-                    'trans_type' => TransContext::getTransType(),
-                    'op' => $requestBranch->op,
-                ],
+                'dtm' => $dtm,
+                'gid' => TransContext::getGid(),
+                'branch_id' => $requestBranch->branchId,
+                'trans_type' => TransContext::getTransType(),
+                'op' => $requestBranch->op,
             ],
             RequestOptions::JSON => $requestBranch->body,
             RequestOptions::HEADERS => $requestBranch->branchHeaders,
