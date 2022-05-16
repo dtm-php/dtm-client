@@ -25,11 +25,14 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           tools: phpize
-          ini-values: opcache.enable_cli=1
+          ini-values: ｜
+            opcache.enable_cli=1
+
           coverage: none
       - name: Setup Swoole
         if: ${{ matrix.engine == 'swoole' }}
         run: |
+          sudo apt-get update
           sudo apt-get install libcurl4-openssl-dev
           wget https://github.com/swoole/swoole-src/archive/v${SWOOLE_VERSION}.tar.gz -O swoole.tar.gz
           mkdir -p swoole
@@ -71,5 +74,8 @@ jobs:
           composer require hyperf/http-server
           composer require hyperf/db
           composer require hyperf/db-connection
+          composer require hyperf/json-rpc
+          composer require hyperf/rpc-client
+          composer require symfony/serializer:^5.0
           composer analyse
           composer test

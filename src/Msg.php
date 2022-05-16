@@ -49,7 +49,10 @@ class Msg extends AbstractTransaction
             $businessCall();
             $this->submit();
         } catch (FailureException $failureException) {
-            $this->api->abort();
+            $this->api->abort([
+                'gid' => TransContext::getGid(),
+                'trans_type' => TransType::MSG,
+            ]);
             throw $failureException;
         } catch (\Exception $exception) {
             $this->queryPrepared($queryPrepared);
