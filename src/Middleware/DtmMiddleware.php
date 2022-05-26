@@ -46,10 +46,21 @@ class DtmMiddleware implements MiddlewareInterface
 
         /** @var Dispatched $dispatched */
         $dispatched = $request->getAttribute(Dispatched::class);
-
         if ($dispatched instanceof Dispatched && ! empty($dispatched->handler->callback)) {
-            [$class, $method] = $dispatched->handler->callback;
+            $callback = $dispatched->handler->callback;
+            
+            if (is_array($callback)) {
+                [$class, $method] = $callback;
+            }
+            
+            if (is_string($callback) && str_contains($callback, '@')) {
+                [$class, $method] = explode('@', $callback);
+            }
 
+            if (is_string($callback) && str_contains($callback, '::')) {
+                [$class, $method] = explode('::', $callback);
+            }
+           
             $barrier = $this->config->get('dtm.barrier.apply', []);
 
             $businessCall = function () use ($handler, $request) {
