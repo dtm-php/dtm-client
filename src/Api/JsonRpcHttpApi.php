@@ -24,9 +24,9 @@ use Psr\Container\ContainerInterface;
 
 class JsonRpcHttpApi extends AbstractServiceClient implements ApiInterface
 {
-    protected $serviceName = 'dtmserver';
+    protected string $serviceName = 'dtmserver';
 
-    protected $protocol = 'jsonrpc-http';
+    protected string $protocol = 'jsonrpc-http';
 
     protected ConfigInterface $config;
 
