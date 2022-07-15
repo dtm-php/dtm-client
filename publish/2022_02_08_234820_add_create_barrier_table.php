@@ -1,9 +1,14 @@
 <?php
 
-use Hyperf\Database\Schema\Schema;
-use Hyperf\Database\Schema\Blueprint;
+declare(strict_types=1);
+/**
+ * This file is part of DTM-PHP.
+ *
+ * @license  https://github.com/dtm-php/dtm-client/blob/master/LICENSE
+ */
 use Hyperf\Database\Migrations\Migration;
-use Hyperf\DbConnection\Db;
+use Hyperf\Database\Schema\Blueprint;
+use Hyperf\Database\Schema\Schema;
 
 class AddCreateBarrierTable extends Migration
 {
@@ -24,7 +29,7 @@ class AddCreateBarrierTable extends Migration
             $table->dateTime('update_time')->useCurrent();
             $table->index('create_time');
             $table->index('update_time');
-            $table->unique(['gid', 'branch_id','op','barrier_id']);
+            $table->unique(['gid', 'branch_id', 'op', 'barrier_id']);
         });
     }
 

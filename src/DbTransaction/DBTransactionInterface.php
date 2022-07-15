@@ -17,4 +17,6 @@ interface DBTransactionInterface
     public function rollback();
 
     public function execInsert(string $sql, array $bindings): int;
+
+    public function execute(string $sql, array $bindings);
 }

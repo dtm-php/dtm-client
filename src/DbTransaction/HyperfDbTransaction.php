@@ -31,4 +31,9 @@ class HyperfDbTransaction implements DBTransactionInterface
     {
         return Db::affectingStatement($sql, $bindings);
     }
+
+    public function execute(string $sql, array $bindings): bool
+    {
+        return Db::statement($sql, $bindings);
+    }
 }

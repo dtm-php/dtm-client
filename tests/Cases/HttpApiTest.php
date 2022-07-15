@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace DtmClientTest\Cases;
 
 use DtmClient\Api\HttpApi;
-use DtmClient\Api\HttpApiFactory;
 use GuzzleHttp\Client;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Guzzle\ClientFactory;

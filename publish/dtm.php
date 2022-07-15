@@ -6,8 +6,8 @@ declare(strict_types=1);
  *
  * @license  https://github.com/dtm-php/dtm-client/blob/master/LICENSE
  */
-use DtmClient\Constants\Protocol;
 use DtmClient\Constants\DbType;
+use DtmClient\Constants\Protocol;
 
 return [
     'protocol' => Protocol::HTTP,
@@ -18,7 +18,7 @@ return [
     ],
     'barrier' => [
         'db' => [
-            'type' => DbType::MySQL
+            'type' => DbType::MySQL,
         ],
         'apply' => [],
     ],

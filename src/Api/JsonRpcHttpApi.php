@@ -10,6 +10,7 @@ namespace DtmClient\Api;
 
 use DtmClient\Constants\Protocol;
 use DtmClient\Constants\Result;
+use DtmClient\Constants\TransType;
 use DtmClient\Exception\FailureException;
 use DtmClient\Exception\OngingException;
 use DtmClient\Exception\RequestException;
@@ -96,14 +97,20 @@ class JsonRpcHttpApi extends AbstractServiceClient implements ApiInterface
     public function transRequestBranch(RequestBranch $requestBranch)
     {
         [$serviceName, $method] = $this->parseServiceNameAndMethod($requestBranch->url);
-        $response = $this->jsonRpcClientManager->getClient($serviceName)->send($method, [
+        $options = [
             'dtm' => $this->getServiceName(),
             'gid' => TransContext::getGid(),
             'branch_id' => $requestBranch->branchId,
             'trans_type' => TransContext::getTransType(),
             'op' => $requestBranch->op,
             'body' => $requestBranch->body,
-        ]);
+        ];
+
+        if (TransContext::getTransType() == TransType::XA) {
+            $options['phase2_url'] = $requestBranch->phase2Url;
+        }
+
+        $response = $this->jsonRpcClientManager->getClient($serviceName)->send($method, $options);
 
         if (Result::isOngoing($response)) {
             throw new OngingException();

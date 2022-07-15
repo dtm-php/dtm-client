@@ -36,4 +36,6 @@ class RequestBranch
     public string $jsonRpcServiceName = '';
 
     public array $jsonRpcServiceParams = [];
+
+    public string $phase2Url = '';
 }

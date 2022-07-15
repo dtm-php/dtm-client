@@ -31,4 +31,9 @@ class HyperfSimpleDbTransaction implements DBTransactionInterface
     {
         return DB::execute($sql, $bindings);
     }
+
+    public function execute(string $sql, array $bindings)
+    {
+        return DB::execute($sql, $bindings);
+    }
 }
