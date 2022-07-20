@@ -277,7 +277,7 @@ A separate component called a transaction manager (TM) assigns identifiers to tr
 
 The following figure illustrates the interfaces defined by the X/Open DTP model.
 
-<img src="https://en.dtm.pub/assets/xa-dtp.78622cb4.jpeg" height=428/>
+<img src="https://en.dtm.pub/assets/xa-dtp.78622cb4.jpeg" />
 
 XA is divided into two phases.
 
@@ -287,7 +287,7 @@ Phase 2 (commit/rollback): When the transaction manager (TM) receives that all p
 
 At present, almost all popular databases support XA transactions, including Mysql, Oracle, SqlServer, and Postgres
 
-<img src="https://en.dtm.pub/assets/xa_normal.ebc35054.jpg" height=600/>
+<img src="https://en.dtm.pub/assets/xa_normal.ebc35054.jpg" height=600 />
 
 ### Example code
 
