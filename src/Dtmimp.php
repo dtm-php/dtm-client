@@ -12,7 +12,7 @@ use DtmClient\Constants\Branch;
 use DtmClient\Constants\Operation;
 use DtmClient\DBSpecial\DBSpecialInterface;
 use DtmClient\DbTransaction\DBTransactionInterface;
-use DtmClient\Exception\XaTransactionException;
+use DtmClient\Exception\RuntimeException;
 
 class Dtmimp
 {
@@ -28,68 +28,54 @@ class Dtmimp
 
     /**
      * Handle the callback of commit/rollback.
-     * @throws XaTransactionException
      */
     public function xaHandlePhase2(string $gid, string $branchId, string $op): bool
     {
-        $this->DBTransaction->beginTransaction();
-        try {
-            $xaId = $gid . '-' . $branchId;
-            $sql = $this->DBSpecial->getXaSQL($op, $xaId);
-            if (! $this->DBTransaction->execute($sql, [])) {
-                throw new XaTransactionException(sprintf('xa %s does not exist', $xaId));
-            }
-
-            if ($op == Branch::BranchRollback) {
-                $sql = $this->DBSpecial->getInsertIgnoreTemplate('barrier (trans_type, gid, branch_id, op, barrier_id, reason) values(?,?,?,?,?,?)', 'uniq_barrier');
-                $result = $this->DBTransaction->execute($sql, [TransContext::getTransType(), $gid, $branchId, Operation::ACTION, '01', $op]);
-                if (! $result) {
-                    throw new XaTransactionException(sprintf($sql . ' error', $xaId));
-                }
-            }
-            $this->DBTransaction->commit();
-            return true;
-        } catch (\Throwable $throwable) {
-            $this->DBTransaction->rollback();
-            throw $throwable;
+        $xaId = $gid . '-' . $branchId;
+        $sql = $this->DBSpecial->getXaSQL($op, $xaId);
+        if (! $this->DBTransaction->execute($sql, [])) {
+            // Repeat commit/rollback with the same id, report this error, ignore
+            throw new RuntimeException(sprintf('xa %s does not exist', $xaId));
         }
+
+        if ($op == Branch::BranchRollback) {
+            // rollback insert a row after prepare. no-error means prepare has finished.
+            $sql = 'INSERT IGNOR INTO barrier (trans_type, gid, branch_id, op, barrier_id, reason) VALUES(?,?,?,?,?,?)';
+            $result = $this->DBTransaction->execInsert($sql, [TransContext::getTransType(), $gid, $branchId, Operation::ACTION, '01', $op]);
+            if (! $result) {
+                throw new RuntimeException(sprintf('xaId:%s rollback insert a row after prepare fail. ', $xaId));
+            }
+        }
+        return true;
     }
 
     /**
      * Public handler of LocalTransaction via http/grpc.
-     * @param mixed $callback
-     * @throws XaTransactionException
+     * @throws RuntimeException
      */
-    public function xaHandleLocalTrans($callback): void
+    public function xaHandleLocalTrans(callable $callback): void
     {
-        $this->DBTransaction->beginTransaction();
-        try {
-            $xaBranch = TransContext::getGid() . '-' . TransContext::getBranchId();
-            $sql = $this->DBSpecial->getXaSQL('start', $xaBranch);
-            if (! $this->DBTransaction->execute($sql, [])) {
-                throw new XaTransactionException($sql . ' execute error');
-            }
+        $xaBranch = TransContext::getGid() . '-' . TransContext::getBranchId();
+        $sql = $this->DBSpecial->getXaSQL('start', $xaBranch);
+        if (! $this->DBTransaction->execute($sql, [])) {
+            throw new RuntimeException($sql . ' execute error');
+        }
 
-            $sql = $this->DBSpecial->getInsertIgnoreTemplate('barrier (trans_type, gid, branch_id, op, barrier_id, reason) values(?,?,?,?,?,?)', 'uniq_barrier');
-            if (! $this->DBTransaction->execute($sql, [TransContext::getTransType(), TransContext::getGid(), TransContext::getBranchId(), Operation::ACTION, '01', Operation::ACTION])) {
-                throw new XaTransactionException($sql . ' execute error');
-            }
+        $sql  = 'INSERT IGNOR INTO barrier (trans_type, gid, branch_id, op, barrier_id, reason) VALUES(?,?,?,?,?,?)';
+        if (! $this->DBTransaction->execInsert($sql, [TransContext::getTransType(), TransContext::getGid(), TransContext::getBranchId(), Operation::ACTION, '01', Operation::ACTION])) {
+            throw new RuntimeException($sql . ' execute error');
+        }
 
-            $callback();
+        $callback();
 
-            $sql = $this->DBSpecial->getXaSQL('end', $xaBranch);
-            if (! $this->DBTransaction->execute($sql, [])) {
-                throw new XaTransactionException($sql . ' execute error');
-            }
+        $sql = $this->DBSpecial->getXaSQL('end', $xaBranch);
+        if (! $this->DBTransaction->execute($sql, [])) {
+            throw new RuntimeException($sql . ' execute error');
+        }
 
-            $sql = $this->DBSpecial->getXaSQL('prepare', $xaBranch);
-            if (! $this->DBTransaction->execute($sql, [])) {
-                throw new XaTransactionException($sql . ' execute error');
-            }
-            $this->DBTransaction->commit();
-        } catch (\Throwable $throwable) {
-            $this->DBTransaction->rollback();
-            throw $throwable;
+        $sql = $this->DBSpecial->getXaSQL('prepare', $xaBranch);
+        if (! $this->DBTransaction->execute($sql, [])) {
+            throw new RuntimeException($sql . ' execute error');
         }
     }
 

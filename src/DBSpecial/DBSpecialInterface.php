@@ -12,7 +12,5 @@ interface DBSpecialInterface
 {
     public function getPlaceHoldSQL(string $sql): string;
 
-    public function getInsertIgnoreTemplate(string $tableAndValues, string $pgConstraint): string;
-
     public function getXaSQL(string $command, string $xid): string;
 }
