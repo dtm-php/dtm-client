@@ -12,7 +12,7 @@ use DtmClient\Constants\Branch;
 use DtmClient\Constants\Operation;
 use DtmClient\DBSpecial\DBSpecialInterface;
 use DtmClient\DbTransaction\DBTransactionInterface;
-use DtmClient\Exception\XaTransactionException;
+use DtmClient\Exception\RuntimeException;
 
 class Dtmimp
 {
@@ -28,7 +28,6 @@ class Dtmimp
 
     /**
      * Handle the callback of commit/rollback.
-     * @throws XaTransactionException
      */
     public function xaHandlePhase2(string $gid, string $branchId, string $op): bool
     {
@@ -56,10 +55,9 @@ class Dtmimp
 
     /**
      * Public handler of LocalTransaction via http/grpc.
-     * @param mixed $callback
-     * @throws XaTransactionException
+     * @throws RuntimeException
      */
-    public function xaHandleLocalTrans($callback): void
+    public function xaHandleLocalTrans(callable $callback): void
     {
         try {
             $xaBranch = TransContext::getGid() . '-' . TransContext::getBranchId();

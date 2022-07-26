@@ -16,7 +16,6 @@ use DtmClient\Constants\Protocol;
 use DtmClient\Constants\TransType;
 use DtmClient\Exception\InvalidArgumentException;
 use DtmClient\Exception\UnsupportedException;
-use DtmClient\Exception\XaTransactionException;
 use Google\Protobuf\Internal\Message;
 
 class XA extends AbstractTransaction
@@ -37,10 +36,8 @@ class XA extends AbstractTransaction
 
     /**
      * start a xa local transaction.
-     * @param mixed $callback
-     * @throws XaTransactionException
      */
-    public function localTransaction($callback)
+    public function localTransaction(callable $callback)
     {
         if (TransContext::getOp() == Branch::BranchCommit || TransContext::getOp() == Branch::BranchRollback) {
             $this->dtmimp->xaHandlePhase2(TransContext::getGid(), TransContext::getBranchId(), TransContext::getOp());
@@ -79,7 +76,7 @@ class XA extends AbstractTransaction
      * @param null|mixed $rpcReply
      * @throws InvalidArgumentException
      */
-    public function callBranch(string $url, $body, $rpcReply = null)
+    public function callBranch(string $url, array|Message $body, array $rpcReply = null)
     {
         $subBranch = $this->branchIdGenerator->generateSubBranchId();
         switch ($this->api->getProtocol()) {
@@ -103,7 +100,7 @@ class XA extends AbstractTransaction
                 $branchRequest->url = $url;
                 $branchRequest->phase2Url = $url;
                 $branchRequest->op = Operation::ACTION;
-                $rpcReply && $branchRequest->grpcDeserialize = $rpcReply;
+                ! empty($rpcReply) && $branchRequest->grpcDeserialize = $rpcReply;
                 $branchRequest->grpcMetadata = [
                     'dtm-gid' => TransContext::getGid(),
                     'dtm-trans_type' => TransType::XA,
@@ -121,10 +118,9 @@ class XA extends AbstractTransaction
 
     /**
      * start a xa global transaction.
-     * @param $callback
      * @throws \Throwable
      */
-    public function globalTransaction($callback)
+    public function globalTransaction(callable $callback)
     {
         $this->init();
         $this->api->prepare(TransContext::toArray());

@@ -15,13 +15,8 @@ class MySqlDBSpecial implements DBSpecialInterface
         return $sql;
     }
 
-    public function getInsertIgnoreTemplate(string $tableAndValues, string $pgConstraint): string
-    {
-        return sprintf('insert ignore into %s', $tableAndValues);
-    }
-
     public function getXaSQL(string $command, string $xid): string
     {
-        return sprintf('XA %s \'%s\'', $command, $xid);
+        return sprintf("XA %s '%s'", $command, $xid);
     }
 }
