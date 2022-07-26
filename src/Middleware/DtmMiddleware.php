@@ -10,6 +10,7 @@ namespace DtmClient\Middleware;
 
 use DtmClient\Annotation\Barrier as BarrierAnnotation;
 use DtmClient\Barrier;
+use DtmClient\TransContext;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Di\Annotation\AnnotationCollector;
 use Hyperf\HttpServer\Router\Dispatched;
@@ -40,19 +41,22 @@ class DtmMiddleware implements MiddlewareInterface
         $gid = $queryParams['gid'] ?? null;
         $branchId = $queryParams['branch_id'] ?? null;
         $op = $queryParams['op'] ?? null;
+        $phase2Url = $queryParams['phase2_url'] ?? null;
         if ($transType && $gid && $branchId && $op) {
             $this->barrier->barrierFrom($transType, $gid, $branchId, $op);
         }
+        // use in XA
+        $phase2Url && TransContext::setPhase2URL($phase2Url);
 
         /** @var Dispatched $dispatched */
         $dispatched = $request->getAttribute(Dispatched::class);
         if ($dispatched instanceof Dispatched && ! empty($dispatched->handler->callback)) {
             $callback = $dispatched->handler->callback;
-            
+
             if (is_array($callback)) {
                 [$class, $method] = $callback;
             }
-            
+
             if (is_string($callback) && str_contains($callback, '@')) {
                 [$class, $method] = explode('@', $callback);
             }
@@ -60,7 +64,7 @@ class DtmMiddleware implements MiddlewareInterface
             if (is_string($callback) && str_contains($callback, '::')) {
                 [$class, $method] = explode('::', $callback);
             }
-           
+
             $barrier = $this->config->get('dtm.barrier.apply', []);
 
             $businessCall = function () use ($handler, $request) {

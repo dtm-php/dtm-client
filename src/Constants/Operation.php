@@ -27,4 +27,6 @@ class Operation
     public const BRANCH_CANCEL = 'cancel';
 
     public const BRANCH_COMPENSATE = 'compensate';
+
+    public const ACTION = 'action';
 }

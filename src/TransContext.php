@@ -60,6 +60,8 @@ class TransContext extends Context
      */
     private static string $queryPrepared;
 
+    private static string $phase2URL = '';
+
     public static function toArray(): array
     {
         $data = self::getContainer();
@@ -87,6 +89,16 @@ class TransContext extends Context
     public static function setGid(string $gid)
     {
         static::set(static::class . '.gid', $gid);
+    }
+
+    public static function getPhase2URL(): string
+    {
+        return static::get(static::class . '.phase2_url', '');
+    }
+
+    public static function setPhase2URL(string $phase2URL)
+    {
+        static::set(static::class . '.phase2_url', $phase2URL);
     }
 
     public static function getTransType(): string

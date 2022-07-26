@@ -79,7 +79,7 @@ class GrpcApi implements ApiInterface
     {
         [$hostname, $method] = $this->parseHostnameAndMethod($requestBranch->url);
         $client = $this->grpcClientManager->getClient($hostname);
-        $client->invoke($method, $requestBranch->grpcArgument, $requestBranch->grpcDeserialize, $requestBranch->grpcMetadata, $requestBranch->grpcOptions);
+        return $client->invoke($method, $requestBranch->grpcArgument, $requestBranch->grpcDeserialize, $requestBranch->grpcMetadata, $requestBranch->grpcOptions);
     }
 
     protected function transferToRequest(array $body): DtmRequest

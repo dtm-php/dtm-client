@@ -11,6 +11,7 @@ namespace DtmClient\Api;
 use DtmClient\Constants\Operation;
 use DtmClient\Constants\Protocol;
 use DtmClient\Constants\Result;
+use DtmClient\Constants\TransType;
 use DtmClient\Exception\FailureException;
 use DtmClient\Exception\GenerateException;
 use DtmClient\Exception\OngingException;
@@ -36,6 +37,11 @@ class HttpApi implements ApiInterface
     public function getProtocol(): string
     {
         return Protocol::HTTP;
+    }
+
+    public function getProtocolHead(): string
+    {
+        return $this->getProtocol() . '://';
     }
 
     public function generateGid(): string
@@ -92,8 +98,8 @@ class HttpApi implements ApiInterface
 
     public function transRequestBranch(RequestBranch $requestBranch)
     {
-        $dtm = $this->config->get('dtm.server', '127.0.0.1') . ':' . $this->config->get('dtm.port.http', 36789) . '/api/dtmsvr';
-        $response = $this->client->request($requestBranch->method, $requestBranch->url, [
+        $dtm = $this->getProtocolHead() . $this->config->get('dtm.server', '127.0.0.1') . ':' . $this->config->get('dtm.port.http', 36789) . '/api/dtmsvr';
+        $options = [
             RequestOptions::QUERY => [
                 'dtm' => $dtm,
                 'gid' => TransContext::getGid(),
@@ -103,7 +109,13 @@ class HttpApi implements ApiInterface
             ],
             RequestOptions::JSON => $requestBranch->body,
             RequestOptions::HEADERS => $requestBranch->branchHeaders,
-        ]);
+        ];
+
+        if (TransContext::getTransType() == TransType::XA) {
+            $options[RequestOptions::QUERY]['phase2_url'] = $requestBranch->phase2Url;
+        }
+
+        $response = $this->client->request($requestBranch->method, $requestBranch->url, $options);
 
         if (Result::isOngoing($response)) {
             throw new OngingException();
