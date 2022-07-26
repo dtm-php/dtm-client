@@ -30,12 +30,7 @@ class LaravelDbTransaction implements DBTransactionInterface
         Db::rollback();
     }
 
-    public function execInsert(string $sql, array $bindings): int
-    {
-        return Db::affectingStatement($sql, $bindings);
-    }
-
-    public function execute(string $sql, array $bindings, string $pool = 'default', bool $isXa = false): bool
+    public function execInsert(string $sql, array $bindings, string $pool = 'default', bool $isXa = false): int
     {
         $db = Db::connection($pool);
         if ($isXa) {
@@ -44,6 +39,23 @@ class LaravelDbTransaction implements DBTransactionInterface
             $pdo->setAttribute(0, 'autocommit');
             $db->setPdo($pdo);
         }
-        return $db->statement($sql, $bindings);
+        return $db->affectingStatement($sql, $bindings);
+    }
+
+    public function execute(string $sql, array $bindings, string $pool = 'default', bool $isXa = false): bool
+    {
+        return self::connection($pool, $isXa)->statement($sql, $bindings);
+    }
+
+    public static function connection(string $pool = 'default', bool $isXa = false)
+    {
+        $db = Db::connection($pool);
+        if ($isXa) {
+            /** @var \PDO $pdo */
+            $pdo = $db->getPdo();
+            $pdo->setAttribute(0, 'autocommit');
+            $db->setPdo($pdo);
+        }
+        return $db;
     }
 }

@@ -72,7 +72,6 @@ class XA extends AbstractTransaction
     }
 
     /**
-     * @param array|Message $body
      * @param null|mixed $rpcReply
      * @throws InvalidArgumentException
      */

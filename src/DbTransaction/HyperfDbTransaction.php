@@ -27,12 +27,17 @@ class HyperfDbTransaction implements DBTransactionInterface
         Db::rollback();
     }
 
-    public function execInsert(string $sql, array $bindings): int
+    public function execInsert(string $sql, array $bindings, string $pool = 'default', bool $isXa = false): int
     {
-        return Db::affectingStatement($sql, $bindings);
+        return self::connection($pool, $isXa)->affectingStatement($sql, $bindings);
     }
 
     public function execute(string $sql, array $bindings, string $pool = 'default', bool $isXa = false): bool
+    {
+        return self::connection($pool, $isXa)->statement($sql, $bindings);
+    }
+
+    public static function connection(string $pool = 'default', bool $isXa = false)
     {
         $db = Db::connection($pool);
         if ($isXa) {
@@ -41,6 +46,6 @@ class HyperfDbTransaction implements DBTransactionInterface
             $pdo->setAttribute(0, 'autocommit');
             $db->setPdo($pdo);
         }
-        return $db->statement($sql, $bindings);
+        return $db;
     }
 }

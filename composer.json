@@ -23,11 +23,7 @@
         "php": ">=8.0",
         "ext-json": "*",
         "hyperf/context": "^2.2|^3.0",
-        "hyperf/database": "^2.2",
-        "hyperf/db": "^2.2",
-        "hyperf/db-connection": "^2.2",
         "hyperf/guzzle": "^2.2|^3.0",
-        "illuminate/database": "^9.21",
         "psr/http-server-middleware": "^1.0"
     },
     "require-dev": {
