@@ -32,8 +32,15 @@ class HyperfSimpleDbTransaction implements DBTransactionInterface
         return DB::execute($sql, $bindings);
     }
 
-    public function execute(string $sql, array $bindings)
+    public function execute(string $sql, array $bindings, string $pool = 'default', bool $isXa = false)
     {
-        return DB::execute($sql, $bindings);
+        $db = Db::connection($pool);
+        if ($isXa) {
+            /** @var \PDO $pdo */
+            $pdo = $db->getPdo();
+            $pdo->setAttribute(0, 'autocommit');
+            $db->setPdo($pdo);
+        }
+        return $db->execute($sql, $bindings);
     }
 }

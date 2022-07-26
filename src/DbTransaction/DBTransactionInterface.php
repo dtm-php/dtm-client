@@ -18,5 +18,5 @@ interface DBTransactionInterface
 
     public function execInsert(string $sql, array $bindings): int;
 
-    public function execute(string $sql, array $bindings);
+    public function execute(string $sql, array $bindings,  string $pool = 'default', bool $isXa = false);
 }

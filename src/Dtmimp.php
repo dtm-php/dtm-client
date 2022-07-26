@@ -32,17 +32,16 @@ class Dtmimp
      */
     public function xaHandlePhase2(string $gid, string $branchId, string $op): bool
     {
-        $this->DBTransaction->beginTransaction();
         try {
             $xaId = $gid . '-' . $branchId;
             $sql = $this->DBSpecial->getXaSQL($op, $xaId);
-            if (! $this->DBTransaction->execute($sql, [])) {
+            if (! $this->DBTransaction->execute($sql, [], 'default', true)) {
                 throw new XaTransactionException(sprintf('xa %s does not exist', $xaId));
             }
 
             if ($op == Branch::BranchRollback) {
                 $sql = $this->DBSpecial->getInsertIgnoreTemplate('barrier (trans_type, gid, branch_id, op, barrier_id, reason) values(?,?,?,?,?,?)', 'uniq_barrier');
-                $result = $this->DBTransaction->execute($sql, [TransContext::getTransType(), $gid, $branchId, Operation::ACTION, '01', $op]);
+                $result = $this->DBTransaction->execute($sql, [TransContext::getTransType(), $gid, $branchId, Operation::ACTION, '01', $op], 'default', true);
                 if (! $result) {
                     throw new XaTransactionException(sprintf($sql . ' error', $xaId));
                 }
@@ -62,28 +61,27 @@ class Dtmimp
      */
     public function xaHandleLocalTrans($callback): void
     {
-        $this->DBTransaction->beginTransaction();
         try {
             $xaBranch = TransContext::getGid() . '-' . TransContext::getBranchId();
             $sql = $this->DBSpecial->getXaSQL('start', $xaBranch);
-            if (! $this->DBTransaction->execute($sql, [])) {
+            if (! $this->DBTransaction->execute($sql, [], 'default', true)) {
                 throw new XaTransactionException($sql . ' execute error');
             }
 
             $sql = $this->DBSpecial->getInsertIgnoreTemplate('barrier (trans_type, gid, branch_id, op, barrier_id, reason) values(?,?,?,?,?,?)', 'uniq_barrier');
-            if (! $this->DBTransaction->execute($sql, [TransContext::getTransType(), TransContext::getGid(), TransContext::getBranchId(), Operation::ACTION, '01', Operation::ACTION])) {
+            if (! $this->DBTransaction->execute($sql, [TransContext::getTransType(), TransContext::getGid(), TransContext::getBranchId(), Operation::ACTION, '01', Operation::ACTION], 'default', true)) {
                 throw new XaTransactionException($sql . ' execute error');
             }
 
             $callback();
 
             $sql = $this->DBSpecial->getXaSQL('end', $xaBranch);
-            if (! $this->DBTransaction->execute($sql, [])) {
+            if (! $this->DBTransaction->execute($sql, [], 'default', true)) {
                 throw new XaTransactionException($sql . ' execute error');
             }
 
             $sql = $this->DBSpecial->getXaSQL('prepare', $xaBranch);
-            if (! $this->DBTransaction->execute($sql, [])) {
+            if (! $this->DBTransaction->execute($sql, [], 'default', true)) {
                 throw new XaTransactionException($sql . ' execute error');
             }
             $this->DBTransaction->commit();

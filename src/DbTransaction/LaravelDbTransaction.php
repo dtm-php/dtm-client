@@ -35,8 +35,15 @@ class LaravelDbTransaction implements DBTransactionInterface
         return Db::affectingStatement($sql, $bindings);
     }
 
-    public function execute(string $sql, array $bindings): bool
+    public function execute(string $sql, array $bindings, string $pool = 'default', bool $isXa = false): bool
     {
-        return Db::statement($sql, $bindings);
+        $db = Db::connection($pool);
+        if ($isXa) {
+            /** @var \PDO $pdo */
+            $pdo = $db->getPdo();
+            $pdo->setAttribute(0, 'autocommit');
+            $db->setPdo($pdo);
+        }
+        return $db->statement($sql, $bindings);
     }
 }
