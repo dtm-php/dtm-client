@@ -16,9 +16,5 @@ interface DBTransactionInterface
 
     public function rollback();
 
-    public function execInsert(string $sql, array $bindings, string $pool = 'default', bool $isXa = false): int;
-
-    public function execute(string $sql, array $bindings, string $pool = 'default', bool $isXa = false);
-
-    public static function connection(string $pool = 'default', bool $isXa = false);
+    public function execInsert(string $sql, array $bindings): int;
 }

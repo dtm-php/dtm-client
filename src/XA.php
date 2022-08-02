@@ -17,6 +17,7 @@ use DtmClient\Constants\TransType;
 use DtmClient\Exception\InvalidArgumentException;
 use DtmClient\Exception\UnsupportedException;
 use Google\Protobuf\Internal\Message;
+use PDO;
 
 class XA extends AbstractTransaction
 {
@@ -37,14 +38,14 @@ class XA extends AbstractTransaction
     /**
      * start a xa local transaction.
      */
-    public function localTransaction(callable $callback)
+    public function localTransaction(PDO $pdo, callable $callback): void
     {
         if (TransContext::getOp() == Branch::BranchCommit || TransContext::getOp() == Branch::BranchRollback) {
-            $this->dtmimp->xaHandlePhase2(TransContext::getGid(), TransContext::getBranchId(), TransContext::getOp());
+            $this->dtmimp->xaHandlePhase2($pdo, TransContext::getGid(), TransContext::getBranchId(), TransContext::getOp());
             return;
         }
 
-        $this->dtmimp->xaHandleLocalTrans(function () use ($callback) {
+        $this->dtmimp->xaHandleLocalTrans($pdo, function () use ($callback) {
             $callback();
             switch ($this->api->getProtocol()) {
                 case Protocol::GRPC:

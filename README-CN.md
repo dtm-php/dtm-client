@@ -285,10 +285,21 @@ XA一共分为两阶段：
 以下展示在 Hyperf 框架中的使用方法，其它框架类似
 ```php
 <?php
+
+declare(strict_types=1);
+/**
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ */
 namespace App\Controller;
 
 use DtmClient\TransContext;
 use DtmClient\XA;
+use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\GetMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
@@ -309,7 +320,7 @@ class XaController
         $this->xa->globalTransaction(function () use ($payload) {
             // 调用子事物接口
             $respone = $this->xa->callBranch($this->serviceUri . '/api/transIn', $payload);
-            // XA http模式下获取子事物响应结果
+            // XA http模式下获取子事物返回结构
             /* @var ResponseInterface $respone */
             $respone->getBody()->getContents();
             // 调用子事物接口
@@ -324,9 +335,16 @@ class XaController
     {
         // 模拟分布式系统下transIn方法
         // 子事物处理
-        $this->xa->localTransaction(function () {
-            // 本地事物处理
-        });
+        $pdo = Db::connection('default')->getPdo();
+        $pdo->setAttribute(0, 'autocommit');
+        try {
+            $this->xa->localTransaction($pdo, function () {
+                // TODO pdo
+                // 请使用pdo处理本地Mysql事物
+            });
+        } finally {
+            $pdo->setAttribute(1, 'autocommit');
+        }
 
         return ['status' => 0, 'message' => 'ok'];
     }
@@ -336,9 +354,17 @@ class XaController
     {
         // 模拟分布式系统下transOut方法
         // 子事物处理
-        $this->xa->localTransaction(function () {
-            // 本地事物处理
-        });
+        $pdo = Db::connection('default')->getPdo();
+        $pdo->setAttribute(0, 'autocommit');
+        try {
+            $this->xa->localTransaction($pdo, function () {
+                // TODO pdo
+                // 请使用pdo处理本地Mysql事物
+            });
+        } finally {
+            $pdo->setAttribute(1, 'autocommit');
+        }
+
 
         return ['status' => 0, 'message' => 'ok'];
     }

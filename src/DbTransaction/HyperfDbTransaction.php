@@ -27,25 +27,8 @@ class HyperfDbTransaction implements DBTransactionInterface
         Db::rollback();
     }
 
-    public function execInsert(string $sql, array $bindings, string $pool = 'default', bool $isXa = false): int
+    public function execInsert(string $sql, array $bindings): int
     {
-        return self::connection($pool, $isXa)->affectingStatement($sql, $bindings);
-    }
-
-    public function execute(string $sql, array $bindings, string $pool = 'default', bool $isXa = false): bool
-    {
-        return self::connection($pool, $isXa)->statement($sql, $bindings);
-    }
-
-    public static function connection(string $pool = 'default', bool $isXa = false)
-    {
-        $db = Db::connection($pool);
-        if ($isXa) {
-            /** @var \PDO $pdo */
-            $pdo = $db->getPdo();
-            $pdo->setAttribute(0, 'autocommit');
-            $db->setPdo($pdo);
-        }
-        return $db;
+        return Db::affectingStatement($sql, $bindings);
     }
 }
