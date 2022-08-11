@@ -335,12 +335,10 @@ class XaController
     {
         // 模拟分布式系统下transIn方法
         // 子事物处理
-        $pdo = Db::connection('default')->getPdo();
         $pdo->setAttribute(0, 'autocommit');
         try {
-            $this->xa->localTransaction($pdo, function () {
-                // TODO pdo
-                // 请使用pdo处理本地Mysql事物
+            $this->xa->localTransaction(function () {
+                // 请使用 DBTransactionInterface 处理本地 Mysql 事物
             });
         } finally {
             $pdo->setAttribute(1, 'autocommit');
@@ -354,12 +352,10 @@ class XaController
     {
         // 模拟分布式系统下transOut方法
         // 子事物处理
-        $pdo = Db::connection('default')->getPdo();
         $pdo->setAttribute(0, 'autocommit');
         try {
             $this->xa->localTransaction($pdo, function () {
-                // TODO pdo
-                // 请使用pdo处理本地Mysql事物
+                // 请使用 DBTransactionInterface 处理本地 Mysql 事物
             });
         } finally {
             $pdo->setAttribute(1, 'autocommit');

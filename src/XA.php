@@ -14,6 +14,7 @@ use DtmClient\Constants\Branch;
 use DtmClient\Constants\Operation;
 use DtmClient\Constants\Protocol;
 use DtmClient\Constants\TransType;
+use DtmClient\DbTransaction\DBTransactionInterface;
 use DtmClient\Exception\InvalidArgumentException;
 use DtmClient\Exception\UnsupportedException;
 use Google\Protobuf\Internal\Message;
@@ -25,27 +26,30 @@ class XA extends AbstractTransaction
 
     protected BranchIdGeneratorInterface $branchIdGenerator;
 
-    protected Dtmimp $dtmimp;
+    protected DtmImp $dtmimp;
 
-    public function __construct(ApiInterface $api, Barrier $barrier, BranchIdGeneratorInterface $branchIdGenerator, Dtmimp $dtmimp)
+    protected DBTransactionInterface $dbTransaction;
+
+    public function __construct(ApiInterface $api, Barrier $barrier, BranchIdGeneratorInterface $branchIdGenerator, DtmImp $dtmImp, DBTransactionInterface $dbTransaction)
     {
         $this->api = $api;
         $this->barrier = $barrier;
         $this->branchIdGenerator = $branchIdGenerator;
-        $this->dtmimp = $dtmimp;
+        $this->dtmimp = $dtmImp;
+        $this->dbTransaction = $dbTransaction;
     }
 
     /**
      * start a xa local transaction.
      */
-    public function localTransaction(PDO $pdo, callable $callback): void
+    public function localTransaction(callable $callback): void
     {
         if (TransContext::getOp() == Branch::BranchCommit || TransContext::getOp() == Branch::BranchRollback) {
-            $this->dtmimp->xaHandlePhase2($pdo, TransContext::getGid(), TransContext::getBranchId(), TransContext::getOp());
+            $this->dtmimp->xaHandlePhase2(TransContext::getGid(), TransContext::getBranchId(), TransContext::getOp());
             return;
         }
 
-        $this->dtmimp->xaHandleLocalTrans($pdo, function () use ($callback) {
+        $this->dtmimp->xaHandleLocalTrans(function () use ($callback) {
             $callback();
             switch ($this->api->getProtocol()) {
                 case Protocol::GRPC:

@@ -75,7 +75,7 @@ class MySqlBarrier implements BarrierInterface
             return 0;
         }
 
-        return $this->DBTransaction->execInsert(
+        return $this->DBTransaction->execute(
             'INSERT IGNORE INTO `barrier` (trans_type, gid, branch_id, op, barrier_id, reason) values(?,?,?,?,?,?)',
             [$transType, $gid, $branchId, $op, $barrierID, $reason]
         );

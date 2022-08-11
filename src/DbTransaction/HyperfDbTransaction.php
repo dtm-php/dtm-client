@@ -27,8 +27,13 @@ class HyperfDbTransaction implements DBTransactionInterface
         Db::rollback();
     }
 
-    public function execInsert(string $sql, array $bindings): int
+    public function execute(string $sql, array $bindings = [])
     {
         return Db::affectingStatement($sql, $bindings);
+    }
+
+    public function query(string $sql, array $bindings = [])
+    {
+        return Db::select($sql, $bindings);
     }
 }

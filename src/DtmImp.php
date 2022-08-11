@@ -11,36 +11,40 @@ namespace DtmClient;
 use DtmClient\Constants\Branch;
 use DtmClient\Constants\Operation;
 use DtmClient\DBSpecial\DBSpecialInterface;
+use DtmClient\DbTransaction\DBTransactionInterface;
 use DtmClient\Exception\RuntimeException;
 use PDO;
 use Throwable;
 
-class Dtmimp
+class DtmImp
 {
     protected DBSpecialInterface $DBSpecial;
 
-    public function __construct(DBSpecialInterface $DBSpecial)
+    protected DBTransactionInterface $dbTransaction;
+
+    public function __construct(DBSpecialInterface $DBSpecial, DBTransactionInterface $dbTransaction)
     {
         $this->DBSpecial = $DBSpecial;
+        $this->dbTransaction = $dbTransaction;
     }
 
     /**
      * Handle the callback of commit/rollback.
      */
-    public function xaHandlePhase2(PDO $pdo, string $gid, string $branchId, string $op): bool
+    public function xaHandlePhase2(string $gid, string $branchId, string $op): bool
     {
         try {
             $xaId = $gid . '-' . $branchId;
             if ($op == Branch::BranchRollback) {
-                $sql = "INSERT IGNORE INTO barrier (trans_type, gid, branch_id, op, barrier_id, reason) VALUES('%s','%s','%s','%s','%s','%s')";
-                $result = $pdo->exec(sprintf($sql, TransContext::getTransType(), $gid, $branchId, Operation::ACTION, '01', $op));
-                if ($result === false || ! $pdo->commit()) {
+                $sql = 'INSERT IGNORE INTO barrier (trans_type, gid, branch_id, op, barrier_id, reason) VALUES(?,?,?,?,?,?)';
+                $result = $this->dbTransaction->execute($sql, [TransContext::getTransType(), $gid, $branchId, Operation::ACTION, '01', $op]);
+                if (! $result || ! $this->dbTransaction->commit()) {
                     throw new RuntimeException(sprintf($sql . ' error', $xaId));
                 }
             }
 
             $sql = $this->DBSpecial->getXaSQL($op, $xaId);
-            if ($pdo->exec($sql) === false) {
+            if (! $this->dbTransaction->execute($sql)) {
                 throw new RuntimeException(sprintf('xa %s does not exist', $xaId));
             }
             return true;
@@ -53,31 +57,30 @@ class Dtmimp
      * Public handler of LocalTransaction via http/grpc.
      * @throws RuntimeException
      */
-    public function xaHandleLocalTrans(PDO $pdo, callable $callback): void
+    public function xaHandleLocalTrans(callable $callback): void
     {
         try {
             $xaBranch = TransContext::getGid() . '-' . TransContext::getBranchId();
             $sql = $this->DBSpecial->getXaSQL('start', $xaBranch);
-            if ($pdo->exec($sql) === false) {
+            if (! $this->dbTransaction->execute($sql)) {
                 throw new RuntimeException($sql . ' execute error');
             }
 
-            $sql = "INSERT IGNORE INTO barrier (trans_type, gid, branch_id, op, barrier_id, reason) VALUES('%s','%s','%s','%s','%s','%s')";
-            $sql = sprintf($sql, TransContext::getTransType(), TransContext::getGid(), TransContext::getBranchId(), Operation::ACTION, '01', Operation::ACTION);
-            $result = $pdo->exec($sql);
-            if ($result === false) {
+            $sql = 'INSERT IGNORE INTO barrier (trans_type, gid, branch_id, op, barrier_id, reason) VALUES(?,?,?,?,?,?)';
+            $result = $this->dbTransaction->execute($sql, [TransContext::getTransType(), TransContext::getGid(), TransContext::getBranchId(), Operation::ACTION, '01', Operation::ACTION]);
+            if (! $result) {
                 throw new RuntimeException($sql . ' execute error');
             }
 
             $callback();
 
             $sql = $this->DBSpecial->getXaSQL('end', $xaBranch);
-            if ($pdo->exec($sql) === false) {
+            if (! $this->dbTransaction->execute($sql)) {
                 throw new RuntimeException($sql . ' execute error');
             }
 
             $sql = $this->DBSpecial->getXaSQL('prepare', $xaBranch);
-            if ($pdo->exec($sql) === false) {
+            if (! $this->dbTransaction->execute($sql)) {
                 throw new RuntimeException($sql . ' execute error');
             }
         } catch (\Throwable $throwable) {

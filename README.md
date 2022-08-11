@@ -334,12 +334,10 @@ class XaController
     {
         // The transIn method under the simulated distributed system
         // Sub-transaction processing
-        $pdo = Db::connection('default')->getPdo();
         $pdo->setAttribute(0, 'autocommit');
         try {
             $this->xa->localTransaction($pdo, function () {
-                // TODO pdo
-                // Please use pdo to handle local Mysql things
+                // Please use DBTransactionInterface to handle local Mysql things
             });
         } finally {
             $pdo->setAttribute(1, 'autocommit');
@@ -353,12 +351,10 @@ class XaController
     {
         // The transOut method under the simulated distributed system
         // Sub-transaction processing
-        $pdo = Db::connection('default')->getPdo();
         $pdo->setAttribute(0, 'autocommit');
         try {
             $this->xa->localTransaction($pdo, function () {
-                // TODO pdo
-                // Please use pdo to handle local Mysql things
+                // Please use DBTransactionInterface to handle local Mysql things
             });
         } finally {
             $pdo->setAttribute(1, 'autocommit');
