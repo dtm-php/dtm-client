@@ -8,10 +8,19 @@ declare(strict_types=1);
  */
 namespace DtmClient\DbTransaction;
 
+use Hyperf\Context\Context;
+use Hyperf\Contract\ConfigInterface;
 use Hyperf\DbConnection\Db;
+use Hyperf\Utils\ApplicationContext;
+use PDO;
 
-class HyperfDbTransaction implements DBTransactionInterface
+class HyperfDbTransaction extends AbstractTransaction
 {
+    public function __construct(ConfigInterface $config)
+    {
+        $this->config = $config->get('dtm.database');
+    }
+
     public function beginTransaction()
     {
         Db::beginTransaction();
@@ -27,13 +36,4 @@ class HyperfDbTransaction implements DBTransactionInterface
         Db::rollback();
     }
 
-    public function execute(string $sql, array $bindings = [])
-    {
-        return Db::affectingStatement($sql, $bindings);
-    }
-
-    public function query(string $sql, array $bindings = [])
-    {
-        return Db::select($sql, $bindings);
-    }
 }

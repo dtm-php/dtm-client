@@ -50,7 +50,7 @@ class XA extends AbstractTransaction
         }
 
         $this->dtmimp->xaHandleLocalTrans(function () use ($callback) {
-            $callback();
+            $callback($this->dbTransaction);
             switch ($this->api->getProtocol()) {
                 case Protocol::GRPC:
                     $body = [
@@ -124,17 +124,25 @@ class XA extends AbstractTransaction
      * start a xa global transaction.
      * @throws \Throwable
      */
-    public function globalTransaction(callable $callback)
+    public function globalTransaction(string $gid, callable $callback)
     {
-        $this->init();
+        var_dump('start globalTransaction');
+        $this->init($gid);
+        var_dump('prepare start');
         $this->api->prepare(TransContext::toArray());
+        var_dump('prepare end');
         try {
             $callback();
+            var_dump('start submit');
             $this->api->submit(TransContext::toArray());
+            var_dump('end submit');
         } catch (\Throwable $throwable) {
+            var_dump('start abort');
             $this->api->abort(TransContext::toArray());
+            var_dump('end abort');
             throw $throwable;
         }
+        var_dump('end');
     }
 
     protected function init(?string $gid = null)

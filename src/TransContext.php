@@ -60,6 +60,9 @@ class TransContext extends Context
      */
     private static string $queryPrepared;
 
+    /**
+     * Use in XA.
+     */
     private static string $phase2URL = '';
 
     public static function toArray(): array

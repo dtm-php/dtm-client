@@ -12,5 +12,5 @@ interface DBSpecialInterface
 {
     public function getPlaceHoldSQL(string $sql): string;
 
-    public function getXaSQL(string $command, string $xid): string;
+    public function getXaSQL(string $command, string $xaId): string;
 }

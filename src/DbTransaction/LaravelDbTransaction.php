@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 /**
  * The LaravelDbTransaction use in laravel framework.
  */
-class LaravelDbTransaction implements DBTransactionInterface
+class LaravelDbTransaction  extends AbstractTransaction
 {
     public function beginTransaction()
     {
@@ -28,15 +28,5 @@ class LaravelDbTransaction implements DBTransactionInterface
     public function rollback()
     {
         Db::rollback();
-    }
-
-    public function execute(string $sql, array $bindings = [])
-    {
-        return Db::affectingStatement($sql, $bindings);
-    }
-
-    public function query(string $sql, array $bindings = [])
-    {
-        return Db::select($sql, $bindings);
     }
 }
