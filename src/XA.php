@@ -18,7 +18,6 @@ use DtmClient\DbTransaction\DBTransactionInterface;
 use DtmClient\Exception\InvalidArgumentException;
 use DtmClient\Exception\UnsupportedException;
 use Google\Protobuf\Internal\Message;
-use PDO;
 
 class XA extends AbstractTransaction
 {

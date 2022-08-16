@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 /**
  * The LaravelDbTransaction use in laravel framework.
  */
-class LaravelDbTransaction  extends AbstractTransaction
+class LaravelDbTransaction extends AbstractTransaction
 {
     public function beginTransaction()
     {

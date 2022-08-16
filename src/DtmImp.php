@@ -47,12 +47,10 @@ class DtmImp
 
             if ($op == Branch::BranchRollback) {
                 // rollback insert a row after prepare. no-error means prepare has finished.
-                $sql = 'INSERT IGNORE INTO barrier (trans_type, gid, branch_id, op, barrier_id, reason) VALUES(?,?,?,?,?,?)';
-                $result = $this->dbTransaction->xaExecute($sql, [TransContext::getTransType(), $gid, $branchId, Operation::ACTION, '01', $op]);
-                if (! $result) {
-                    // Repeat commit/rollback with the same id, report this error, ignore
-                    throw new RuntimeException(sprintf($sql . ' error', $xaId));
-                }
+                $this->dbTransaction->xaExecute(
+                    'INSERT IGNORE INTO barrier (trans_type, gid, branch_id, op, barrier_id, reason) VALUES(?,?,?,?,?,?)',
+                    [TransContext::getTransType(), $gid, $branchId, Operation::ACTION, '01', $op]
+                );
             }
 
             return true;

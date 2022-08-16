@@ -9,10 +9,7 @@ declare(strict_types=1);
 namespace DtmClient\DbTransaction;
 
 use DtmClient\Config\DatabaseConfigInterface;
-use Hyperf\Context\Context;
 use Hyperf\DbConnection\Db;
-use Hyperf\Utils\ApplicationContext;
-use PDO;
 
 class HyperfDbTransaction extends AbstractTransaction
 {
@@ -35,5 +32,4 @@ class HyperfDbTransaction extends AbstractTransaction
     {
         Db::rollback();
     }
-
 }

@@ -1,5 +1,11 @@
 <?php
 
+declare(strict_types=1);
+/**
+ * This file is part of DTM-PHP.
+ *
+ * @license  https://github.com/dtm-php/dtm-client/blob/master/LICENSE
+ */
 namespace DtmClient\DbTransaction;
 
 use DtmClient\Config\DatabaseConfigInterface;
@@ -12,6 +18,44 @@ use PDOStatement;
 abstract class AbstractTransaction implements DBTransactionInterface
 {
     protected ?DatabaseConfigInterface $databaseConfig = null;
+
+    /**
+     * Code from https://github.com/hyperf/db/blob/master/src/PDOConnection.php.
+     */
+    public function xaExecute(string $sql, array $bindings = []): int
+    {
+        $statement = $this->connect()->prepare($sql);
+
+        $this->bindValues($statement, $bindings);
+
+        $statement->execute();
+
+        return $statement->rowCount();
+    }
+
+    /**
+     * Code from https://github.com/hyperf/db/blob/master/src/PDOConnection.php.
+     */
+    public function xaQuery(string $sql, array $bindings = []): bool|array
+    {
+        // For select statements, we'll simply execute the query and return an array
+        // of the database result set. Each element in the array will be a single
+        // row from the database table, and will either be an array or objects.
+        $statement = $this->connect()->prepare($sql);
+
+        $this->bindValues($statement, $bindings);
+
+        $statement->execute();
+
+        $fetchMode = $this->databaseConfig['fetch_mode'];
+
+        return $statement->fetchAll($fetchMode);
+    }
+
+    public function xaExec(string $sql): int|false
+    {
+        return $this->connect()->exec($sql);
+    }
 
     protected function connect(): PDO
     {
@@ -42,46 +86,8 @@ abstract class AbstractTransaction implements DBTransactionInterface
     }
 
     /**
-     * Code from https://github.com/hyperf/db/blob/master/src/PDOConnection.php
-     */
-    public function xaExecute(string $sql, array $bindings = []): int
-    {
-        $statement = $this->connect()->prepare($sql);
-
-        $this->bindValues($statement, $bindings);
-
-        $statement->execute();
-
-        return $statement->rowCount();
-    }
-
-    /**
-     * Code from https://github.com/hyperf/db/blob/master/src/PDOConnection.php
-     */
-    public function xaQuery(string $sql, array $bindings = []): bool|array
-    {
-        // For select statements, we'll simply execute the query and return an array
-        // of the database result set. Each element in the array will be a single
-        // row from the database table, and will either be an array or objects.
-        $statement = $this->connect()->prepare($sql);
-
-        $this->bindValues($statement, $bindings);
-
-        $statement->execute();
-
-        $fetchMode = $this->databaseConfig['fetch_mode'];
-
-        return $statement->fetchAll($fetchMode);
-    }
-    
-    public function xaExec(string $sql): int|false
-    {
-        return $this->connect()->exec($sql);
-    }
-
-    /**
      * Build the DSN string for a host / port configuration.
-     * Code from https://github.com/hyperf/db/blob/master/src/PDOConnection.php
+     * Code from https://github.com/hyperf/db/blob/master/src/PDOConnection.php.
      */
     protected function buildDsn(): string
     {
@@ -93,7 +99,7 @@ abstract class AbstractTransaction implements DBTransactionInterface
 
     /**
      * Configure the connection character set and collation.
-     * Code from https://github.com/hyperf/db/blob/master/src/PDOConnection.php
+     * Code from https://github.com/hyperf/db/blob/master/src/PDOConnection.php.
      */
     protected function configureCharset(PDO $connection)
     {
@@ -104,7 +110,7 @@ abstract class AbstractTransaction implements DBTransactionInterface
 
     /**
      * Configure the timezone on the connection.
-     * Code from https://github.com/hyperf/db/blob/master/src/PDOConnection.php
+     * Code from https://github.com/hyperf/db/blob/master/src/PDOConnection.php.
      */
     protected function configureTimezone(PDO $connection): void
     {
@@ -115,7 +121,7 @@ abstract class AbstractTransaction implements DBTransactionInterface
 
     /**
      * Bind values to their parameters in the given statement.
-     * Code from https://github.com/hyperf/db/blob/master/src/PDOConnection.php
+     * Code from https://github.com/hyperf/db/blob/master/src/PDOConnection.php.
      */
     protected function bindValues(PDOStatement $statement, array $bindings): void
     {
@@ -130,7 +136,7 @@ abstract class AbstractTransaction implements DBTransactionInterface
 
     /**
      * Get the collation for the configuration.
-     * Code from https://github.com/hyperf/db/blob/master/src/PDOConnection.php
+     * Code from https://github.com/hyperf/db/blob/master/src/PDOConnection.php.
      */
     protected function getCollation(): string
     {
