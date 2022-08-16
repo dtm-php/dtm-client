@@ -83,7 +83,6 @@ class DtmImp
             $this->dbTransaction->xaExec($sql);
             throw $throwable;
         }
-
     }
 
     public function initTransBase(string $gid, string $transType, string $branchId): void
