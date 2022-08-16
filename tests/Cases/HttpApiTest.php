@@ -9,10 +9,8 @@ declare(strict_types=1);
 namespace DtmClientTest\Cases;
 
 use DtmClient\Api\HttpApi;
-use DtmClient\Api\HttpApiFactory;
 use GuzzleHttp\Client;
 use Hyperf\Contract\ConfigInterface;
-use Hyperf\Guzzle\ClientFactory;
 use Mockery;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -51,7 +49,6 @@ class HttpApiTest extends AbstractTestCase
         $config->shouldReceive('get')->with('dtm.guzzle.options', [])->andReturn([]);
         $container = Mockery::mock(ContainerInterface::class);
         $container->shouldReceive('get')->with(ConfigInterface::class)->andReturn($config);
-        $container->shouldReceive('get')->with(ClientFactory::class)->andReturn(new ClientFactory($container));
         $client = Mockery::mock(Client::class);
         $httpClientResponseStub = Mockery::mock(ResponseInterface::class);
         $streamInterfaceStub = Mockery::mock(StreamInterface::class);
