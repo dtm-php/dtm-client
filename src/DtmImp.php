@@ -64,20 +64,26 @@ class DtmImp
         $xaId = TransContext::getGid() . '-' . TransContext::getBranchId();
         $sql = $this->DBSpecial->getXaSQL('start', $xaId);
         $this->dbTransaction->xaExec($sql);
+        try {
+            // prepare and rollback both insert a row
+            $sql = 'INSERT IGNORE INTO barrier (trans_type, gid, branch_id, op, barrier_id, reason) VALUES(?,?,?,?,?,?)';
+            $result = $this->dbTransaction->xaExecute($sql, [TransContext::getTransType(), TransContext::getGid(), TransContext::getBranchId(), Operation::ACTION, '01', Operation::ACTION]);
+            if (! $result) {
+                throw new RuntimeException($sql . ' execute error');
+            }
 
-        // prepare and rollback both insert a row
-        $sql = 'INSERT IGNORE INTO barrier (trans_type, gid, branch_id, op, barrier_id, reason) VALUES(?,?,?,?,?,?)';
-        $result = $this->dbTransaction->xaExecute($sql, [TransContext::getTransType(), TransContext::getGid(), TransContext::getBranchId(), Operation::ACTION, '01', Operation::ACTION]);
-        if (! $result) {
-            throw new RuntimeException($sql . ' execute error');
+            $callback();
+
+            $sql = $this->DBSpecial->getXaSQL('end', $xaId);
+            $this->dbTransaction->xaExec($sql);
+            $sql = $this->DBSpecial->getXaSQL('prepare', $xaId);
+            $this->dbTransaction->xaExec($sql);
+        } catch (\Throwable $throwable) {
+            $sql = $this->DBSpecial->getXaSQL('rollback', $xaId);
+            $this->dbTransaction->xaExec($sql);
+            throw $throwable;
         }
 
-        $callback();
-
-        $sql = $this->DBSpecial->getXaSQL('end', $xaId);
-        $this->dbTransaction->xaExec($sql);
-        $sql = $this->DBSpecial->getXaSQL('prepare', $xaId);
-        $this->dbTransaction->xaExec($sql);
     }
 
     public function initTransBase(string $gid, string $transType, string $branchId): void
