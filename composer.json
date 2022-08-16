@@ -22,8 +22,8 @@
     "require": {
         "php": ">=8.0",
         "ext-json": "*",
+        "guzzlehttp/guzzle": "^7.4",
         "hyperf/context": "^2.2|^3.0",
-        "hyperf/guzzle": "^2.2|^3.0",
         "psr/http-server-middleware": "^1.0"
     },
     "require-dev": {

@@ -8,8 +8,8 @@ declare(strict_types=1);
  */
 namespace DtmClient\Api;
 
+use GuzzleHttp\Client;
 use Hyperf\Contract\ConfigInterface;
-use Hyperf\Guzzle\ClientFactory;
 use Psr\Container\ContainerInterface;
 
 class HttpApiFactory
@@ -20,8 +20,7 @@ class HttpApiFactory
         $server = $config->get('dtm.server', '127.0.0.1');
         $port = $config->get('dtm.port.http', 36789);
         $options = $config->get('dtm.guzzle.options', []);
-        $clientFactory = $container->get(ClientFactory::class);
-        $client = $clientFactory->create(array_merge(
+        $client = new Client(array_merge(
             [
                 'base_uri' => $server . ':' . $port,
             ],
