@@ -295,70 +295,88 @@ The following is shown in the Hyperf framework, similar to others
 
 ```php
 <?php
+
 namespace App\Controller;
 
+use App\Grpc\GrpcClient;
+use DtmClient\DbTransaction\DBTransactionInterface;
 use DtmClient\TransContext;
 use DtmClient\XA;
+use Hyperf\Contract\ConfigInterface;
 use Hyperf\Di\Annotation\Inject;
+use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\GetMapping;
+use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class XaController
+#[Controller(prefix: '/xa')]
+class XAController
 {
-    protected string $serviceUri = 'http://127.0.0.1:9501';
 
-    #[Inject]
-    protected XA $xa;
+    private GrpcClient $grpcClient;
+
+    protected string $serviceUri = 'http://127.0.0.1:9502';
+
+    public function __construct(
+        private XA $xa,
+        protected ConfigInterface $config,
+    ) {
+        $server = $this->config->get('dtm.server', '127.0.0.1');
+        $port = $this->config->get('dtm.port.grpc', 36790);
+        $hostname = $server . ':' . $port;
+        $this->grpcClient = new GrpcClient($hostname);
+    }
+
 
     #[GetMapping(path: 'successCase')]
     public function successCase(): string
     {
         $payload = ['amount' => 50];
-        // Open the Xa, the global transaction
-        $this->xa->globalTransaction(function () use ($payload) {
-            // Call the sub transaction interface
-            $respone = $this->xa->callBranch($this->serviceUri . '/api/transIn', $payload);
-            // Obtain subthing response results in XA http mode
+        // Open the Xa, the global thing
+        $gid = $this->xa->generateGid();
+        $this->xa->globalTransaction($gid, function () use ($payload) {
+            // Call the subthings interface
+            $respone = $this->xa->callBranch($this->serviceUri . '/xa/api/transIn', $payload);
+            // Get subthings return structure in XA http mode
             /* @var ResponseInterface $respone */
             $respone->getBody()->getContents();
-            // Call the sub transaction interface
-            $this->xa->callBranch($this->serviceUri . '/api/transOut', $payload);
+            // Call the subthings interface
+            $payload = ['amount' => 10];
+            $this->xa->callBranch($this->serviceUri . '/xa/api/transOut', $payload);
         });
         // Return the global transaction ID via TransContext:: getGid()
         return TransContext::getGid();
     }
 
-    #[GetMapping(path: 'api/transIn')]
+    #[RequestMapping(methods: ["GET", "POST", "PUT"], path: 'api/transIn')]
     public function transIn(RequestInterface $request): array
     {
+        $content = $request->post('amount');
+        $amount = $content['amount'] ?? 50;
         // The transIn method under the simulated distributed system
-        // Sub-transaction processing
-        $pdo->setAttribute(0, 'autocommit');
-        try {
-            $this->xa->localTransaction($pdo, function () {
-                // Please use DBTransactionInterface to handle local Mysql things
-            });
-        } finally {
-            $pdo->setAttribute(1, 'autocommit');
-        }
+        $this->xa->localTransaction(function (DBTransactionInterface $dbTransaction) use ($amount) {
+            // Please use the DBTransactionInterface to handle the local Mysql things
+            $dbTransaction->xaExecute('UPDATE `order` set `amount` = `amount` + ? where id = 1', [$amount]);
+        });
 
         return ['status' => 0, 'message' => 'ok'];
     }
 
-    #[GetMapping(path: 'api/transOut')]
+    /**
+     * @param RequestInterface $request
+     * @return array
+     */
+    #[RequestMapping(methods: ["GET", "POST", "PUT"], path: 'api/transOut')]
     public function transOut(RequestInterface $request): array
     {
+        $content = $request->post('amount');
+        $amount = $content['amount'] ?? 10;
         // The transOut method under the simulated distributed system
-        // Sub-transaction processing
-        $pdo->setAttribute(0, 'autocommit');
-        try {
-            $this->xa->localTransaction($pdo, function () {
-                // Please use DBTransactionInterface to handle local Mysql things
-            });
-        } finally {
-            $pdo->setAttribute(1, 'autocommit');
-        }
+        $this->xa->localTransaction(function (DBTransactionInterface $dbTransaction) use ($amount) {
+            // Please use the DBTransactionInterface to handle the local Mysql things
+            $dbTransaction->xaExecute('UPDATE `order` set `amount` = `amount` - ? where id = 2', [$amount]);
+        });
 
         return ['status' => 0, 'message' => 'ok'];
     }
