@@ -8,17 +8,17 @@ declare(strict_types=1);
  */
 namespace DtmClient\DbTransaction;
 
+use DtmClient\Config\DatabaseConfigInterface;
 use Hyperf\Context\Context;
-use Hyperf\Contract\ConfigInterface;
 use Hyperf\DbConnection\Db;
 use Hyperf\Utils\ApplicationContext;
 use PDO;
 
 class HyperfDbTransaction extends AbstractTransaction
 {
-    public function __construct(ConfigInterface $config)
+    public function __construct(DatabaseConfigInterface $config)
     {
-        $this->config = $config->get('dtm.database');
+        $this->databaseConfig = $config;
     }
 
     public function beginTransaction()

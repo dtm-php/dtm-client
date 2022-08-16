@@ -15,7 +15,7 @@ class HyperfSimpleDbTransaction extends AbstractTransaction
 {
     public function __construct(ConfigInterface $config)
     {
-        $this->config = $config->get('dtm.database');
+        $this->databaseConfig = $config->get('dtm.database');
     }
 
     public function beginTransaction()

@@ -11,6 +11,8 @@ namespace DtmClient;
 use DtmClient\Api\ApiInterface;
 use DtmClient\Api\HttpApi;
 use DtmClient\Api\HttpApiFactory;
+use DtmClient\Config\DatabaseConfigInterface;
+use DtmClient\Config\HyperfDatabaseConfig;
 use DtmClient\DBSpecial\DBSpecialFactory;
 use DtmClient\DBSpecial\DBSpecialInterface;
 use DtmClient\DbTransaction\DBTransactionInterface;
@@ -47,6 +49,7 @@ class ConfigProvider
                 PathGeneratorInterface::class => DtmPatchGenerator::class,
                 JsonRpcTransporter::class => JsonRpcPoolTransporter::class,
                 ResponseInterface::class => Response::class,
+                DatabaseConfigInterface::class => HyperfDatabaseConfig::class,
             ],
             'commands' => [
             ],

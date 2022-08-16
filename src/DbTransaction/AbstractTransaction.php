@@ -2,38 +2,20 @@
 
 namespace DtmClient\DbTransaction;
 
+use DtmClient\Config\DatabaseConfigInterface;
 use DtmClient\Exception\RuntimeException;
 use Hyperf\Context\Context;
-use Hyperf\DbConnection\Db;
 use Hyperf\Pool\Exception\ConnectionException;
-use Hyperf\Utils\Coroutine;
 use PDO;
 use PDOStatement;
 
 abstract class AbstractTransaction implements DBTransactionInterface
 {
-    protected array $config = [
-        'host' => 'localhost',
-        'port' => 3306,
-        'database' => '',
-        'username' => '',
-        'password' => '',
-        'charset' => 'utf8mb4',
-        'collation' => 'utf8mb4_unicode_ci',
-        'fetch_mode' => PDO::FETCH_ASSOC,
-        'options' => [
-            PDO::ATTR_CASE => PDO::CASE_NATURAL,
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
-            PDO::ATTR_STRINGIFY_FETCHES => false,
-            PDO::ATTR_EMULATE_PREPARES => false,
-            PDO::ATTR_AUTOCOMMIT => false,
-        ],
-    ];
+    protected ?DatabaseConfigInterface $databaseConfig = null;
 
-    protected function connect(array $config = []): PDO
+    protected function connect(): PDO
     {
-        if (! isset($config['options'][PDO::ATTR_AUTOCOMMIT]) && ! isset($this->config['options'][PDO::ATTR_AUTOCOMMIT])) {
+        if (! isset($this->databaseConfig->getOptions()[PDO::ATTR_AUTOCOMMIT])) {
             throw new RuntimeException('plase set autocommit is false');
         }
 
@@ -41,20 +23,19 @@ abstract class AbstractTransaction implements DBTransactionInterface
         if (! empty($pdo)) {
             return $pdo;
         }
-        $this->config = array_replace_recursive($this->config, $config);
 
-        $username = $this->config['username'];
-        $password = $this->config['password'];
-        $dsn = $this->buildDsn($this->config);
+        $username = $this->databaseConfig->getUsername();
+        $password = $this->databaseConfig->getPassword();
+        $dsn = $this->buildDsn();
         try {
-            $pdo = new \PDO($dsn, $username, $password, $this->config['options']);
+            $pdo = new \PDO($dsn, $username, $password, $this->databaseConfig->getOptions());
         } catch (\Throwable $e) {
             throw new ConnectionException('Connection reconnect failed.:' . $e->getMessage());
         }
 
-        $this->configureCharset($pdo, $this->config);
+        $this->configureCharset($pdo);
 
-        $this->configureTimezone($pdo, $this->config);
+        $this->configureTimezone($pdo);
 
         Context::set('dtm.connect', $pdo);
         return $pdo;
@@ -88,25 +69,25 @@ abstract class AbstractTransaction implements DBTransactionInterface
 
         $statement->execute();
 
-        $fetchMode = $this->config['fetch_mode'];
+        $fetchMode = $this->databaseConfig['fetch_mode'];
 
         return $statement->fetchAll($fetchMode);
     }
     
-    public function xaExec(string $sql, array $config = []): int|false
+    public function xaExec(string $sql): int|false
     {
-        return $this->connect($config)->exec($sql);
+        return $this->connect()->exec($sql);
     }
 
     /**
      * Build the DSN string for a host / port configuration.
      * Code from https://github.com/hyperf/db/blob/master/src/PDOConnection.php
      */
-    protected function buildDsn(array $config): string
+    protected function buildDsn(): string
     {
-        $host = $config['host'] ?? null;
-        $port = $config['port'] ?? 3306;
-        $database = $config['database'] ?? null;
+        $host = $this->databaseConfig->getHost() ?? null;
+        $port = $this->databaseConfig->getPort() ?? 3306;
+        $database = $this->databaseConfig->getDatabase() ?? null;
         return sprintf('mysql:host=%s;port=%d;dbname=%s', $host, $port, $database);
     }
 
@@ -114,10 +95,10 @@ abstract class AbstractTransaction implements DBTransactionInterface
      * Configure the connection character set and collation.
      * Code from https://github.com/hyperf/db/blob/master/src/PDOConnection.php
      */
-    protected function configureCharset(PDO $connection, array $config)
+    protected function configureCharset(PDO $connection)
     {
-        if (isset($config['charset'])) {
-            $connection->prepare(sprintf("set names '%s'%s", $config['charset'], $this->getCollation($config)))->execute();
+        if (! empty($this->databaseConfig->getCharset())) {
+            $connection->prepare(sprintf("set names '%s'%s", $this->databaseConfig->getCharset(), $this->getCollation()))->execute();
         }
     }
 
@@ -125,10 +106,10 @@ abstract class AbstractTransaction implements DBTransactionInterface
      * Configure the timezone on the connection.
      * Code from https://github.com/hyperf/db/blob/master/src/PDOConnection.php
      */
-    protected function configureTimezone(PDO $connection, array $config): void
+    protected function configureTimezone(PDO $connection): void
     {
-        if (isset($config['timezone'])) {
-            $connection->prepare(sprintf('set time_zone="%s"', $config['timezone']))->execute();
+        if (! empty($this->databaseConfig->getTimezone())) {
+            $connection->prepare(sprintf('set time_zone="%s"', $this->databaseConfig->getTimezone()))->execute();
         }
     }
 
@@ -151,8 +132,8 @@ abstract class AbstractTransaction implements DBTransactionInterface
      * Get the collation for the configuration.
      * Code from https://github.com/hyperf/db/blob/master/src/PDOConnection.php
      */
-    protected function getCollation(array $config): string
+    protected function getCollation(): string
     {
-        return isset($config['collation']) ? " collate '{$config['collation']}'" : '';
+        return ! empty($this->databaseConfig->getCollation()) ? " collate '{$this->databaseConfig->getCollation()}'" : '';
     }
 }
