@@ -14,7 +14,6 @@ use DtmClient\DBSpecial\DBSpecialInterface;
 use DtmClient\DbTransaction\DBTransactionInterface;
 use DtmClient\Exception\RuntimeException;
 use PDOException;
-use Throwable;
 
 class DtmImp
 {
@@ -33,47 +32,42 @@ class DtmImp
      */
     public function xaHandlePhase2(string $gid, string $branchId, string $op): bool
     {
+        $xaId = $gid . '-' . $branchId;
+        $sql = $this->DBSpecial->getXaSQL($op, $xaId);
         try {
-            $xaId = $gid . '-' . $branchId;
-            $sql = $this->DBSpecial->getXaSQL($op, $xaId);
-            try {
-                $this->dbTransaction->xaExec($sql);
-            } catch (PDOException $exception) {
-                // Repeat commit/rollback with the same id, report this error, ignore
-                if (! str_contains($exception->getMessage(), 'XAER_NOTA') && ! str_contains($exception->getMessage(), 'does not exist')) {
-                    throw new RuntimeException($sql . ' execute error');
-                }
+            $this->dbTransaction->xaExec($sql);
+        } catch (PDOException $exception) {
+            // Repeat commit/rollback with the same id, report this error, ignore
+            if (! str_contains($exception->getMessage(), 'XAER_NOTA') && ! str_contains($exception->getMessage(), 'does not exist')) {
+                throw $exception;
             }
-
-            if ($op == Branch::BranchRollback) {
-                // rollback insert a row after prepare. no-error means prepare has finished.
-                $this->dbTransaction->xaExecute(
-                    'INSERT IGNORE INTO barrier (trans_type, gid, branch_id, op, barrier_id, reason) VALUES(?,?,?,?,?,?)',
-                    [TransContext::getTransType(), $gid, $branchId, Operation::ACTION, '01', $op]
-                );
-            }
-
-            return true;
-        } catch (Throwable $throwable) {
-            throw $throwable;
         }
+
+        if ($op == Branch::BranchRollback) {
+            // rollback insert a row after prepare. no-error means prepare has finished.
+            $this->dbTransaction->xaExecute(
+                'INSERT IGNORE INTO barrier (trans_type, gid, branch_id, op, barrier_id, reason) VALUES(?,?,?,?,?,?)',
+                [TransContext::getTransType(), $gid, $branchId, Operation::ACTION, '01', $op]
+            );
+        }
+
+        return true;
     }
 
     /**
      * Public handler of LocalTransaction via http/grpc.
      * @throws RuntimeException
+     * @throws PDOException
      */
     public function xaHandleLocalTrans(callable $callback): void
     {
         $xaId = TransContext::getGid() . '-' . TransContext::getBranchId();
         $sql = $this->DBSpecial->getXaSQL('start', $xaId);
-        $res = $this->dbTransaction->xaExec($sql);
-        var_dump('start xa', $res);
+        $this->dbTransaction->xaExec($sql);
 
         // prepare and rollback both insert a row
         $sql = 'INSERT IGNORE INTO barrier (trans_type, gid, branch_id, op, barrier_id, reason) VALUES(?,?,?,?,?,?)';
         $result = $this->dbTransaction->xaExecute($sql, [TransContext::getTransType(), TransContext::getGid(), TransContext::getBranchId(), Operation::ACTION, '01', Operation::ACTION]);
-        var_dump($result);
         if (! $result) {
             throw new RuntimeException($sql . ' execute error');
         }
@@ -81,9 +75,7 @@ class DtmImp
         $callback();
 
         $sql = $this->DBSpecial->getXaSQL('end', $xaId);
-        var_dump('end xa');
         $this->dbTransaction->xaExec($sql);
-        var_dump('xx end xa');
         $sql = $this->DBSpecial->getXaSQL('prepare', $xaId);
         $this->dbTransaction->xaExec($sql);
     }
