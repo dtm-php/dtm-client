@@ -8,10 +8,16 @@ declare(strict_types=1);
  */
 namespace DtmClient\DbTransaction;
 
+use DtmClient\Config\DatabaseConfigInterface;
 use Hyperf\DbConnection\Db;
 
-class HyperfDbTransaction implements DBTransactionInterface
+class HyperfDbTransaction extends AbstractTransaction
 {
+    public function __construct(DatabaseConfigInterface $config)
+    {
+        $this->databaseConfig = $config;
+    }
+
     public function beginTransaction()
     {
         Db::beginTransaction();
@@ -25,10 +31,5 @@ class HyperfDbTransaction implements DBTransactionInterface
     public function rollback()
     {
         Db::rollback();
-    }
-
-    public function execInsert(string $sql, array $bindings): int
-    {
-        return Db::affectingStatement($sql, $bindings);
     }
 }

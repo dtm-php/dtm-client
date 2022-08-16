@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+/**
+ * This file is part of DTM-PHP.
+ *
+ * @license  https://github.com/dtm-php/dtm-client/blob/master/LICENSE
+ */
 namespace DtmClientTest\Cases;
 
 use DtmClient\Api\GrpcApi;
-use Hyperf\GrpcClient\BaseClient;
-use Hyperf\GrpcClient\UniversalGrpcClient;
 use DtmClient\Grpc\GrpcClient;
 
 class GrpcApiStub extends GrpcApi

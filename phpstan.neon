@@ -12,7 +12,5 @@ parameters:
         - '#Static call to instance method Hyperf\\DB\\DB::beginTransaction\(\)\.#'
         - '#Static call to instance method Hyperf\\DB\\DB::commit\(\)\.#'
         - '#Static call to instance method Hyperf\\DB\\DB::rollback\(\)\.#'
-        - '#Static call to instance method Hyperf\\DB\\DB::execute\(\)\.#'
-        - '#Call to static method affectingStatement\(\) on an unknown class Illuminate\\Support\\Facades\\DB\.#'
         - '#Call to static method currentRouteAction\(\) on an unknown class Illuminate\\Support\\Facades\\Route\.#'
         - '#Parameter \$request of method DtmClient\\Middleware\\DtmLaravelMiddleware::handle\(\) has invalid type Illuminate\\Http\\Request\.#'
