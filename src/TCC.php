@@ -90,7 +90,7 @@ class TCC extends AbstractTransaction
                 $argument = new DtmBranchRequest($formatBody);
                 $this->api->registerBranch($formatBody);
                 $branchRequest = new RequestBranch();
-                $branchRequest->grpcArgument = $argument;
+                $branchRequest->grpcArgument = $body;
                 $branchRequest->url = $tryUrl;
                 $branchRequest->metadata = [
                     'dtm-gid' => [$formatBody['Gid']],
