@@ -10,7 +10,6 @@ namespace DtmClient\Middleware;
 
 use DtmClient\Annotation\Barrier as BarrierAnnotation;
 use DtmClient\Barrier;
-use DtmClient\TransContext;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Di\Annotation\AnnotationCollector;
 use Hyperf\HttpServer\Router\Dispatched;
@@ -40,15 +39,14 @@ class DtmMiddleware implements MiddlewareInterface
         $headers = $request->getHeaders();
         $transType = $headers['dtm-trans_type'][0] ?? $queryParams['trans_type'] ?? null;
         $gid = $headers['dtm-gid'][0] ?? $queryParams['gid'] ?? null;
-        $branchId =  $headers['dtm-branch_id'][0] ??$queryParams['branch_id'] ?? null;
+        $branchId = $headers['dtm-branch_id'][0] ?? $queryParams['branch_id'] ?? null;
         $op = $headers['dtm-op'][0] ?? $queryParams['op'] ?? null;
-        $phase2Url =  $headers['dtm-phase2_url'][0] ?? $queryParams['phase2_url'] ?? null;
+        $phase2Url = $headers['dtm-phase2_url'][0] ?? $queryParams['phase2_url'] ?? null;
         $dtm = $headers['dtm-dtm'][0] ?? null;
 
         if ($transType && $gid && $branchId && $op) {
             $this->barrier->barrierFrom($transType, $gid, $branchId, $op, $phase2Url, $dtm);
         }
-
 
         /** @var Dispatched $dispatched */
         $dispatched = $request->getAttribute(Dispatched::class);
