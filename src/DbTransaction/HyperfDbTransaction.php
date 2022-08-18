@@ -37,5 +37,4 @@ class HyperfDbTransaction extends AbstractTransaction
     {
         return Db::affectingStatement($sql, $bindings);
     }
-
 }

@@ -15,7 +15,6 @@ use DtmClient\Constants\Protocol;
 use DtmClient\Constants\TransType;
 use DtmClient\Exception\InvalidArgumentException;
 use DtmClient\Exception\UnsupportedException;
-use DtmClient\Grpc\Message\DtmBranchRequest;
 use Google\Protobuf\Internal\Message;
 
 class TCC extends AbstractTransaction

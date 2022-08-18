@@ -99,4 +99,3 @@ class Msg extends AbstractTransaction
         $this->api->abort(TransContext::toArray());
     }
 }
-
