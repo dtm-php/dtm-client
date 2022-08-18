@@ -9,7 +9,10 @@ declare(strict_types=1);
 namespace DtmClient;
 
 use DtmClient\Api\ApiInterface;
+use DtmClient\Constants\Protocol;
 use DtmClient\Constants\TransType;
+use DtmClient\Exception\UnsupportedException;
+use Google\Protobuf\Internal\Message;
 
 class Saga extends AbstractTransaction
 {
@@ -38,7 +41,19 @@ class Saga extends AbstractTransaction
             'action' => $action,
             'compensate' => $compensate,
         ]);
-        TransContext::addPayload([json_encode($payload)]);
+        switch ($this->api->getProtocol()) {
+            case Protocol::HTTP:
+            case Protocol::JSONRPC_HTTP:
+                TransContext::addPayload([json_encode($payload)]);
+                break;
+            case Protocol::GRPC:
+                /* @var $payload Message */
+                TransContext::addBinPayload([$payload->serializeToString()]);
+                break;
+            default:
+                throw new UnsupportedException('Unsupported protocol');
+        }
+
         return $this;
     }
 

@@ -88,7 +88,7 @@ class GrpcApi implements ApiInterface
         isset($body['gid']) && $request->setGid($body['gid']);
         isset($body['trans_type']) && $request->setTransType($body['trans_type']);
         isset($body['custom_data']) && $request->setCustomedData($body['custom_data']);
-        isset($body['bin_payloads']) && $request->setQueryPrepared($body['bin_payloads']);
+        isset($body['bin_payloads']) && $request->setBinPayloads($body['bin_payloads']);
         isset($body['query_prepared']) && $request->setQueryPrepared($body['query_prepared']);
         isset($body['steps']) && $request->setSteps(json_encode($body['steps']));
         $dtmTransOptions = $this->transferToTransOptions($body);

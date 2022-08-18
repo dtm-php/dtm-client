@@ -10,8 +10,12 @@ namespace DtmClient;
 
 use DtmClient\Api\ApiInterface;
 use DtmClient\Api\RequestBranch;
+use DtmClient\Constants\Protocol;
 use DtmClient\Constants\TransType;
 use DtmClient\Exception\FailureException;
+use DtmClient\Exception\UnsupportedException;
+use Google\Protobuf\GPBEmpty;
+use Google\Protobuf\Internal\Message;
 use GuzzleHttp\Psr7\Response;
 
 class Msg extends AbstractTransaction
@@ -24,10 +28,29 @@ class Msg extends AbstractTransaction
         $this->barrier = $barrier;
     }
 
+    public function init(?string $gid = null)
+    {
+        if ($gid === null) {
+            $gid = $this->generateGid();
+        }
+        TransContext::init($gid, TransType::MSG, '');
+    }
+
     public function add(string $action, $payload)
     {
         TransContext::addStep(['action' => $action]);
-        TransContext::addPayload($payload);
+        switch ($this->api->getProtocol()) {
+            case Protocol::HTTP:
+            case Protocol::JSONRPC_HTTP:
+                TransContext::addPayload([json_encode($payload)]);
+                break;
+            case Protocol::GRPC:
+                /* @var $payload Message */
+                TransContext::addBinPayload([$payload->serializeToString()]);
+                break;
+            default:
+                throw new UnsupportedException('Unsupported protocol');
+        }
     }
 
     public function prepare(string $queryPrepared)
@@ -68,6 +91,7 @@ class Msg extends AbstractTransaction
         $requestBranch->branchId = TransContext::getBranchId();
         $requestBranch->op = TransContext::getOp();
         $requestBranch->url = $queryPrepared;
+        $requestBranch->grpcArgument = new GPBEmpty();
         /** @var Response $response */
         $response = $this->api->transRequestBranch($requestBranch);
 
@@ -75,3 +99,4 @@ class Msg extends AbstractTransaction
         $this->api->abort(TransContext::toArray());
     }
 }
+

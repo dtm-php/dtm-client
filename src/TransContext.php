@@ -38,7 +38,7 @@ class TransContext extends Context
      */
     private static array $payloads;
 
-    private static array $binPayLoads;
+    private static array $binPayloads;
 
     /**
      * Use in XA/TCC.
@@ -106,7 +106,7 @@ class TransContext extends Context
 
     public static function getTransType(): string
     {
-        return static::get(static::class . '.transType');
+        return static::get(static::class . '.transType', '');
     }
 
     public static function setTransType(string $transType)
@@ -166,12 +166,12 @@ class TransContext extends Context
 
     public static function getBinPayLoads(): array
     {
-        return static::get(static::class . '.binPayLoads') ?? [];
+        return static::get(static::class . '.binPayloads') ?? [];
     }
 
     public static function setBinPayLoads(array $binPayLoads)
     {
-        static::set(static::class . '.binPayLoads', $binPayLoads);
+        static::set(static::class . '.binPayloads', $binPayLoads);
     }
 
     public static function addBinPayload(array $binPayLoad)
@@ -201,7 +201,7 @@ class TransContext extends Context
 
     public static function getOp(): string
     {
-        return static::get(static::class . '.op');
+        return static::get(static::class . '.op', '');
     }
 
     public static function setOp(string $op)

@@ -32,7 +32,7 @@ class MySqlBarrier implements BarrierInterface
         $transType = TransContext::getTransType();
         $op = TransContext::getOp();
 
-        $barrierID = ++$this->barrierId;
+        $barrierID = $this->barrierId + 1;
         $bid = sprintf('%02d', $barrierID);
 
         $originOP = [

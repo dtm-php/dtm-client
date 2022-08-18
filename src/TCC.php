@@ -87,17 +87,16 @@ class TCC extends AbstractTransaction
                     'BusiPayload' => $body->serializeToString(),
                     'Data' => ['confirm' => $confirmUrl, 'cancel' => $cancelUrl],
                 ];
-                $argument = new DtmBranchRequest($formatBody);
                 $this->api->registerBranch($formatBody);
                 $branchRequest = new RequestBranch();
                 $branchRequest->grpcArgument = $body;
                 $branchRequest->url = $tryUrl;
-                $branchRequest->metadata = [
-                    'dtm-gid' => [$formatBody['Gid']],
-                    'dtm-trans_type' => [$formatBody['TransType']],
-                    'dtm-branch_id' => [$formatBody['BranchID']],
-                    'dtm-op' => [Operation::TRY],
-                    'dtm-dtm' => [TransContext::getDtm()],
+                $branchRequest->grpcMetadata = [
+                    'dtm-gid' => $formatBody['Gid'],
+                    'dtm-trans_type' => $formatBody['TransType'],
+                    'dtm-branch_id' => $formatBody['BranchID'],
+                    'dtm-op' => Operation::TRY,
+                    'dtm-dtm' => TransContext::getDtm(),
                 ];
                 $this->api->transRequestBranch($branchRequest);
                 break;
