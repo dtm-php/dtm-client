@@ -57,6 +57,7 @@ class TCC extends AbstractTransaction
     {
         $branchId = $this->branchIdGenerator->generateSubBranchId();
         switch ($this->api->getProtocol()) {
+            case Protocol::JSONRPC_HTTP:
             case Protocol::HTTP:
                 $this->api->registerBranch([
                     'data' => json_encode($body),
@@ -74,7 +75,6 @@ class TCC extends AbstractTransaction
                 $branchRequest->op = Operation::TRY;
                 $branchRequest->body = $body;
                 return $this->api->transRequestBranch($branchRequest);
-                break;
             case Protocol::GRPC:
                 if (! $body instanceof Message) {
                     throw new InvalidArgumentException('$body must be instance of Message');
@@ -97,29 +97,9 @@ class TCC extends AbstractTransaction
                     'dtm-op' => Operation::TRY,
                     'dtm-dtm' => TransContext::getDtm(),
                 ];
-                $this->api->transRequestBranch($branchRequest);
-                break;
-            case Protocol::JSONRPC_HTTP:
-                $this->api->registerBranch([
-                    'data' => json_encode($body),
-                    'branch_id' => $branchId,
-                    'confirm' => $confirmUrl,
-                    'cancel' => $cancelUrl,
-                    'gid' => TransContext::getGid(),
-                    'trans_type' => TransType::TCC,
-                ]);
-
-                $branchRequest = new RequestBranch();
-                $branchRequest->method = 'POST';
-                $branchRequest->url = $tryUrl;
-                $branchRequest->branchId = $branchId;
-                $branchRequest->op = Operation::TRY;
-                $branchRequest->body = $body;
                 return $this->api->transRequestBranch($branchRequest);
-                break;
             default:
                 throw new UnsupportedException('Unsupported protocol');
-                break;
         }
     }
 }
