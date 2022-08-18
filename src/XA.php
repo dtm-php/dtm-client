@@ -125,23 +125,15 @@ class XA extends AbstractTransaction
      */
     public function globalTransaction(string $gid, callable $callback)
     {
-        var_dump('start globalTransaction');
         $this->init($gid);
-        var_dump('prepare start');
         $this->api->prepare(TransContext::toArray());
-        var_dump('prepare end');
         try {
             $callback();
-            var_dump('start submit');
             $this->api->submit(TransContext::toArray());
-            var_dump('end submit');
         } catch (\Throwable $throwable) {
-            var_dump('start abort');
             $this->api->abort(TransContext::toArray());
-            var_dump('end abort');
             throw $throwable;
         }
-        var_dump('end');
     }
 
     protected function init(?string $gid = null)
