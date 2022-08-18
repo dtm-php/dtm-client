@@ -32,4 +32,9 @@ class HyperfDbTransaction extends AbstractTransaction
     {
         Db::rollback();
     }
+
+    public function execute(string $sql, array $bindings = []): int
+    {
+        return Db::affectingStatement($sql, $bindings);
+    }
 }

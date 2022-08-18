@@ -16,8 +16,6 @@ use DtmClient\Exception\DuplicatedException;
 
 class MySqlBarrier implements BarrierInterface
 {
-    protected int $barrierId = 0;
-
     protected DBTransactionInterface $DBTransaction;
 
     public function __construct(DBTransactionInterface $DBTransaction)
@@ -32,7 +30,9 @@ class MySqlBarrier implements BarrierInterface
         $transType = TransContext::getTransType();
         $op = TransContext::getOp();
 
-        $barrierID = ++$this->barrierId;
+        $barrierID = TransContext::getBarrierId() + 1;
+        TransContext::setBarrierId($barrierID);
+
         $bid = sprintf('%02d', $barrierID);
 
         $originOP = [
@@ -69,7 +69,7 @@ class MySqlBarrier implements BarrierInterface
         }
     }
 
-    protected function insertBarrier(string $transType, string $gid, string $branchId, string $op, string $barrierID, string $reason)
+    protected function insertBarrier(string $transType, string $gid, string $branchId, string $op, string $barrierID, string $reason): int
     {
         if (empty($op)) {
             return 0;

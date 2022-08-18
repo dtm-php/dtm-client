@@ -16,6 +16,8 @@ interface DBTransactionInterface
 
     public function rollback();
 
+    public function execute(string $sql, array $bindings = []): int;
+
     public function xaExecute(string $sql, array $bindings = []): int;
 
     public function xaQuery(string $sql, array $bindings = []): bool|array;
