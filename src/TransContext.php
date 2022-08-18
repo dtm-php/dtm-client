@@ -164,19 +164,19 @@ class TransContext extends Context
         static::setPayloads(array_merge(static::getPayloads(), $payload));
     }
 
-    public static function getBinPayLoads(): array
+    public static function getBinPayloads(): array
     {
         return static::get(static::class . '.binPayloads') ?? [];
     }
 
-    public static function setBinPayLoads(array $binPayLoads)
+    public static function setBinPayloads(array $binPayLoads)
     {
         static::set(static::class . '.binPayloads', $binPayLoads);
     }
 
     public static function addBinPayload(array $binPayLoad)
     {
-        static::setBinPayLoads(array_merge(static::getBinPayLoads(), $binPayLoad));
+        static::setBinPayloads(array_merge(static::getBinPayloads(), $binPayLoad));
     }
 
     public static function getBranchId(): string
