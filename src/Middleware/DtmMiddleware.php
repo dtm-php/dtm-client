@@ -85,7 +85,6 @@ class DtmMiddleware implements MiddlewareInterface
 
     protected function parserRouter(array|string $callback): array
     {
-
         if (is_array($callback)) {
             [$class, $method] = $callback;
         }
