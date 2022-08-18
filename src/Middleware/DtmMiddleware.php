@@ -10,6 +10,7 @@ namespace DtmClient\Middleware;
 
 use DtmClient\Annotation\Barrier as BarrierAnnotation;
 use DtmClient\Barrier;
+use DtmClient\Exception\RuntimeException;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Di\Annotation\AnnotationCollector;
 use Hyperf\HttpServer\Router\Dispatched;
@@ -53,17 +54,14 @@ class DtmMiddleware implements MiddlewareInterface
         if ($dispatched instanceof Dispatched && ! empty($dispatched->handler->callback)) {
             $callback = $dispatched->handler->callback;
 
-            if (is_array($callback)) {
-                [$class, $method] = $callback;
+            if (is_callable($callback)) {
+                // unsupported use barrier in callable
+                return $handler->handle($request);
             }
 
-            if (is_string($callback) && str_contains($callback, '@')) {
-                [$class, $method] = explode('@', $callback);
-            }
-
-            if (is_string($callback) && str_contains($callback, '::')) {
-                [$class, $method] = explode('::', $callback);
-            }
+            $router = $this->parserRouter($callback);
+            $class = $router['class'];
+            $method = $router['method'];
 
             $barrier = $this->config->get('dtm.barrier.apply', []);
 
@@ -83,5 +81,30 @@ class DtmMiddleware implements MiddlewareInterface
         }
 
         return $handler->handle($request);
+    }
+
+    protected function parserRouter(array|callable|string $callback): callable|array
+    {
+        if (is_callable($callback)) {
+            return $callback;
+        }
+
+        if (is_array($callback)) {
+            [$class, $method] = $callback;
+        }
+
+        if (is_string($callback) && str_contains($callback, '@')) {
+            [$class, $method] = explode('@', $callback);
+        }
+
+        if (is_string($callback) && str_contains($callback, '::')) {
+            [$class, $method] = explode('::', $callback);
+        }
+
+        if (! isset($class) || ! isset($method)) {
+            throw new RuntimeException('router not exist');
+        }
+
+        return ['class' => $class, 'method' => $method];
     }
 }
