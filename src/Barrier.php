@@ -9,6 +9,8 @@ declare(strict_types=1);
 namespace DtmClient;
 
 use DtmClient\Constants\DbType;
+use DtmClient\Constants\Protocol;
+use DtmClient\Constants\TransType;
 use DtmClient\Exception\DtmException;
 use DtmClient\Exception\UnsupportedException;
 use Hyperf\Contract\ConfigInterface;
@@ -35,14 +37,37 @@ class Barrier
         }
     }
 
-    public function barrierFrom(string $transType, string $gid, string $branchId, string $op)
+    public function barrierFrom(string $transType, string $gid, string $branchId, string $op, ?string $phase2Url = null, ?string $dtm = null)
     {
         TransContext::setTransType($transType);
         TransContext::setGid($gid);
         TransContext::setBranchId($branchId);
         TransContext::setOp($op);
+        // use in XA
+        TransContext::setPhase2URL($phase2Url);
+        TransContext::setDtm($dtm);
         if (! TransContext::getTransType() || ! TransContext::getGid() || ! TransContext::getBranchId() || ! TransContext::getOp()) {
-            $info = 'transType:' . TransContext::getTransType() . ' gid:' . TransContext::getGid() . ' branchId:' . TransContext::getBranchId() . ' op:' . TransContext::getOp();
+            $info = sprintf(
+                'transType:%s gid:%s branchId:%s op:%s',
+                TransContext::getTransType(),
+                TransContext::getGid(),
+                TransContext::getBranchId(),
+                TransContext::getOp(),
+            );
+            throw new DtmException(sprintf('Invalid transaction info: %s', $info));
+        }
+
+        $protocol = $this->config->get('dtm.protocol');
+        if ($protocol === Protocol::GRPC && $transType === TransType::XA && (! TransContext::getPhase2URL() || ! TransContext::getDtm())) {
+            $info = sprintf(
+                'transType:%s gid:%s branchId:%s op:%s phase2url:%s dtm:%s',
+                TransContext::getTransType(),
+                TransContext::getGid(),
+                TransContext::getBranchId(),
+                TransContext::getOp(),
+                TransContext::getPhase2URL(),
+                TransContext::getDtm(),
+            );
             throw new DtmException(sprintf('Invalid transaction info: %s', $info));
         }
     }

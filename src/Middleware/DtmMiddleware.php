@@ -37,16 +37,18 @@ class DtmMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $queryParams = $request->getQueryParams() ?: $request->getParsedBody();
-        $transType = $queryParams['trans_type'] ?? null;
-        $gid = $queryParams['gid'] ?? null;
-        $branchId = $queryParams['branch_id'] ?? null;
-        $op = $queryParams['op'] ?? null;
-        $phase2Url = $queryParams['phase2_url'] ?? null;
+        $headers = $request->getHeaders();
+        $transType = $headers['dtm-trans_type'][0] ?? $queryParams['trans_type'] ?? null;
+        $gid = $headers['dtm-gid'][0] ?? $queryParams['gid'] ?? null;
+        $branchId =  $headers['dtm-branch_id'][0] ??$queryParams['branch_id'] ?? null;
+        $op = $headers['dtm-op'][0] ?? $queryParams['op'] ?? null;
+        $phase2Url =  $headers['dtm-phase2_url'][0] ?? $queryParams['phase2_url'] ?? null;
+        $dtm = $headers['dtm-dtm'][0] ?? null;
+
         if ($transType && $gid && $branchId && $op) {
-            $this->barrier->barrierFrom($transType, $gid, $branchId, $op);
+            $this->barrier->barrierFrom($transType, $gid, $branchId, $op, $phase2Url, $dtm);
         }
-        // use in XA
-        $phase2Url && TransContext::setPhase2URL($phase2Url);
+
 
         /** @var Dispatched $dispatched */
         $dispatched = $request->getAttribute(Dispatched::class);

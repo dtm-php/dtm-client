@@ -94,12 +94,12 @@ class TransContext extends Context
         static::set(static::class . '.gid', $gid);
     }
 
-    public static function getPhase2URL(): string
+    public static function getPhase2URL(): ?string
     {
         return static::get(static::class . '.phase2_url', '');
     }
 
-    public static function setPhase2URL(string $phase2URL)
+    public static function setPhase2URL(?string $phase2URL)
     {
         static::set(static::class . '.phase2_url', $phase2URL);
     }
@@ -114,12 +114,12 @@ class TransContext extends Context
         static::set(static::class . '.transType', $transType);
     }
 
-    public static function getDtm(): string
+    public static function getDtm(): ?string
     {
         return static::get(static::class . '.dtm');
     }
 
-    public static function setDtm(string $dtm)
+    public static function setDtm(?string $dtm)
     {
         static::set(static::class . '.dtm', $dtm);
     }
