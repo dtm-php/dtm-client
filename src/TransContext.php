@@ -106,7 +106,7 @@ class TransContext extends Context
 
     public static function getTransType(): string
     {
-        return static::get(static::class . '.transType', '');
+        return static::get(static::class . '.transType');
     }
 
     public static function setTransType(string $transType)
@@ -201,7 +201,7 @@ class TransContext extends Context
 
     public static function getOp(): string
     {
-        return static::get(static::class . '.op', '');
+        return static::get(static::class . '.op');
     }
 
     public static function setOp(string $op)
