@@ -69,7 +69,7 @@ class MySqlBarrier implements BarrierInterface
         }
     }
 
-    protected function insertBarrier(string $transType, string $gid, string $branchId, string $op, string $barrierID, string $reason)
+    protected function insertBarrier(string $transType, string $gid, string $branchId, string $op, string $barrierID, string $reason): int
     {
         if (empty($op)) {
             return 0;
