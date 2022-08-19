@@ -69,13 +69,15 @@ class DtmMiddleware implements MiddlewareInterface
                 $handler->handle($request);
             };
 
-            if (in_array($class . '::' . $method, $barrier) && $this->barrier->call($businessCall)) {
+            if (in_array($class . '::' . $method, $barrier)) {
+                $this->barrier->call($businessCall);
                 return $this->response->withStatus(200);
             }
 
             $annotations = AnnotationCollector::getClassMethodAnnotation($class, $method);
 
-            if (isset($annotations[BarrierAnnotation::class]) && $this->barrier->call($businessCall)) {
+            if (isset($annotations[BarrierAnnotation::class])) {
+                $this->barrier->call($businessCall);
                 return $this->response->withStatus(200);
             }
         }
