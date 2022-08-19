@@ -20,6 +20,7 @@ use DtmClient\DbTransaction\HyperfDbTransaction;
 use DtmClient\Grpc\GrpcClientManager;
 use DtmClient\Grpc\GrpcClientManagerFactory;
 use DtmClient\JsonRpc\DtmPatchGenerator;
+use Hyperf\GrpcServer\CoreMiddleware;
 use Hyperf\HttpServer\Response;
 use Hyperf\JsonRpc\JsonRpcPoolTransporter;
 use Hyperf\JsonRpc\JsonRpcTransporter;
@@ -57,6 +58,10 @@ class ConfigProvider
                 'scan' => [
                     'paths' => [
                         __DIR__,
+                    ],
+                    'class_map' => [
+                        // 需要映射的类名 => 类所在的文件地址
+                        CoreMiddleware::class => __DIR__ . '/../class_map/CoreMiddleware.php',
                     ],
                 ],
             ],

@@ -10,6 +10,10 @@ namespace DtmClient\Middleware;
 
 use DtmClient\Annotation\Barrier as BarrierAnnotation;
 use DtmClient\Barrier;
+use DtmClient\Constants\Protocol;
+use DtmClient\Constants\Result;
+use DtmClient\Exception\FailureException;
+use DtmClient\Exception\OngingException;
 use DtmClient\Exception\RuntimeException;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Di\Annotation\AnnotationCollector;
@@ -70,15 +74,13 @@ class DtmMiddleware implements MiddlewareInterface
             };
 
             if (in_array($class . '::' . $method, $barrier)) {
-                $this->barrier->call($businessCall);
-                return $this->response->withStatus(200);
+                return $this->handlerBarrierCall($businessCall);
             }
 
             $annotations = AnnotationCollector::getClassMethodAnnotation($class, $method);
 
             if (isset($annotations[BarrierAnnotation::class])) {
-                $this->barrier->call($businessCall);
-                return $this->response->withStatus(200);
+                return $this->handlerBarrierCall($businessCall);
             }
         }
 
@@ -105,4 +107,29 @@ class DtmMiddleware implements MiddlewareInterface
 
         return ['class' => $class, 'method' => $method];
     }
+
+    protected function handlerBarrierCall(callable $businessCall): ResponseInterface
+    {
+        try {
+            $this->barrier->call($businessCall);
+            var_dump($this->response->getBody()->getContents());
+            $this->response->getBody()->rewind();
+            return $this->response->withStatus(200);
+        } catch (OngingException $ongingException) {
+            $code = $this->isGRPC() ? 200 : $ongingException->getCode();
+            return $this->response->withStatus($code);
+        } catch (FailureException $failureException) {
+            $code = $this->isGRPC() ? 200 : $failureException->getCode();
+            return $this->response->withStatus($code);
+        } catch (\Throwable $throwable) {
+            $code = $this->isGRPC() ? 200 : Result::FAILURE_STATUS;
+            return $this->response->withStatus($code);
+        }
+    }
+
+    protected function isGRPC():bool
+    {
+        return $this->config->get('dtm.protocol') === Protocol::GRPC;
+    }
+
 }
