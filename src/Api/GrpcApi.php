@@ -44,7 +44,7 @@ class GrpcApi implements ApiInterface
     public function prepare(array $body)
     {
         $dtmRequest = $this->transferToRequest($body);
-        $this->getDtmClient()->transCallDtm($dtmRequest, Operation::PREPARE);
+        $res = $this->getDtmClient()->transCallDtm($dtmRequest, Operation::PREPARE);
     }
 
     public function submit(array $body)

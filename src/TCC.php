@@ -40,7 +40,9 @@ class TCC extends AbstractTransaction
         $this->init($gid);
         $requestBody = TransContext::toArray();
         try {
-            $this->api->prepare($requestBody);
+            $res = $this->api->prepare($requestBody);
+            var_dump('======prepare===========');
+            var_dump($res);
             $callback($this);
         } catch (\Throwable $throwable) {
             $this->api->abort($requestBody);

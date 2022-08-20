@@ -70,6 +70,7 @@ class CoreMiddleware extends HttpCoreMiddleware
                     }
                     $parameters = $this->parseMethodParameters($controller, $action, $dispatched->params);
                     $result = $controllerInstance->{$action}(...$parameters);
+
                 }
 
                 if (! $result instanceof Message) {
