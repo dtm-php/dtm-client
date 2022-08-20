@@ -17,6 +17,8 @@ use DtmClient\Exception\OngingException;
 use DtmClient\Exception\RuntimeException;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Di\Annotation\AnnotationCollector;
+use Hyperf\Grpc\StatusCode;
+use Hyperf\HttpMessage\Stream\SwooleStream;
 use Hyperf\HttpServer\Router\Dispatched;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -110,20 +112,35 @@ class DtmMiddleware implements MiddlewareInterface
 
     protected function handlerBarrierCall(callable $businessCall): ResponseInterface
     {
+        $response = $this->response;
+        if ($this->isGRPC()) {
+            $response = $response
+                ->withBody(new SwooleStream(\DtmClient\Grpc\GrpcParser::serializeMessage(null)))
+                ->withAddedHeader('Server', 'Hyperf')
+                ->withAddedHeader('Content-Type', 'application/grpc')
+                ->withAddedHeader('trailer', 'grpc-status, grpc-message');
+        }
+
         try {
             $this->barrier->call($businessCall);
-            var_dump($this->response->getBody()->getContents());
-            $this->response->getBody()->rewind();
-            return $this->response->withStatus(200);
+            $response = $response->withStatus(200);
+            $this->isGRPC() && $response = $response->withTrailer('grpc-status', (string) StatusCode::OK)->withTrailer('grpc-message', 'ok');
+            return $response;
         } catch (OngingException $ongingException) {
             $code = $this->isGRPC() ? 200 : $ongingException->getCode();
-            return $this->response->withStatus($code);
+            $response = $response->withStatus($code);
+            $this->isGRPC() && $response = $response->withTrailer('grpc-status', (string) $ongingException->getCode())->withTrailer('grpc-message', $ongingException->getMessage());
+            return $response;
         } catch (FailureException $failureException) {
             $code = $this->isGRPC() ? 200 : $failureException->getCode();
-            return $this->response->withStatus($code);
+            $response = $response->withStatus($code);
+            $this->isGRPC() && $response = $response->withTrailer('grpc-status', (string) $failureException->getCode())->withTrailer('grpc-message', $failureException->getMessage());
+            return $response;
         } catch (\Throwable $throwable) {
             $code = $this->isGRPC() ? 200 : Result::FAILURE_STATUS;
-            return $this->response->withStatus($code);
+            $response = $response->withStatus($code);
+            $this->isGRPC() && $response = $response->withTrailer('grpc-status', (string) Result::FAILURE_STATUS)->withTrailer('grpc-message', $throwable->getMessage());
+            return $response;
         }
     }
 

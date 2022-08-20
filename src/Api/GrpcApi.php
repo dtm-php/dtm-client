@@ -10,6 +10,10 @@ namespace DtmClient\Api;
 
 use DtmClient\Constants\Operation;
 use DtmClient\Constants\Protocol;
+use DtmClient\Constants\Result;
+use DtmClient\Exception\FailureException;
+use DtmClient\Exception\OngingException;
+use DtmClient\Exception\RequestException;
 use DtmClient\Exception\UnsupportedException;
 use DtmClient\Grpc\GrpcClient;
 use DtmClient\Grpc\GrpcClientManager;
@@ -44,7 +48,7 @@ class GrpcApi implements ApiInterface
     public function prepare(array $body)
     {
         $dtmRequest = $this->transferToRequest($body);
-        $res = $this->getDtmClient()->transCallDtm($dtmRequest, Operation::PREPARE);
+        $this->getDtmClient()->transCallDtm($dtmRequest, Operation::PREPARE);
     }
 
     public function submit(array $body)
@@ -79,7 +83,20 @@ class GrpcApi implements ApiInterface
     {
         [$hostname, $method] = $this->parseHostnameAndMethod($requestBranch->url);
         $client = $this->grpcClientManager->getClient($hostname);
-        return $client->invoke($method, $requestBranch->grpcArgument, $requestBranch->grpcDeserialize, $requestBranch->grpcMetadata, $requestBranch->grpcOptions);
+
+        [$reply, $status, $response] = $client->invoke($method, $requestBranch->grpcArgument, $requestBranch->grpcDeserialize, $requestBranch->grpcMetadata, $requestBranch->grpcOptions);
+
+        if (Result::ONGOING_STATUS == $status) {
+            throw new OngingException();
+        }
+        if (Result::FAILURE_STATUS == $status) {
+            throw new FailureException();
+        }
+        if ($status !== 0) {
+            throw new RequestException($reply->serializeToString(), $status);
+        }
+
+        return [$reply, $status, $response];
     }
 
     protected function transferToRequest(array $body): DtmRequest
