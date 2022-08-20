@@ -17,4 +17,3 @@ parameters:
         - '#Parameter \$request of method DtmClient\\Middleware\\DtmLaravelMiddleware::handle\(\) has invalid type Illuminate\\Http\\Request\.#'
         - '#Call to static method affectingStatement\(\) on an unknown class Illuminate\\Support\\Facades\\DB\.#'
         - '#Class Hyperf\\GrpcServer\\CoreMiddleware not found\.#'
-        - '#Class Hyperf\\GrpcClient\\BaseClient not found\.#'
