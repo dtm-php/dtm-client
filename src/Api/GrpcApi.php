@@ -92,7 +92,7 @@ class GrpcApi implements ApiInterface
         if (Result::FAILURE_STATUS == $status) {
             throw new FailureException();
         }
-        if ($status !== 0) {
+        if ($status !== Result::OK_STATUS) {
             throw new RequestException($reply->serializeToString(), $status);
         }
 
