@@ -60,10 +60,6 @@ class ConfigProvider
                     'paths' => [
                         __DIR__,
                     ],
-                    'class_map' => [
-                        CoreMiddleware::class => __DIR__ . '/../class_map/CoreMiddleware.php',
-                        BaseClient::class => __DIR__ . '/../class_map/BaseClient.php',
-                    ],
                 ],
             ],
         ];

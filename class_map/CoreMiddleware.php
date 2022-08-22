@@ -174,7 +174,7 @@ class CoreMiddleware extends HttpCoreMiddleware
             ->withAddedHeader('Server', 'Hyperf')
             ->withAddedHeader('Content-Type', 'application/grpc')
             ->withAddedHeader('trailer', 'grpc-status, grpc-message')
-            ->withTrailer('grpc-status', $grpcStatus)
+            ->withTrailer('grpc-status', (string) $grpcStatus)
             ->withTrailer('grpc-message', $grpcMessage);
     }
 }
