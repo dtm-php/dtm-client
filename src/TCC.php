@@ -46,7 +46,6 @@ class TCC extends AbstractTransaction
             $this->api->abort($requestBody);
             throw $throwable;
         }
-
         $this->api->submit($requestBody);
     }
 

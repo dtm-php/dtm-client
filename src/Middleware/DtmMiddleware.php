@@ -10,9 +10,15 @@ namespace DtmClient\Middleware;
 
 use DtmClient\Annotation\Barrier as BarrierAnnotation;
 use DtmClient\Barrier;
+use DtmClient\Constants\Protocol;
+use DtmClient\Constants\Result;
+use DtmClient\Exception\FailureException;
+use DtmClient\Exception\OngingException;
 use DtmClient\Exception\RuntimeException;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Di\Annotation\AnnotationCollector;
+use Hyperf\Grpc\StatusCode;
+use Hyperf\HttpMessage\Stream\SwooleStream;
 use Hyperf\HttpServer\Router\Dispatched;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -69,14 +75,14 @@ class DtmMiddleware implements MiddlewareInterface
                 $handler->handle($request);
             };
 
-            if (in_array($class . '::' . $method, $barrier) && $this->barrier->call($businessCall)) {
-                return $this->response->withStatus(200);
+            if (in_array($class . '::' . $method, $barrier)) {
+                return $this->handlerBarrierCall($businessCall);
             }
 
             $annotations = AnnotationCollector::getClassMethodAnnotation($class, $method);
 
-            if (isset($annotations[BarrierAnnotation::class]) && $this->barrier->call($businessCall)) {
-                return $this->response->withStatus(200);
+            if (isset($annotations[BarrierAnnotation::class])) {
+                return $this->handlerBarrierCall($businessCall);
             }
         }
 
@@ -103,4 +109,44 @@ class DtmMiddleware implements MiddlewareInterface
 
         return ['class' => $class, 'method' => $method];
     }
+
+    protected function handlerBarrierCall(callable $businessCall): ResponseInterface
+    {
+        $response = $this->response;
+        if ($this->isGRPC()) {
+            $response = $response
+                ->withBody(new SwooleStream(\DtmClient\Grpc\GrpcParser::serializeMessage(null)))
+                ->withAddedHeader('Server', 'Hyperf')
+                ->withAddedHeader('Content-Type', 'application/grpc')
+                ->withAddedHeader('trailer', 'grpc-status, grpc-message');
+        }
+
+        try {
+            $this->barrier->call($businessCall);
+            $response = $response->withStatus(200);
+            $this->isGRPC() && $response = $response->withTrailer('grpc-status', (string) StatusCode::OK)->withTrailer('grpc-message', 'ok');
+            return $response;
+        } catch (OngingException $ongingException) {
+            $code = $this->isGRPC() ? 200 : $ongingException->getCode();
+            $response = $response->withStatus($code);
+            $this->isGRPC() && $response = $response->withTrailer('grpc-status', (string) $ongingException->getCode())->withTrailer('grpc-message', $ongingException->getMessage());
+            return $response;
+        } catch (FailureException $failureException) {
+            $code = $this->isGRPC() ? 200 : $failureException->getCode();
+            $response = $response->withStatus($code);
+            $this->isGRPC() && $response = $response->withTrailer('grpc-status', (string) $failureException->getCode())->withTrailer('grpc-message', $failureException->getMessage());
+            return $response;
+        } catch (\Throwable $throwable) {
+            $code = $this->isGRPC() ? 200 : Result::FAILURE_STATUS;
+            $response = $response->withStatus($code);
+            $this->isGRPC() && $response = $response->withTrailer('grpc-status', (string) Result::FAILURE_STATUS)->withTrailer('grpc-message', $throwable->getMessage());
+            return $response;
+        }
+    }
+
+    protected function isGRPC():bool
+    {
+        return $this->config->get('dtm.protocol') === Protocol::GRPC;
+    }
+
 }

@@ -32,6 +32,11 @@ class Result
 
     public const ERR_DUPLICATED_STATUS = 425;
 
+    public const OK_STATUS = 0;
+
+    public const OK = 'OK';
+
+
     public static function isOngoing(ResponseInterface|array $response)
     {
         if (is_array($response)) {

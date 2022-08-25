@@ -9,7 +9,11 @@ declare(strict_types=1);
 namespace DtmClient\Grpc;
 
 use Google\Protobuf\Internal\Message;
+use Hyperf\Grpc\Parser;
+use Hyperf\Grpc\StatusCode;
 use Hyperf\GrpcClient\BaseClient;
+use Hyperf\GrpcClient\Exception\GrpcClientException;
+use Swoole\Http2\Response;
 
 class UniversalGrpcClient extends BaseClient
 {
