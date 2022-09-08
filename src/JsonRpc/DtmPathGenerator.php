@@ -10,7 +10,7 @@ namespace DtmClient\JsonRpc;
 
 use Hyperf\Rpc\Contract\PathGeneratorInterface;
 
-class DtmPatchGenerator implements PathGeneratorInterface
+class DtmPathGenerator implements PathGeneratorInterface
 {
     public function generate(string $service, string $method): string
     {

@@ -19,7 +19,7 @@ use DtmClient\DbTransaction\DBTransactionInterface;
 use DtmClient\DbTransaction\HyperfDbTransaction;
 use DtmClient\Grpc\GrpcClientManager;
 use DtmClient\Grpc\GrpcClientManagerFactory;
-use DtmClient\JsonRpc\DtmPatchGenerator;
+use DtmClient\JsonRpc\DtmPathGenerator;
 use Hyperf\HttpServer\Response;
 use Hyperf\JsonRpc\JsonRpcPoolTransporter;
 use Hyperf\JsonRpc\JsonRpcTransporter;
@@ -48,7 +48,7 @@ class ConfigProvider
                 GrpcClientManager::class => GrpcClientManagerFactory::class,
                 DBTransactionInterface::class => HyperfDbTransaction::class,
                 DBSpecialInterface::class => DBSpecialFactory::class,
-                PathGeneratorInterface::class => DtmPatchGenerator::class,
+                PathGeneratorInterface::class => DtmPathGenerator::class,
                 JsonRpcTransporter::class => JsonRpcPoolTransporter::class,
                 ResponseInterface::class => Response::class,
                 DatabaseConfigInterface::class => HyperfDatabaseConfig::class,
