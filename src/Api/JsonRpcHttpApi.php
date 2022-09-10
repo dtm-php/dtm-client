@@ -15,7 +15,7 @@ use DtmClient\Exception\FailureException;
 use DtmClient\Exception\OngingException;
 use DtmClient\Exception\RequestException;
 use DtmClient\Exception\UnsupportedException;
-use DtmClient\JsonRpc\DtmPatchGenerator;
+use DtmClient\JsonRpc\DtmPathGenerator;
 use DtmClient\JsonRpc\JsonRpcClientManager;
 use DtmClient\TransContext;
 use GuzzleHttp\Client;
@@ -25,19 +25,19 @@ use Psr\Container\ContainerInterface;
 
 class JsonRpcHttpApi extends AbstractServiceClient implements ApiInterface
 {
-    protected $serviceName = 'dtmserver';
+    protected string $serviceName = 'dtmserver';
 
-    protected $protocol = 'jsonrpc-http';
+    protected string $protocol = 'jsonrpc-http';
 
     protected ConfigInterface $config;
 
     protected JsonRpcClientManager $jsonRpcClientManager;
 
-    public function __construct(ContainerInterface $container, DtmPatchGenerator $patchGenerator, JsonRpcClientManager $jsonRpcClientManager)
+    public function __construct(ContainerInterface $container, DtmPathGenerator $pathGenerator, JsonRpcClientManager $jsonRpcClientManager)
     {
         parent::__construct($container);
 
-        $this->pathGenerator = $patchGenerator;
+        $this->pathGenerator = $pathGenerator;
         $this->config = $container->get(ConfigInterface::class);
         $this->jsonRpcClientManager = $jsonRpcClientManager;
     }
