@@ -6,9 +6,10 @@ declare(strict_types=1);
  *
  * @license  https://github.com/dtm-php/dtm-client/blob/master/LICENSE
  */
-namespace DtmClientTest\Cases;
+namespace DtmClientTest\Cases\Api;
 
 use DtmClient\Api\HttpApi;
+use DtmClientTest\Cases\AbstractTestCase;
 use GuzzleHttp\Client;
 use Hyperf\Contract\ConfigInterface;
 use Mockery;
