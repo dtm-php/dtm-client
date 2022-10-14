@@ -25,10 +25,6 @@ use Psr\Container\ContainerInterface;
 
 class JsonRpcHttpApi extends AbstractServiceClient implements ApiInterface
 {
-    protected string $serviceName = 'dtmserver';
-
-    protected string $protocol = 'jsonrpc-http';
-
     protected ConfigInterface $config;
 
     protected JsonRpcClientManager $jsonRpcClientManager;
@@ -36,7 +32,9 @@ class JsonRpcHttpApi extends AbstractServiceClient implements ApiInterface
     public function __construct(ContainerInterface $container, DtmPathGenerator $pathGenerator, JsonRpcClientManager $jsonRpcClientManager)
     {
         parent::__construct($container);
-
+        // Compatible with hyperf2.2 and hyperf3.0
+        $this->serviceName = 'dtmserver';
+        $this->protocol = 'jsonrpc-http';
         $this->pathGenerator = $pathGenerator;
         $this->config = $container->get(ConfigInterface::class);
         $this->jsonRpcClientManager = $jsonRpcClientManager;
