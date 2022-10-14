@@ -60,8 +60,17 @@ jobs:
           sudo make install
           sudo sh -c "echo extension=swow > /etc/php/${{ matrix.php-version }}/cli/conf.d/swow.ini"
           php --ri swow
+
       - name: Setup Packages
+        if: ${{ matrix.engine != 'swow' }}
         run: composer update -o --no-scripts
+
+      - name: Setup Swow Packages
+        if: ${{ matrix.engine == 'swow' }}
+        run: |
+          composer update -o --no-scripts
+          composer require hyperf/engine-swow
+
       - name: Run Test Cases
         run: |
           composer require symfony/finder:^5.0
