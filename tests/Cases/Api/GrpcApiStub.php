@@ -6,7 +6,7 @@ declare(strict_types=1);
  *
  * @license  https://github.com/dtm-php/dtm-client/blob/master/LICENSE
  */
-namespace DtmClientTest\Cases;
+namespace DtmClientTest\Cases\Api;
 
 use DtmClient\Api\GrpcApi;
 use DtmClient\Grpc\GrpcClient;

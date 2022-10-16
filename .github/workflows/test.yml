@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -60,10 +60,10 @@ jobs:
           sudo make install
           sudo sh -c "echo extension=swow > /etc/php/${{ matrix.php-version }}/cli/conf.d/swow.ini"
           php --ri swow
+
       - name: Setup Packages
-        run: composer update -o --no-scripts
-      - name: Run Test Cases
         run: |
+          composer update -o --no-scripts
           composer require symfony/finder:^5.0
           composer require hyperf/di
           composer require hyperf/grpc-client
@@ -77,5 +77,13 @@ jobs:
           composer require hyperf/json-rpc
           composer require hyperf/rpc-client
           composer require symfony/serializer:^5.0
+
+      - name: Setup Swow Packages
+        if: ${{ matrix.engine == 'swow' }}
+        run: |
+          composer require hyperf/engine-swow
+
+      - name: Run Test Cases
+        run: |
           composer analyse
           composer test

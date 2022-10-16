@@ -8,8 +8,8 @@ declare(strict_types=1);
  */
 namespace DtmClient;
 
+use DtmClient\Context\Context;
 use DtmClient\Util\Str;
-use Hyperf\Context\Context;
 
 /**
  * All properties in this class are read-only.
