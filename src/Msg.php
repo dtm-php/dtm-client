@@ -92,8 +92,8 @@ class Msg extends AbstractTransaction
         $requestBranch->op = TransContext::getOp();
         $requestBranch->url = $queryPrepared;
         $requestBranch->grpcArgument = new GPBEmpty();
-        /** @var Response $response */
-        $response = $this->api->transRequestBranch($requestBranch);
+
+        $this->api->transRequestBranch($requestBranch);
 
         // if local transaction is fail, then abort transaction
         $this->api->abort(TransContext::toArray());
