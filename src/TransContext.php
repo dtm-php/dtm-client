@@ -124,7 +124,7 @@ class TransContext extends Context
         static::set(static::class . '.dtm', $dtm);
     }
 
-    public static function getCustomData(): string
+    public static function getCustomData(): ?string
     {
         return static::get(static::class . '.customData');
     }
