@@ -41,9 +41,7 @@ class SagaTest extends AbstractTestCase
         $this->assertEquals($saga, $result);
         $this->assertEquals(TransContext::getSteps(), [['action' => 'testAction', 'compensate' => 'compensate']]);
         $this->assertEquals(TransContext::getPayloads(), [json_encode(['test' => 'message'])]);
-        // Clean TransContext
-        TransContext::setSteps([]);
-        TransContext::setPayloads([]);
+        $this->cleanTransContext();
     }
 
     public function testAddUseJsonRpcHttp()
@@ -58,9 +56,7 @@ class SagaTest extends AbstractTestCase
         $this->assertEquals($saga, $result);
         $this->assertEquals(TransContext::getSteps(), [['action' => 'testAction', 'compensate' => 'compensate']]);
         $this->assertEquals(TransContext::getPayloads(), [json_encode(['test' => 'message'])]);
-        // Clean TransContext
-        TransContext::setSteps([]);
-        TransContext::setPayloads([]);
+        $this->cleanTransContext();
     }
 
     public function testAddUseGrpc()
@@ -87,7 +83,6 @@ class SagaTest extends AbstractTestCase
 
         $saga->addBranchOrder(1, ['preBranches']);
         $saga->addBranchOrder(2, ['preBranches1']);
-
 
         $ordersProperty = new \ReflectionProperty($saga, 'orders');
         $ordersProperty->setAccessible(true);
@@ -131,7 +126,13 @@ class SagaTest extends AbstractTestCase
                 ['test' => 'test']
             ],
         ]), TransContext::getCustomData());
+    }
 
+    public function cleanTransContext()
+    {
+        // Clean TransContext
+        TransContext::setSteps([]);
+        TransContext::setPayloads([]);
     }
 
 }
