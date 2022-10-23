@@ -41,6 +41,9 @@ class SagaTest extends AbstractTestCase
         $this->assertEquals($saga, $result);
         $this->assertEquals(TransContext::getSteps(), [['action' => 'testAction', 'compensate' => 'compensate']]);
         $this->assertEquals(TransContext::getPayloads(), [json_encode(['test' => 'message'])]);
+        // Clean TransContext
+        TransContext::setSteps([]);
+        TransContext::setPayloads([]);
     }
 
     public function testAddUseJsonRpcHttp()
@@ -55,6 +58,9 @@ class SagaTest extends AbstractTestCase
         $this->assertEquals($saga, $result);
         $this->assertEquals(TransContext::getSteps(), [['action' => 'testAction', 'compensate' => 'compensate']]);
         $this->assertEquals(TransContext::getPayloads(), [json_encode(['test' => 'message'])]);
+        // Clean TransContext
+        TransContext::setSteps([]);
+        TransContext::setPayloads([]);
     }
 
     public function testAddUseGrpc()
