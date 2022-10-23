@@ -3,13 +3,11 @@
 namespace DtmClientTest\Cases;
 
 use DtmClient\Api\ApiInterface;
-use DtmClient\Barrier;
 use DtmClient\Constants\Protocol;
 use DtmClient\Constants\TransType;
 use DtmClient\Grpc\Message\DtmBranchRequest;
 use DtmClient\Saga;
 use DtmClient\TransContext;
-use PHPUnit\Util\Json;
 
 class SagaTest extends AbstractTestCase
 {
