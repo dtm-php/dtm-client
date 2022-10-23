@@ -25,6 +25,7 @@ class SagaTest extends AbstractTestCase
 
         $saga->init('test');
         $this->assertSame('test', TransContext::getGid());
+        $this->cleanTransContext();
     }
 
     public function testAddUseHttp()
@@ -131,6 +132,8 @@ class SagaTest extends AbstractTestCase
         // Clean TransContext
         TransContext::setSteps([]);
         TransContext::setPayloads([]);
+        TransContext::setGid('');
+        TransContext::setBinPayloads([]);
     }
 
 }
