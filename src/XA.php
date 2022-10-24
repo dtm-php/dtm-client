@@ -25,7 +25,7 @@ class XA extends AbstractTransaction
 
     protected BranchIdGeneratorInterface $branchIdGenerator;
 
-    protected DtmImp $dtmimp;
+    protected DtmImp $dtmImp;
 
     protected DBTransactionInterface $dbTransaction;
 
@@ -34,21 +34,21 @@ class XA extends AbstractTransaction
         $this->api = $api;
         $this->barrier = $barrier;
         $this->branchIdGenerator = $branchIdGenerator;
-        $this->dtmimp = $dtmImp;
+        $this->dtmImp = $dtmImp;
         $this->dbTransaction = $dbTransaction;
     }
 
     /**
-     * start a xa local transaction.
+     * Start a xa local transaction.
      */
     public function localTransaction(callable $callback): void
     {
         if (TransContext::getOp() == Branch::BranchCommit || TransContext::getOp() == Branch::BranchRollback) {
-            $this->dtmimp->xaHandlePhase2(TransContext::getGid(), TransContext::getBranchId(), TransContext::getOp());
+            $this->dtmImp->xaHandlePhase2(TransContext::getGid(), TransContext::getBranchId(), TransContext::getOp());
             return;
         }
 
-        $this->dtmimp->xaHandleLocalTrans(function () use ($callback) {
+        $this->dtmImp->xaHandleLocalTrans(function () use ($callback) {
             $callback($this->dbTransaction);
             switch ($this->api->getProtocol()) {
                 case Protocol::GRPC:
@@ -75,11 +75,7 @@ class XA extends AbstractTransaction
         });
     }
 
-    /**
-     * @param null|mixed $rpcReply
-     * @throws InvalidArgumentException
-     */
-    public function callBranch(string $url, array|Message $body, array $rpcReply = null)
+    public function callBranch(string $url, array|Message $body, ?array $rpcReply = null)
     {
         $subBranch = $this->branchIdGenerator->generateSubBranchId();
         switch ($this->api->getProtocol()) {
@@ -92,7 +88,7 @@ class XA extends AbstractTransaction
                 $requestBranch->op = Operation::ACTION;
                 $requestBranch->method = 'POST';
                 $requestBranch->branchId = $subBranch;
-                $requestBranch->branchHeaders = TransContext::$branchHeaders;
+                $requestBranch->branchHeaders = TransContext::getBranchHeaders();
                 return $this->api->transRequestBranch($requestBranch);
             case Protocol::GRPC:
                 if (! $body instanceof Message) {
@@ -120,8 +116,7 @@ class XA extends AbstractTransaction
     }
 
     /**
-     * start a xa global transaction.
-     * @throws \Throwable
+     * Start a xa global transaction.
      */
     public function globalTransaction(string $gid, callable $callback)
     {
