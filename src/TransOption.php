@@ -25,7 +25,7 @@ trait TransOption
      */
     public static array $passthroughHeaders = [];
 
-    public static array $branchHeaders = [];
+    public static ?array $branchHeaders = [];
 
     public static function isWaitResult(): ?bool
     {
@@ -69,7 +69,7 @@ trait TransOption
 
     public static function getBranchHeaders(): array
     {
-        return static::get(TransContext::class . '.branchHeaders');
+        return static::get(TransContext::class . '.branchHeaders', []);
     }
 
     public static function setBranchHeaders(array $branchHeaders)
