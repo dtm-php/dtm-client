@@ -22,7 +22,7 @@ class HttpApiFactory
         $options = $config->get('dtm.guzzle.options', []);
         $client = new Client(array_merge(
             [
-                'base_uri' => $server . ':' . $port,
+                'base_uri' => empty($port) ? $server : $server . ':' . $port,
             ],
             $options
         ));
