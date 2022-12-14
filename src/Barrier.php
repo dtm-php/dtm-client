@@ -29,12 +29,7 @@ class Barrier
 
     public function call(callable $businessCall)
     {
-        switch ($this->config->get('dtm.barrier.db.type', DbType::MySQL)) {
-            case DbType::MySQL:
-                return $this->mySqlBarrier->call($businessCall);
-            default:
-                throw new UnsupportedException('Barrier DB type is unsupported.');
-        }
+        return $this->getBarrier()->call($businessCall);
     }
 
     public function barrierFrom(string $transType, string $gid, string $branchId, string $op, ?string $phase2Url = null, ?string $dtm = null)
@@ -71,4 +66,21 @@ class Barrier
             throw new DtmException(sprintf('Invalid transaction info: %s', $info));
         }
     }
+
+    public function queryPrepared(string $transType, string $gid)
+    {
+        return $this->getBarrier()->queryPrepared($transType, $gid);
+    }
+
+    protected function getBarrier(): BarrierInterface
+    {
+        switch ($this->config->get('dtm.barrier.db.type', DbType::MySQL)) {
+            case DbType::MySQL:
+                return $this->mySqlBarrier;
+            default:
+                throw new UnsupportedException('Barrier DB type is unsupported.');
+        }
+    }
+
+
 }

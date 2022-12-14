@@ -26,7 +26,7 @@ class HyperfDatabaseConfig implements DatabaseConfigInterface
 
     public function getPort(): int
     {
-        return $this->getConfig('port');
+        return (int) $this->getConfig('port');
     }
 
     public function getDatabase(): string

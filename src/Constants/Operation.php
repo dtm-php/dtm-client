@@ -29,4 +29,6 @@ class Operation
     public const BRANCH_COMPENSATE = 'compensate';
 
     public const ACTION = 'action';
+
+    public const ROLLBACK = 'rollback';
 }

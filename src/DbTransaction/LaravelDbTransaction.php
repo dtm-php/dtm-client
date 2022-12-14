@@ -22,16 +22,21 @@ class LaravelDbTransaction extends AbstractTransaction
 
     public function commit()
     {
-        Db::commit();
+        DB::commit();
     }
 
     public function rollback()
     {
-        Db::rollback();
+        DB::rollback();
     }
 
     public function execute(string $sql, array $bindings = []): int
     {
-        return Db::affectingStatement($sql, $bindings);
+        return DB::affectingStatement($sql, $bindings);
+    }
+
+    public function query(string $sql, array $bindings = []): bool|array
+    {
+        return DB::select($sql, $bindings);
     }
 }

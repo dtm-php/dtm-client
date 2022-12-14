@@ -30,4 +30,13 @@ class Branch
 
     // BranchRollback branch type for XA
     public const BranchRollback = 'rollback';
+
+    // MsgDoBranch0 const for DoAndSubmit barrier branch
+    public const MsgDoBranch0 = '00';
+
+    // MsgDoBarrier1 const for DoAndSubmit barrier barrierID
+    public const MsgDoBarrier1 = '01';
+
+    // MsgDoOp const for DoAndSubmit barrier op
+    public const MsgDoOp = 'msg';
 }

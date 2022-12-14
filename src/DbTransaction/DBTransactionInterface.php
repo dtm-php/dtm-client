@@ -18,6 +18,8 @@ interface DBTransactionInterface
 
     public function execute(string $sql, array $bindings = []): int;
 
+    public function query(string $sql, array $bindings = []): bool|array;
+
     public function xaExecute(string $sql, array $bindings = []): int;
 
     public function xaQuery(string $sql, array $bindings = []): bool|array;
