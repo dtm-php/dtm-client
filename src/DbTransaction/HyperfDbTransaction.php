@@ -37,4 +37,9 @@ class HyperfDbTransaction extends AbstractTransaction
     {
         return Db::affectingStatement($sql, $bindings);
     }
+
+    public function query(string $sql, array $bindings = []): bool|array
+    {
+        return Db::select($sql, $bindings);
+    }
 }

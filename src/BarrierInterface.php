@@ -11,4 +11,6 @@ namespace DtmClient;
 interface BarrierInterface
 {
     public function call(callable $businessCall): bool;
+
+    public function queryPrepared(string $transType, string $gid): bool;
 }

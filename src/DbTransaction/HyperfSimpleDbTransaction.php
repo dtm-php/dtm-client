@@ -37,4 +37,10 @@ class HyperfSimpleDbTransaction extends AbstractTransaction
     {
         return DB::execute($sql, $bindings);
     }
+
+    public function query(string $sql, array $bindings = []): bool|array
+    {
+        return DB::query($sql, $bindings);
+    }
+    
 }

@@ -13,6 +13,7 @@ use DtmClient\Constants\Operation;
 use DtmClient\Constants\TransType;
 use DtmClient\DbTransaction\DBTransactionInterface;
 use DtmClient\Exception\DuplicatedException;
+use DtmClient\Exception\FailureException;
 
 class MySqlBarrier implements BarrierInterface
 {
@@ -79,5 +80,24 @@ class MySqlBarrier implements BarrierInterface
             'INSERT IGNORE INTO `barrier` (trans_type, gid, branch_id, op, barrier_id, reason) values(?,?,?,?,?,?)',
             [$transType, $gid, $branchId, $op, $barrierID, $reason]
         );
+    }
+
+
+    public function queryPrepared(string $transType, string $gid): bool
+    {
+        $this->DBTransaction->execute(
+            'INSERT IGNORE INTO `barrier` (trans_type, gid, branch_id, op, barrier_id, reason) values(?,?,?,?,?,?)',
+            [$transType, $gid, Branch::MsgDoBranch0, Branch::MsgDoOp, Branch::MsgDoBarrier1, Operation::ROLLBACK]
+        );
+
+        $reason = $this->DBTransaction->query(
+            'select reason from `barrier` where gid=? and branch_id=? and op=? and barrier_id=? limit 1',
+            [$gid, Branch::MsgDoBranch0, Branch::MsgDoOp, Branch::MsgDoBarrier1]
+        )[0];
+
+        if ($reason->reason == Operation::ROLLBACK) {
+            throw new FailureException();
+        }
+        return true;
     }
 }
