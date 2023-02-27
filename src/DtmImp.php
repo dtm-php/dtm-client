@@ -78,6 +78,8 @@ class DtmImp
             $this->dbTransaction->xaExec($sql);
             $sql = $this->DBSpecial->getXaSQL('prepare', $xaId);
             $this->dbTransaction->xaExec($sql);
+        } catch (PDOException $exception) {
+            throw $exception;
         } catch (\Throwable $throwable) {
             $sql = $this->DBSpecial->getXaSQL('rollback', $xaId);
             $this->dbTransaction->xaExec($sql);
