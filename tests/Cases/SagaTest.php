@@ -103,6 +103,19 @@ class SagaTest extends AbstractTestCase
         $this->assertTrue($concurrent);
     }
 
+    public function testEnableConcurrentWithoutAddBranchOrders()
+    {
+        $api = \Mockery::mock(ApiInterface::class);
+
+        $saga = new Saga($api);
+        $saga->enableConcurrent();
+
+        $ordersProperty = new \ReflectionProperty($saga, 'orders');
+        $ordersProperty->setAccessible(true);
+        $orders = $ordersProperty->getValue($saga);
+        $this->assertSame(null, $orders ?: null);
+    }
+
     public function testSubmit()
     {
         $api = \Mockery::mock(ApiInterface::class);
