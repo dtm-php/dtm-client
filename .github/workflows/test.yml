@@ -64,9 +64,8 @@ jobs:
       - name: Setup Packages
         run: |
           composer update -o --no-scripts
-          composer update hyperf/context:^3.0
           composer require symfony/finder:^5.0
-          composer require hyperf/di
+          composer require hyperf/di:^3.0
           composer require hyperf/grpc-client
           composer require hyperf/framework
           composer require psr/log:^1.0
