@@ -77,11 +77,10 @@ class DtmImp
             $sql = $this->DBSpecial->getXaSQL('end', $xaId);
             $this->dbTransaction->xaExec($sql);
             $sql = $this->DBSpecial->getXaSQL('prepare', $xaId);
+            $this->dbTransaction->xaExec($sql);
 
             // Fix the MySql XA deadlock
             $this->dbTransaction->reconnect();
-
-            $this->dbTransaction->xaExec($sql);
         } catch (PDOException $exception) {
             throw $exception;
         } catch (\Throwable $throwable) {
