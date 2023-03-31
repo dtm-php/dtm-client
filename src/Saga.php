@@ -6,6 +6,7 @@ declare(strict_types=1);
  *
  * @license  https://github.com/dtm-php/dtm-client/blob/master/LICENSE
  */
+
 namespace DtmClient;
 
 use DtmClient\Api\ApiInterface;
@@ -79,7 +80,7 @@ class Saga extends AbstractTransaction
         if ($this->concurrent) {
             TransContext::setCustomData(json_encode([
                 'concurrent' => $this->concurrent,
-                'orders' => $this->orders,
+                'orders' => $this->orders ?: null,
             ]));
         }
     }
