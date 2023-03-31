@@ -78,6 +78,11 @@ class DtmImp
             $this->dbTransaction->xaExec($sql);
             $sql = $this->DBSpecial->getXaSQL('prepare', $xaId);
             $this->dbTransaction->xaExec($sql);
+
+            // Fix the MySql XA deadlock
+            $this->dbTransaction->reconnect();
+        } catch (PDOException $exception) {
+            throw $exception;
         } catch (\Throwable $throwable) {
             $sql = $this->DBSpecial->getXaSQL('rollback', $xaId);
             $this->dbTransaction->xaExec($sql);

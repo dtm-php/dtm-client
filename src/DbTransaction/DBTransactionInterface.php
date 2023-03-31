@@ -8,6 +8,8 @@ declare(strict_types=1);
  */
 namespace DtmClient\DbTransaction;
 
+use PDO;
+
 interface DBTransactionInterface
 {
     public function beginTransaction();
@@ -25,4 +27,6 @@ interface DBTransactionInterface
     public function xaQuery(string $sql, array $bindings = []): bool|array;
 
     public function xaExec(string $sql): int|false;
+
+    public function reconnect(): PDO;
 }

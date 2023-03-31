@@ -57,10 +57,16 @@ abstract class AbstractTransaction implements DBTransactionInterface
         return $this->connect()->exec($sql);
     }
 
+    public function reconnect(): PDO
+    {
+        Context::set('dtm.connect', null);
+        return $this->connect();
+    }
+
     protected function connect(): PDO
     {
         if (! isset($this->databaseConfig->getOptions()[PDO::ATTR_AUTOCOMMIT])) {
-            throw new RuntimeException('plase set autocommit is false');
+            throw new RuntimeException('please set autocommit is false');
         }
 
         $pdo = Context::get('dtm.connect');

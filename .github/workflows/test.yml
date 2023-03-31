@@ -64,6 +64,7 @@ jobs:
       - name: Setup Packages
         run: |
           composer update -o --no-scripts
+          composer update doctrine/instantiator:^1.0
           composer require symfony/finder:^5.0
           composer require hyperf/di
           composer require hyperf/grpc-client
