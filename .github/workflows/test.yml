@@ -70,6 +70,7 @@ jobs:
           composer require hyperf/grpc-client
           composer require hyperf/framework
           composer require psr/log:^1.0
+          composer require psr/container:^1.0
           composer require symfony/console:^5.0
           composer require hyperf/dispatcher
           composer require hyperf/server
