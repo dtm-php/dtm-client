@@ -71,6 +71,7 @@ jobs:
           composer require hyperf/framework
           composer require psr/log:^1.0
           composer require symfony/console:^5.0
+          composer require hyperf/dispatcher
           composer require hyperf/server
           composer require hyperf/http-server
           composer require hyperf/db
