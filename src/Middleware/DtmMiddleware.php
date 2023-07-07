@@ -72,7 +72,7 @@ class DtmMiddleware implements MiddlewareInterface
             $barrier = $this->config->get('dtm.barrier.apply', []);
 
             $businessCall = function () use ($handler, $request) {
-                $handler->handle($request);
+                return $handler->handle($request);
             };
 
             if (in_array($class . '::' . $method, $barrier)) {

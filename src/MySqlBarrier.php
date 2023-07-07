@@ -10,6 +10,7 @@ namespace DtmClient;
 
 use DtmClient\Constants\Branch;
 use DtmClient\Constants\Operation;
+use DtmClient\Constants\Result;
 use DtmClient\Constants\TransType;
 use DtmClient\DbTransaction\DBTransactionInterface;
 use DtmClient\Exception\DuplicatedException;
@@ -59,7 +60,10 @@ class MySqlBarrier implements BarrierInterface
                 return true;
             }
 
-            $businessCall();
+            $response = $businessCall();
+            if ($response->getStatusCode() !== Result::SUCCESS_STATUS) {
+                throw new FailureException();
+            }
 
             $this->DBTransaction->commit();
 
