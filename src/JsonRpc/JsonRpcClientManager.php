@@ -21,6 +21,6 @@ class JsonRpcClientManager
             return $this->clients[$serviceName];
         }
 
-        return $this->clients[$serviceName] = make(JsonRpcClient::class)->setServiceName($serviceName)->initClient();
+        return $this->clients[$serviceName] = make(JsonRpcClientInterface::class)->setServiceName($serviceName)->initClient();
     }
 }
