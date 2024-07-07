@@ -17,14 +17,14 @@ use Hyperf\RpcClient\Client;
 use Hyperf\RpcClient\Exception\RequestException;
 use Psr\Container\ContainerInterface;
 
-class JsonRpcClient extends AbstractServiceClient
+class JsonRpcClient extends AbstractServiceClient implements JsonRpcClientInterface
 {
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
 
-    public function initClient()
+    public function initClient(): static
     {
         $this->loadBalancerManager = $this->container->get(LoadBalancerManager::class);
         $protocol = new Protocol($this->container, $this->container->get(ProtocolManager::class), $this->protocol, $this->getOptions());
@@ -39,13 +39,13 @@ class JsonRpcClient extends AbstractServiceClient
         return $this;
     }
 
-    public function setServiceName(string $serviceName)
+    public function setServiceName(string $serviceName): static
     {
         $this->serviceName = $serviceName;
         return $this;
     }
 
-    public function send(string $method, array $params, ?string $id = null)
+    public function send(string $method, array $params, ?string $id = null): array
     {
         if (! $id && $this->idGenerator instanceof IdGeneratorInterface) {
             $id = $this->idGenerator->generate();
