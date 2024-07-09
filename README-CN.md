@@ -73,6 +73,7 @@ composer require dtm/dtm-client
 ```bash
 php bin/hyperf.php vendor:publish dtm/dtm-client
 ```
+另需运行vendor/dtm/dtm-client/publish下的barrier表迁移文件
 
 如果您是在非 Hyperf 框架中使用，可复制 `./vendor/dtm/dtm-client/publish/dtm.php` 文件到对应的配置目录中。
 
