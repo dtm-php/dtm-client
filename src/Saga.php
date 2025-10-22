@@ -18,6 +18,10 @@ use Google\Protobuf\Internal\Message;
 
 class Saga extends AbstractTransaction
 {
+    protected const CONCURRENT = self::class . '.concurrent';
+
+    protected const ORDERS = self::class . '.orders';
+
     protected ApiInterface $api;
 
     public function __construct(ApiInterface $api)
@@ -30,8 +34,8 @@ class Saga extends AbstractTransaction
         if ($gid === null) {
             $gid = $this->generateGid();
         }
-        Context::set('concurrent', false);
-        Context::set('orders', []);
+        Context::set(static::CONCURRENT, false);
+        Context::set(static::ORDERS, []);
         TransContext::init($gid, TransType::SAGA, '');
     }
 
@@ -59,15 +63,15 @@ class Saga extends AbstractTransaction
 
     public function addBranchOrder(int $branch, array $preBranches): static
     {
-        $orders = Context::get('orders', []);
+        $orders = Context::get(static::ORDERS, []);
         $orders[$branch] = $preBranches;
-        Context::set('orders', $orders);
+        Context::set(static::ORDERS, $orders);
         return $this;
     }
 
     public function enableConcurrent()
     {
-        Context::set('concurrent', true);
+        Context::set(static::CONCURRENT, true);
     }
 
     public function submit()
@@ -78,10 +82,10 @@ class Saga extends AbstractTransaction
 
     public function addConcurrentContext()
     {
-        if (Context::get('concurrent', false)) {
+        if (Context::get(static::CONCURRENT, false)) {
             TransContext::setCustomData(json_encode([
-                'concurrent' => Context::get('concurrent'),
-                'orders' => Context::get('orders') ?: null,
+                'concurrent' => Context::get(static::CONCURRENT),
+                'orders' => Context::get(static::ORDERS) ?: null,
             ]));
         }
     }
