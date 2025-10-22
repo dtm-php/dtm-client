@@ -12,15 +12,12 @@ namespace DtmClient;
 use DtmClient\Api\ApiInterface;
 use DtmClient\Constants\Protocol;
 use DtmClient\Constants\TransType;
+use DtmClient\Context\Context;
 use DtmClient\Exception\UnsupportedException;
 use Google\Protobuf\Internal\Message;
 
 class Saga extends AbstractTransaction
 {
-    protected array $orders = [];
-
-    protected bool $concurrent = false;
-
     protected ApiInterface $api;
 
     public function __construct(ApiInterface $api)
@@ -33,6 +30,8 @@ class Saga extends AbstractTransaction
         if ($gid === null) {
             $gid = $this->generateGid();
         }
+        Context::set('concurrent', false);
+        Context::set('orders', []);
         TransContext::init($gid, TransType::SAGA, '');
     }
 
@@ -60,13 +59,15 @@ class Saga extends AbstractTransaction
 
     public function addBranchOrder(int $branch, array $preBranches): static
     {
-        $this->orders[$branch] = $preBranches;
+        $orders = Context::get('orders', []);
+        $orders[$branch] = $preBranches;
+        Context::set('orders', $orders);
         return $this;
     }
 
     public function enableConcurrent()
     {
-        $this->concurrent = true;
+        Context::set('concurrent', true);
     }
 
     public function submit()
@@ -77,10 +78,10 @@ class Saga extends AbstractTransaction
 
     public function addConcurrentContext()
     {
-        if ($this->concurrent) {
+        if (Context::get('concurrent', false)) {
             TransContext::setCustomData(json_encode([
-                'concurrent' => $this->concurrent,
-                'orders' => $this->orders ?: null,
+                'concurrent' => Context::get('concurrent'),
+                'orders' => Context::get('orders') ?: null,
             ]));
         }
     }
