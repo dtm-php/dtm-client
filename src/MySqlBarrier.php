@@ -40,6 +40,7 @@ class MySqlBarrier implements BarrierInterface
         $originOP = [
             Branch::BranchCancel => Branch::BranchTry,
             Branch::BranchCompensate => Branch::BranchAction,
+            Branch::BranchRollback => Branch::BranchRollback,
         ][$op] ?? '';
 
         $this->DBTransaction->beginTransaction();
