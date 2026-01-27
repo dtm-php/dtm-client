@@ -12,5 +12,7 @@ class DbType
 {
     public const MySQL = 'mysql';
 
+    public const DB = 'db';
+
     public const Redis = 'redis';
 }

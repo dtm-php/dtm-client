@@ -19,6 +19,7 @@ return [
     'barrier' => [
         'db' => [
             'type' => DbType::MySQL,
+            // 'type' => DbType::DB,
         ],
         'apply' => [],
     ],
