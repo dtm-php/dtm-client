@@ -40,6 +40,7 @@ class MySqlBarrier implements BarrierInterface
         $originOP = [
             Branch::BranchCancel => Branch::BranchTry,
             Branch::BranchCompensate => Branch::BranchAction,
+            Branch::BranchRollback => Branch::BranchRollback,
         ][$op] ?? '';
 
         $this->DBTransaction->beginTransaction();
@@ -53,7 +54,7 @@ class MySqlBarrier implements BarrierInterface
             }
 
             if (
-                ($op == Operation::BRANCH_CANCEL || $op == Operation::BRANCH_COMPENSATE) && $originAffected > 0 // null compensate
+                ($op == Operation::BRANCH_CANCEL || $op == Operation::BRANCH_COMPENSATE || $op == Operation::ROLLBACK) && $originAffected > 0 // null compensate
                 || $currentAffected == 0// repeated request or dangled request
             ) {
                 $this->DBTransaction->commit();
