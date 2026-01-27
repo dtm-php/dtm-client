@@ -36,6 +36,12 @@ class Msg extends AbstractTransaction
         TransContext::init($gid, TransType::MSG, '');
     }
 
+    public function addTopic(string $action, $payload)
+    {
+        $action = sprintf('topic://%s', $action);
+        $this->add($action, $payload);
+    }
+
     public function add(string $action, $payload)
     {
         TransContext::addStep(['action' => $action]);
@@ -81,6 +87,14 @@ class Msg extends AbstractTransaction
             $this->queryPrepared($queryPrepared);
             throw $exception;
         }
+    }
+
+    public function subscribe(string $topic, string $url, string $remark = '')
+    {
+        $body['topic'] = $topic;
+        $body['url'] = $url;
+        $body['remark'] = $remark;
+        return $this->api->subscribe($body);
     }
 
     protected function queryPrepared(string $queryPrepared)

@@ -79,6 +79,11 @@ class GrpcApi implements ApiInterface
         throw new UnsupportedException('Unsupported QueryAll operation');
     }
 
+    public function subscribe(array $body)
+    {
+        throw new UnsupportedException('Unsupported QueryAll operation');
+    }
+
     public function transRequestBranch(RequestBranch $requestBranch)
     {
         [$hostname, $method] = $this->parseHostnameAndMethod($requestBranch->url);

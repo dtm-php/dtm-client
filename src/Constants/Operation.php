@@ -31,4 +31,6 @@ class Operation
     public const ACTION = 'action';
 
     public const ROLLBACK = 'rollback';
+
+    public const SUBSCRIBE = 'subscribe';
 }
