@@ -85,6 +85,11 @@ class HttpApi implements ApiInterface
         return $this->transQuery($body, Operation::QUERY_ALL);
     }
 
+    public function subscribe(array $body)
+    {
+        return $this->transQuery($body, Operation::SUBSCRIBE);
+    }
+
     public function getClient(): Client
     {
         return $this->client;

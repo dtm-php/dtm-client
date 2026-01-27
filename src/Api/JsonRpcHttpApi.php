@@ -81,6 +81,11 @@ class JsonRpcHttpApi extends AbstractServiceClient implements ApiInterface
         throw new UnsupportedException('Unsupported Query operation');
     }
 
+    public function subscribe(array $body)
+    {
+        throw new UnsupportedException('Unsupported Query operation');
+    }
+
     public function getClient(): Client
     {
         return $this->client;

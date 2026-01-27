@@ -26,5 +26,7 @@ interface ApiInterface
 
     public function queryAll(array $body);
 
+    public function subscribe(array $body);
+
     public function transRequestBranch(RequestBranch $requestBranch);
 }
