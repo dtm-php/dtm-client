@@ -42,14 +42,8 @@ class HyperfDbTransaction extends AbstractTransaction
     {
         return Db::select($sql, $bindings);
     }
-
-    public function insert(string $table, array $data = []): bool
+    public function connection()
     {
-        return Db::table($table)->insert($data);
-    }
-
-    public function queryBuilder(string $table, mixed $select, array $where = [], int $limit = 1): array
-    {
-        return Db::table($table)->select($select)->where($where)->limit($limit)->get()->toArray();
+        return Db::connection();
     }
 }

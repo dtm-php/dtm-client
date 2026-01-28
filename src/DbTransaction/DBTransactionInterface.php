@@ -20,11 +20,12 @@ interface DBTransactionInterface
 
     public function execute(string $sql, array $bindings = []): int;
 
-    public function insert(string $table, array $data = []): bool;
+    /**
+     * @return \Hyperf\Database\ConnectionInterface|\Illuminate\Database\Connection
+     */
+    public function connection();
 
     public function query(string $sql, array $bindings = []): bool|array;
-
-    public function queryBuilder(string $table, mixed $select, array $where = [], int $limit = 1): array;
 
     public function xaExecute(string $sql, array $bindings = []): int;
 

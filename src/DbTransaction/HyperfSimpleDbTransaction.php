@@ -43,13 +43,7 @@ class HyperfSimpleDbTransaction extends AbstractTransaction
         return DB::query($sql, $bindings);
     }
 
-
-    public function queryBuilder(string $table, mixed $select, array $where = [], int $limit = 1): array
-    {
-        throw new \Exception('Not implemented');
-    }
-
-    public function insert(string $table, array $data = []): bool
+    public function connection()
     {
         throw new \Exception('Not implemented');
     }

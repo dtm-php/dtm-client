@@ -14,28 +14,11 @@ use DtmClient\Exception\FailureException;
 
 class DbBarrier extends MySqlBarrier
 {
-    protected function insertBarrier(string $transType, string $gid, string $branchId, string $op, string $barrierID, string $reason): int
-    {
-        if (empty($op)) {
-            return 0;
-        }
-
-        $bool = $this->DBTransaction->insert('barrier', [
-            'trans_type' => $transType,
-            'gid' => $gid,
-            'branch_id' => $branchId,
-            'op' => $op,
-            'barrier_id' => $barrierID,
-            'reason' => $reason,
-        ]);
-
-        return (int)$bool;
-    }
-
-
     public function queryPrepared(string $transType, string $gid): bool
     {
-        $this->DBTransaction->insert('barrier', [
+        $db = $this->DBTransaction->connection();
+        $table = $db->raw('barrier');
+        $db->table($table)->insertOrIgnore([
             'trans_type' => $transType,
             'gid' => $gid,
             'branch_id' => Branch::MsgDoBranch0,
@@ -44,16 +27,34 @@ class DbBarrier extends MySqlBarrier
             'reason' => Operation::ROLLBACK,
         ]);
 
-        $reason = $this->DBTransaction->queryBuilder('barrier','barrier', [
-            'gid' => $gid,
-            'branch_id' => Branch::MsgDoBranch0,
-            'op' => Branch::MsgDoOp,
-            'barrier_id' => Branch::MsgDoBarrier1,
-        ])[0] ?? [];
-
-        if ($reason['reason'] ?? '' == Operation::ROLLBACK) {
+        $reason = $db->table($table)
+            ->select('reason')
+            ->where([
+                'gid' => $gid,
+                'branch_id' => Branch::MsgDoBranch0,
+                'op' => Branch::MsgDoOp,
+                'barrier_id' => Branch::MsgDoBarrier1,
+            ])->first();
+        if ($reason->reason == Operation::ROLLBACK) {
             throw new FailureException();
         }
         return true;
+    }
+
+    protected function insertBarrier(string $transType, string $gid, string $branchId, string $op, string $barrierID, string $reason): int
+    {
+        if (empty($op)) {
+            return 0;
+        }
+        $db = $this->DBTransaction->connection();
+        $table = $db->raw('barrier');
+        return $db->table($table)->insertOrIgnore([
+            'trans_type' => $transType,
+            'gid' => $gid,
+            'branch_id' => $branchId,
+            'op' => $op,
+            'barrier_id' => $barrierID,
+            'reason' => $reason,
+        ]);
     }
 }

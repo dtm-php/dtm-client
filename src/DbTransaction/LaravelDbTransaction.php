@@ -39,13 +39,8 @@ class LaravelDbTransaction extends AbstractTransaction
         return DB::select($sql, $bindings);
     }
 
-    public function insert(string $table, array $data = []): bool
+    public function connection()
     {
-        return DB::table($table)->insert($data);
-    }
-
-    public function queryBuilder(string $table, mixed $select, array $where = [], int $limit = 1): array
-    {
-        return DB::table($table)->select($select)->where($where)->limit($limit)->get()->toArray();
+        return DB::connection();
     }
 }
