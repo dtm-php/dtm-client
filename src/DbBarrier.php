@@ -35,6 +35,7 @@ class DbBarrier extends MySqlBarrier
                 'op' => Branch::MsgDoOp,
                 'barrier_id' => Branch::MsgDoBarrier1,
             ])->first();
+
         if ($reason->reason == Operation::ROLLBACK) {
             throw new FailureException();
         }
