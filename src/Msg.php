@@ -75,7 +75,7 @@ class Msg extends AbstractTransaction
         $this->barrier->barrierFrom(TransType::MSG, TransContext::getGid(), '00', 'msg');
         $this->prepare($queryPrepared);
         try {
-            $businessCall();
+            $this->barrier->call($businessCall);
             $this->submit();
         } catch (FailureException $failureException) {
             $this->api->abort([
