@@ -375,3 +375,73 @@ class XAController
 
 ```
 上面的代码首先注册了一个全局XA事务，然后添加了两个子事务transIn、transOut。子事务全部执行成功之后，提交给dtm。dtm收到提交的xa全局事务后，会调用所有子事务的xa commit，完成整个xa事务。
+
+## 二阶段消息
+
+### 代码示例
+
+以下展示在 Hyperf 框架中的使用方法，其它框架类似
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Controller;
+
+use DtmClient\Barrier;
+use DtmClient\Middleware\DtmMiddleware;
+use DtmClient\Msg;
+use DtmClient\TransContext;
+use Hyperf\HttpServer\Annotation\Controller;
+use Hyperf\HttpServer\Annotation\RequestMapping;
+
+#[Controller(prefix: '/msg')]
+class MsgController extends AbstractSagaController
+{
+    private Msg $msg;
+
+    public function __construct(Msg $msg)
+    {
+        $this->msg = $msg;
+    }
+
+    #[RequestMapping(path: 'msg')]
+    public function msg()
+    {
+        $this->msg->init();
+        $this->msg->add('http://127.0.0.1:19501/msg/test', ['name' => 'dtmMsg']);
+        //添加Topic
+        //$this->msg->addTopic('TransIn', ['name' => 'Topic dtmMsg']);
+
+        $this->msg->doAndSubmit('http://127.0.0.1:19501/msg/queryPrepared', function () {
+            var_dump('执行业务');
+        });
+        return TransContext::getGid();
+    }
+
+    #[RequestMapping(path: 'queryPrepared')]
+    public function queryPrepared(Barrier $barrier)
+    {
+        var_dump(__METHOD__);
+        $transType = $this->request->query('trans_type');
+        $gid = $this->request->query('gid');
+        $barrier->queryPrepared($transType, $gid);
+    }
+
+    #[RequestMapping(path: 'test')]
+    public function test()
+    {
+        var_dump(__METHOD__);
+        return 'rest';
+    }
+
+    #[RequestMapping(path: 'subscribe')]
+    public function subscribe()
+    {
+        //订阅
+        $this->msg->subscribe('TransIn', 'http://127.0.0.1:19501/msg/test', 'subscribe test');
+        return 'subscribe';
+    }
+}
+```
