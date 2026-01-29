@@ -73,6 +73,7 @@ class TCC extends AbstractTransaction
                 $branchRequest->branchId = $branchId;
                 $branchRequest->op = Operation::TRY;
                 $branchRequest->body = $body;
+                $branchRequest->branchHeaders = TransContext::getBranchHeaders();
                 return $this->api->transRequestBranch($branchRequest);
             case Protocol::GRPC:
                 if (! $body instanceof Message) {
