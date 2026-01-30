@@ -1,11 +1,7 @@
 <?php
 
 declare(strict_types=1);
-/**
- * This file is part of DTM-PHP.
- *
- * @license  https://github.com/dtm-php/dtm-client/blob/master/LICENSE
- */
+
 namespace DtmClient;
 
 use DtmClient\Api\ApiInterface;
@@ -14,9 +10,9 @@ use DtmClient\Constants\Protocol;
 use DtmClient\Constants\TransType;
 use DtmClient\Exception\FailureException;
 use DtmClient\Exception\UnsupportedException;
+use Exception;
 use Google\Protobuf\GPBEmpty;
 use Google\Protobuf\Internal\Message;
-use GuzzleHttp\Psr7\Response;
 
 class Msg extends AbstractTransaction
 {
@@ -70,12 +66,17 @@ class Msg extends AbstractTransaction
         return $this->api->submit(TransContext::toArray());
     }
 
+    public function doAndSubmitDB(string $queryPrepared, callable $businessCall)
+    {
+        $this->doAndSubmit($queryPrepared, fn () => $this->barrier->call($businessCall));
+    }
+
     public function doAndSubmit(string $queryPrepared, callable $businessCall)
     {
         $this->barrier->barrierFrom(TransType::MSG, TransContext::getGid(), '00', 'msg');
         $this->prepare($queryPrepared);
         try {
-            $this->barrier->call($businessCall);
+            $businessCall();
             $this->submit();
         } catch (FailureException $failureException) {
             $this->api->abort([
@@ -83,7 +84,7 @@ class Msg extends AbstractTransaction
                 'trans_type' => TransType::MSG,
             ]);
             throw $failureException;
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $this->queryPrepared($queryPrepared);
             throw $exception;
         }
