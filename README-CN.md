@@ -414,7 +414,7 @@ class MsgController extends AbstractSagaController
         //添加Topic
         //$this->msg->addTopic('TransIn', ['name' => 'Topic dtmMsg']);
 
-        $this->msg->doAndSubmit('http://127.0.0.1:19501/msg/queryPrepared', function () {
+        $this->msg->doAndSubmitDB('http://127.0.0.1:19501/msg/queryPrepared', function () {
             var_dump('执行业务');
         });
         return TransContext::getGid();

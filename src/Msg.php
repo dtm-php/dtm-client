@@ -1,7 +1,11 @@
 <?php
 
 declare(strict_types=1);
-
+/**
+ * This file is part of DTM-PHP.
+ *
+ * @license  https://github.com/dtm-php/dtm-client/blob/master/LICENSE
+ */
 namespace DtmClient;
 
 use DtmClient\Api\ApiInterface;
@@ -10,7 +14,6 @@ use DtmClient\Constants\Protocol;
 use DtmClient\Constants\TransType;
 use DtmClient\Exception\FailureException;
 use DtmClient\Exception\UnsupportedException;
-use Exception;
 use Google\Protobuf\GPBEmpty;
 use Google\Protobuf\Internal\Message;
 
@@ -84,7 +87,7 @@ class Msg extends AbstractTransaction
                 'trans_type' => TransType::MSG,
             ]);
             throw $failureException;
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $this->queryPrepared($queryPrepared);
             throw $exception;
         }
