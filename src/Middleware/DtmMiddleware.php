@@ -141,7 +141,7 @@ class DtmMiddleware implements MiddlewareInterface
             $this->isGRPC() && $response = $response->withTrailer('grpc-status', (string) $failureException->getCode())->withTrailer('grpc-message', $failureException->getMessage());
             return $response;
         } catch (\Throwable $throwable) {
-            $this->logger->error($throwable);
+            $this->logger->error((string)$throwable);
             $code = $this->isGRPC() ? 200 : Result::FAILURE_STATUS;
             $response = $response->withStatus($code);
             $this->isGRPC() && $response = $response->withTrailer('grpc-status', (string) Result::FAILURE_STATUS)->withTrailer('grpc-message', $throwable->getMessage());
