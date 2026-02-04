@@ -16,6 +16,7 @@ use DtmClient\Constants\TransType;
 use DtmClient\Exception\InvalidArgumentException;
 use DtmClient\Exception\UnsupportedException;
 use Google\Protobuf\Internal\Message;
+use Psr\Http\Message\ResponseInterface;
 
 class TCC extends AbstractTransaction
 {
@@ -51,6 +52,7 @@ class TCC extends AbstractTransaction
 
     /**
      * @param array|Message $body
+     * @return array|ResponseInterface
      */
     public function callBranch($body, string $tryUrl, string $confirmUrl, string $cancelUrl)
     {
