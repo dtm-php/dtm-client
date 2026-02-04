@@ -15,6 +15,7 @@ use DtmClient\Constants\TransType;
 use DtmClient\DbTransaction\DBTransactionInterface;
 use DtmClient\Exception\DuplicatedException;
 use DtmClient\Exception\FailureException;
+use Psr\Http\Message\ResponseInterface;
 
 class MySqlBarrier implements BarrierInterface
 {
@@ -40,7 +41,7 @@ class MySqlBarrier implements BarrierInterface
         $originOP = [
             Branch::BranchCancel => Branch::BranchTry,
             Branch::BranchCompensate => Branch::BranchAction,
-            Branch::BranchRollback => Branch::BranchRollback,
+            Branch::BranchRollback => Branch::BranchAction,
         ][$op] ?? '';
 
         $this->DBTransaction->beginTransaction();
@@ -62,7 +63,7 @@ class MySqlBarrier implements BarrierInterface
             }
 
             $response = $businessCall();
-            if ($response->getStatusCode() !== Result::SUCCESS_STATUS) {
+            if ($response instanceof ResponseInterface && $response->getStatusCode() !== Result::SUCCESS_STATUS) {
                 throw new FailureException();
             }
 

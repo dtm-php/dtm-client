@@ -16,7 +16,6 @@ use DtmClient\Exception\FailureException;
 use DtmClient\Exception\UnsupportedException;
 use Google\Protobuf\GPBEmpty;
 use Google\Protobuf\Internal\Message;
-use GuzzleHttp\Psr7\Response;
 
 class Msg extends AbstractTransaction
 {
@@ -68,6 +67,11 @@ class Msg extends AbstractTransaction
     public function submit()
     {
         return $this->api->submit(TransContext::toArray());
+    }
+
+    public function doAndSubmitDB(string $queryPrepared, callable $businessCall)
+    {
+        $this->doAndSubmit($queryPrepared, fn () => $this->barrier->call($businessCall));
     }
 
     public function doAndSubmit(string $queryPrepared, callable $businessCall)
