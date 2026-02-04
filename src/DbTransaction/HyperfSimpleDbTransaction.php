@@ -8,6 +8,7 @@ declare(strict_types=1);
  */
 namespace DtmClient\DbTransaction;
 
+use Exception;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\DB\DB;
 
@@ -42,5 +43,9 @@ class HyperfSimpleDbTransaction extends AbstractTransaction
     {
         return DB::query($sql, $bindings);
     }
-    
+
+    public function connection()
+    {
+        throw new Exception('Not implemented');
+    }
 }

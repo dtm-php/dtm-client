@@ -42,4 +42,9 @@ class HyperfDbTransaction extends AbstractTransaction
     {
         return Db::select($sql, $bindings);
     }
+
+    public function connection()
+    {
+        return Db::connection();
+    }
 }

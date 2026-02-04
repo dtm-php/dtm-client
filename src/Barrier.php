@@ -21,10 +21,13 @@ class Barrier
 
     protected MySqlBarrier $mySqlBarrier;
 
-    public function __construct(ConfigInterface $config, MySqlBarrier $mySqlBarrier)
+    protected DbBarrier $dbBarrier;
+
+    public function __construct(ConfigInterface $config, MySqlBarrier $mySqlBarrier, DbBarrier $dbBarrier)
     {
         $this->config = $config;
         $this->mySqlBarrier = $mySqlBarrier;
+        $this->dbBarrier = $dbBarrier;
     }
 
     public function call(callable $businessCall)
@@ -77,6 +80,8 @@ class Barrier
         switch ($this->config->get('dtm.barrier.db.type', DbType::MySQL)) {
             case DbType::MySQL:
                 return $this->mySqlBarrier;
+            case DbType::DB:
+                return $this->dbBarrier;
             default:
                 throw new UnsupportedException('Barrier DB type is unsupported.');
         }
