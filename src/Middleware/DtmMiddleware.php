@@ -16,6 +16,7 @@ use DtmClient\Exception\FailureException;
 use DtmClient\Exception\OngingException;
 use DtmClient\Exception\RuntimeException;
 use Hyperf\Contract\ConfigInterface;
+use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Di\Annotation\AnnotationCollector;
 use Hyperf\Grpc\StatusCode;
 use Hyperf\HttpMessage\Stream\SwooleStream;
@@ -33,11 +34,14 @@ class DtmMiddleware implements MiddlewareInterface
 
     protected ConfigInterface $config;
 
-    public function __construct(Barrier $barrier, ResponseInterface $response, ConfigInterface $config)
+    protected StdoutLoggerInterface $logger;
+
+    public function __construct(Barrier $barrier, ResponseInterface $response, ConfigInterface $config, StdoutLoggerInterface $logger)
     {
         $this->barrier = $barrier;
         $this->response = $response;
         $this->config = $config;
+        $this->logger = $logger;
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
@@ -137,6 +141,7 @@ class DtmMiddleware implements MiddlewareInterface
             $this->isGRPC() && $response = $response->withTrailer('grpc-status', (string) $failureException->getCode())->withTrailer('grpc-message', $failureException->getMessage());
             return $response;
         } catch (\Throwable $throwable) {
+            $this->logger->error((string)$throwable);
             $code = $this->isGRPC() ? 200 : Result::FAILURE_STATUS;
             $response = $response->withStatus($code);
             $this->isGRPC() && $response = $response->withTrailer('grpc-status', (string) Result::FAILURE_STATUS)->withTrailer('grpc-message', $throwable->getMessage());
